@@ -25,24 +25,11 @@
         </android.support.v7.widget.RecyclerView>
 
     </LinearLayout>
-    <LinearLayout
+    <!-- recyclerView 내용 : layout_post_list.xml -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/post_recycler"
+        android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
-        <!-- recyclerView 내용 : layout_post_list.xml -->
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/post_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </android.support.v7.widget.RecyclerView>
-    </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        android:src="@android:drawable/ic_menu_add"
-        android:layout_gravity="right" />
+        android:layout_weight="1" />
 </LinearLayout>

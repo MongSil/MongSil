@@ -43,21 +43,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
         slidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
         slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
-        slidingMenu.setMenu(R.layout.menu_sliding);
-
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                if(id == R.id.toolbar_alarm) {
-                    return true;
-                }
-                if(id == R.id.toolbar_setting) {
-                    return true;
-                }
-                return false;
-            }
-        });
     }
 
     @Override

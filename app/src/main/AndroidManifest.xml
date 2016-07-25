@@ -16,7 +16,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SignUpActivity" />
-        <activity android:name=".MakingMongsilActivity" />
+        <activity android:name=".MakeMongsilActivity" />
         <activity android:name=".SplashActivity"></activity>
     </application>
 
