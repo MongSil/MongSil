@@ -3,6 +3,7 @@
     package="kr.co.tacademy.mongsil.mongsil">
 
     <application
+        android:name=".MongSilApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -17,7 +18,12 @@
         </activity>
         <activity android:name=".SignUpActivity" />
         <activity android:name=".MakeMongsilActivity" />
-        <activity android:name=".SplashActivity"></activity>
+        <activity android:name=".SplashActivity" />
+        <activity android:name=".PostDetailActivity" />
+        <activity android:name=".InviteFriendActivity"></activity>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

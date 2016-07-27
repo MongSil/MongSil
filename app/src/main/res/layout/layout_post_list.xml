@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- recyclerView 내용 : layout_post_item.xml -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
@@ -12,13 +11,10 @@
         android:gravity="left"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <LinearLayout
+    <!-- recyclerView 내용 : layout_post_item.xml -->
+    <android.support.v7.widget.RecyclerView
+        android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <android.support.v7.widget.RecyclerView
-            android:layout_margin="5dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </android.support.v7.widget.RecyclerView>
-    </LinearLayout>
+    </android.support.v7.widget.RecyclerView>
 </LinearLayout>
