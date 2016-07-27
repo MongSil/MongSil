@@ -66,15 +66,15 @@ public class MainActivity extends AppCompatActivity {
         tbSetting = (ImageView) toolbar.findViewById(R.id.toolbar_setting);
 
         // 슬라이딩 메뉴(프로필 메뉴 추가)
-        /*slidingMenu = new SlidingMenu(this);
+        slidingMenu = new SlidingMenu(this);
         slidingMenu.setMode(SlidingMenu.LEFT);
         slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
         slidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
         slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
         slidingMenu.setMenu(R.layout.fragment_sliding_menu);
         getSupportFragmentManager().beginTransaction().
-                replace(R.id.slidingmenumain,
-                        SlidingMenuFragment.newInstance()).commit();*/
+                replace(R.id.sliding_menu_container,
+                        SlidingMenuFragment.newInstance()).commit();
 
         // 날씨
         View wv = findViewById(R.id.weather_info);

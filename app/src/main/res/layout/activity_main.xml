@@ -12,6 +12,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="kr.co.tacademy.mongsil.mongsil.MainActivity">
 
+    <FrameLayout
+        android:id="@+id/sliding_menu_container"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
     <!-- 메인 화면 -->
     <LinearLayout
         android:orientation="vertical"
