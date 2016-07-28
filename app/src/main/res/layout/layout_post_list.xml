@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:paddingBottom="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:background="@drawable/shape_radius"
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2">
+            <ImageView
+                android:id="@+id/img_post_profile"
+                android:src="@mipmap/ic_launcher"
+                android:gravity="center"
+                android:scaleType="fitCenter"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_alignLeft="@+id/text_post_name"
+                android:layout_alignStart="@+id/text_post_name" />
+            <TextView
+                android:id="@+id/text_post_name"
+                android:text="@string/name"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/img_post_profile"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="6">
+            <TextView
+                android:id="@+id/text_post_content"
+                android:text="asdfasfasdf"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="8"/>
+            <TextView
+                android:id="@+id/text_post_time"
+                android:text="ㅇㅇㅇ"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_next"
+            android:background="@mipmap/ic_launcher"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+</LinearLayout>
