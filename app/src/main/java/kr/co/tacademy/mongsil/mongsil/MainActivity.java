@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         weatherRecyclerView.setAdapter(new WeatherRecyclerViewAdapter());
+
         // 사진찍어 글쓰기 버튼
         btnCapturePost = (FloatingActionButton) findViewById(R.id.btn_capture_post);
 
