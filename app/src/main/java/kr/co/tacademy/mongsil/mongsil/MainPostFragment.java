@@ -1,5 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -44,16 +45,20 @@ public class MainPostFragment extends Fragment {
 
         ////// sample code
         PostData data = new PostData();
-        data.setTypeData(0);
+        PostData data1 = new PostData();
+        PostData data2 = new PostData();
+        PostData data3 = new PostData();
+        PostData data4 = new PostData();
+        data.setTimeData(0, "Today");
         adapter.add(data);
-        data.setData(1, "10:25AM", R.mipmap.ic_launcher, "스님", "날이 밝구나");
-        adapter.add(data);
-        data.setData(1, "10:25AM", R.mipmap.ic_launcher, "스님", "날이 밝구나");
-        adapter.add(data);
-        data.setTypeData(0);
-        adapter.add(data);
-        data.setData(1, "10:25AM", R.mipmap.ic_launcher, "스님", "날이 밝구나");
-        adapter.add(data);
+        data1.setData(1, "10:25 AM", R.mipmap.ic_launcher, "스님", "날이 밝구나");
+        adapter.add(data1);
+        data2.setData(1, "02:25 PM", R.mipmap.ic_launcher, "주지스님", "날씨가 덥구나");
+        adapter.add(data2);
+        data3.setTimeData(0, "2016.07.29");
+        adapter.add(data3);
+        data4.setData(1, "05:20 PM", R.mipmap.ic_launcher, "동자스님", "밖에 나가고 싶어요 빼앢");
+        adapter.add(data4);
         //////
 
         return postRecyclerView;
@@ -82,12 +87,12 @@ public class MainPostFragment extends Fragment {
             public DateViewHolder(View view) {
                 super(view);
                 this.view = view;
-                postDate =
-                        (TextView) view.findViewById(R.id.text_post_date);
+                 postDate = (TextView) view.findViewById(R.id.text_post_date);
             }
 
             public void setMyData(PostData data) {
                 // TODO: 서버에서 전송한 '날짜'데이터 삽입, 오늘이면 Today, 어제면 어제..
+                 postDate.setText(data.time);
             }
         }
 
@@ -110,6 +115,10 @@ public class MainPostFragment extends Fragment {
 
             public void setMyData(PostData data) {
                 // TODO: 서버에서 전송한 게시글 목록 삽입
+                imgPostProfile.setImageResource(data.imgProfile);
+                postName.setText(data.name);
+                postContent.setText(data.content);
+                postTime.setText(data.time);
             }
         }
 

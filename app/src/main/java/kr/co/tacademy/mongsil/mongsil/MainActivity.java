@@ -2,12 +2,14 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 툴바 필드
     TextView tbTitle;
-    ImageView tbMenu, tbAlarm, tbSetting;
+    ImageView tbSearch;
 
     // 날씨 필드
     ImageView imgweathericon;
@@ -49,21 +51,15 @@ public class MainActivity extends AppCompatActivity {
             ft.replace(R.id.main_post_fragment_container, mainPostFragment);
             ft.commit();
         }
-
         // 툴바 추가
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeAsUpIndicator(R.mipmap.ic_launcher);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
         tbTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
-        tbMenu = (ImageView) toolbar.findViewById(R.id.toolbar_menu);
-        tbMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                slidingMenu.showMenu();
-            }
-        });
-        tbAlarm = (ImageView) toolbar.findViewById(R.id.toolbar_alarm);
-        tbSetting = (ImageView) toolbar.findViewById(R.id.toolbar_setting);
+        tbSearch = (ImageView) toolbar.findViewById(R.id.toolbar_search);
 
         // 슬라이딩 메뉴(프로필 메뉴 추가)
         slidingMenu = new SlidingMenu(this);
@@ -94,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
 
         // 사진찍어 글쓰기 버튼
         btnCapturePost = (FloatingActionButton) findViewById(R.id.btn_capture_post);
-
     }
 
     private View loadSlidingMenu() {
@@ -106,6 +101,10 @@ public class MainActivity extends AppCompatActivity {
         TextView textMyName, textMyLocation, textMyPost;
         TextView textSignedMongsil, textSignedMongsilNum;
         TextView textMakeMongsil, textInviteMongsil;
+        textMyName = (TextView) menu.findViewById(R.id.text_my_name);
+        textMyLocation = (TextView) menu.findViewById(R.id.text_my_location);
+        textMyName.setText("몽실이");
+        textMyLocation.setText("대전이었던가?");
 
         return menu;
     }
@@ -145,6 +144,16 @@ public class MainActivity extends AppCompatActivity {
         public int getItemCount() {
             return WHEATHER_COUNT;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home :
+                slidingMenu.showMenu();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

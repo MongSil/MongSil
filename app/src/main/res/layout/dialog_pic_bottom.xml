@@ -8,8 +8,9 @@
     <LinearLayout
         android:orientation="vertical"
         android:background="@drawable/shape_radius"
-        android:layout_margin="15dp"
-        android:layout_width="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="2">
         <View
@@ -17,11 +18,14 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.01"/>
-        <TextView
-            android:id="@+id/text_capture"
+        <Button
+            android:id="@+id/btn_capture"
             android:text="@string/capture"
+            android:textColor="#DB2E2F"
+            android:textSize="16sp"
+            android:background="@color/invisible"
             android:gravity="center"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1" />
@@ -29,27 +33,37 @@
             android:background="@color/line"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.01"/>
+            android:layout_weight="0.1"/>
 
-        <TextView
-            android:id="@+id/text_select_gallery"
-            android:text="@string/capture"
+        <Button
+            android:id="@+id/btn_select_gallery"
+            android:text="@string/select_gallery"
+            android:textColor="#2B5B99"
+            android:textSize="16sp"
+            android:background="@color/invisible"
             android:gravity="center"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1" />
     </LinearLayout>
-    
-    <TextView
-        android:id="@+id/text_close"
-        android:text="@string/close"
-        android:gravity="center"
-        android:layout_margin="15dp"
+
+
+    <LinearLayout
+        android:orientation="vertical"
         android:background="@drawable/shape_radius"
+        android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_weight="1" />
-
+        android:layout_weight="1">
+        <Button
+            android:id="@+id/btn_close"
+            android:text="@string/close"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:background="@color/invisible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
 </LinearLayout>
