@@ -4,7 +4,6 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <!-- 뷰페이저 안 : layout_tutorial_content -->
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager_tutorial"

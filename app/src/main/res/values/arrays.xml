@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="menu_tab_title">
+        <item>나의 이야기</item>
+        <item>내가 쓴 댓글</item>
+    </string-array>
+</resources>

@@ -1,101 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".SignUpActivity">
-
-    <ImageView
-        android:id="@+id/img_back"
-        android:scaleType="fitStart"
-        android:layout_width="wrap_content"
-        android:layout_height="?attr/actionBarSize" />
-
     <ImageView
         android:id="@+id/img_signup_mongsil"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_gravity="center"
-        android:layout_weight="1" />
+        android:layout_weight="1.5" />
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_signup_profile"
+        android:src="@android:drawable/ic_menu_edit"
+        android:layout_marginBottom="20dp"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_gravity="center_horizontal|top"
-        android:layout_weight="2" />
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:layout_gravity="center_horizontal" />
 
     <!-- 인폴레이터로 위로 스르륵 올라가게 함 -->
     <LinearLayout
         android:orientation="vertical"
-        android:gravity="center"
-        android:layout_width="wrap_content"
+        android:gravity="start"
+        android:background="@drawable/border"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_weight="2">
+        android:layout_weight="1">
 
         <LinearLayout
             android:orientation="horizontal"
-            android:gravity="start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <ImageView
                 android:id="@+id/img_name"
+                android:src="@mipmap/ic_launcher"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/text_name"
                 android:text="@string/name"
+                android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
         <EditText
             android:id="@+id/edit_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:visibility="visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null" />
     </LinearLayout>
 
     <LinearLayout
         android:orientation="vertical"
-        android:gravity="center"
-        android:layout_width="wrap_content"
+        android:gravity="start"
+        android:background="@drawable/border"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_weight="2">
+        android:layout_weight="1">
 
         <LinearLayout
             android:orientation="horizontal"
-            android:gravity="start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <ImageView
                 android:id="@+id/img_location"
+                android:src="@mipmap/ic_launcher"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/text_location"
-                android:text="@string/location"
+                android:text="@string/name"
+                android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
         <EditText
             android:id="@+id/edit_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
+            android:visibility="visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:autoText="false" />
     </LinearLayout>
-    <TextView
-        android:id="@+id/text_signup_done"
-        android:text="@string/signup_done"
-        android:textSize="24sp"
-        android:gravity="center"
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_weight="3" />
+        android:layout_weight="4"
+        android:layout_gravity="center_horizontal">
+
+        <ImageView
+            android:id="@+id/img_signup_done"
+            android:src="@android:drawable/star_big_on"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 </LinearLayout>
