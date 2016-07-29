@@ -74,18 +74,19 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true" />
         </RelativeLayout>
+
         <!-- 탭레이아웃 부분 -->
         <android.support.design.widget.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="7"
+            android:layout_height="wrap_content"
             app:tabMode="fixed"
             app:tabMinWidth="90dp" />
         <android.support.v4.view.ViewPager
             android:id="@+id/viewpager_menu"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="7"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

@@ -46,7 +46,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="7"
-        android:background="@color/sliding_menu_background"
         android:paddingLeft="10dp"
         android:paddingTop="50dp"
         android:paddingRight="10dp">

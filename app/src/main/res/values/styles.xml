@@ -1,5 +1,4 @@
 <resources>
-
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -24,5 +23,4 @@
         <item name="android:windowEnterAnimation">@anim/anim_slide_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/anim_slide_out_bottom</item>
     </style>
-
 </resources>

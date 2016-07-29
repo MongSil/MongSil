@@ -64,6 +64,6 @@ public class BottomDialogFragment extends DialogFragment {
         wlp.windowAnimations = R.style.BottomDialogAnimation;
         wlp.gravity = Gravity.BOTTOM;
         wlp.height = getResources().getDimensionPixelSize(R.dimen.dialog_pic_vertical);
-        //window.setAttributes(wlp);
+        window.setAttributes(wlp);
     }
 }

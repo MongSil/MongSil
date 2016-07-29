@@ -1,7 +1,12 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -67,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
         slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
         slidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
         slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
-        slidingMenu.setMenu(loadSlidingMenu());
+        slidingMenu.setMenu(
+                loadSlidingMenu());
 
         // 날씨
         View wv = findViewById(R.id.weather_info);
@@ -92,22 +100,67 @@ public class MainActivity extends AppCompatActivity {
         btnCapturePost = (FloatingActionButton) findViewById(R.id.btn_capture_post);
     }
 
-    private View loadSlidingMenu() {
+    public View loadSlidingMenu() {
         View menu = getLayoutInflater().inflate(R.layout.layout_sliding_menu, null);
 
         ImageView imgProfile =
                 (ImageView) menu.findViewById(R.id.img_profile);
 
-        TextView textMyName, textMyLocation, textMyPost;
-        TextView textSignedMongsil, textSignedMongsilNum;
-        TextView textMakeMongsil, textInviteMongsil;
+        TextView textMyName, textMyLocation;
         textMyName = (TextView) menu.findViewById(R.id.text_my_name);
         textMyLocation = (TextView) menu.findViewById(R.id.text_my_location);
         textMyName.setText("몽실이");
         textMyLocation.setText("대전이었던가?");
 
+        ViewPager viewPager = (ViewPager) menu.findViewById(R.id.viewpager_menu);
+        if(viewPager != null) {
+            MenuViewPagerAdapter adapter =
+                    new MenuViewPagerAdapter(getSupportFragmentManager());
+            String[] tabTitle = MongSilApplication.getMongSilContext()
+                    .getResources().getStringArray(R.array.menu_tab_title);
+            adapter.appendFragment(SlidingMenuTabFragment.newInstance(0), tabTitle[0]);
+            adapter.appendFragment(SlidingMenuTabFragment.newInstance(1), tabTitle[1]);
+            viewPager.setAdapter(adapter);
+        }
+
+        TabLayout tabLayout = (TabLayout) menu.findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+
         return menu;
     }
+
+    // 메뉴 뷰페이저 어답터
+    private static class MenuViewPagerAdapter extends FragmentPagerAdapter {
+        private final ArrayList<SlidingMenuTabFragment> fragments
+                = new ArrayList<SlidingMenuTabFragment>();
+        private final ArrayList<String> tabTitle = new ArrayList<String>();
+
+        public MenuViewPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
+
+        public void appendFragment(SlidingMenuTabFragment fragment, String title) {
+            fragments.add(fragment);
+            tabTitle.add(title);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return fragments.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return fragments.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return tabTitle.get(position);
+        }
+    }
+
+    // 일주일 날씨 어답터
     public static class WeatherRecyclerViewAdapter
             extends RecyclerView.Adapter<WeatherRecyclerViewAdapter.ViewHolder> {
         private static final int WHEATHER_COUNT = 6;
