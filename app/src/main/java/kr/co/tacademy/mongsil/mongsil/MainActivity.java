@@ -1,5 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -100,17 +101,28 @@ public class MainActivity extends AppCompatActivity {
         btnCapturePost = (FloatingActionButton) findViewById(R.id.btn_capture_post);
     }
 
+    // 슬라이딩메뉴 뷰
     public View loadSlidingMenu() {
         View menu = getLayoutInflater().inflate(R.layout.layout_sliding_menu, null);
 
-        ImageView imgProfile =
-                (ImageView) menu.findViewById(R.id.img_profile);
+        CircleImageView imgProfile =
+                (CircleImageView) menu.findViewById(R.id.img_profile);
 
         TextView textMyName, textMyLocation;
         textMyName = (TextView) menu.findViewById(R.id.text_my_name);
         textMyLocation = (TextView) menu.findViewById(R.id.text_my_location);
         textMyName.setText("몽실이");
-        textMyLocation.setText("대전이었던가?");
+        textMyLocation.setText("대전");
+
+        ImageView imgSetting, imgAlarm, imgClose;
+        imgSetting = (ImageView) menu.findViewById(R.id.img_setting);
+        imgClose = (ImageView) menu.findViewById(R.id.img_close);
+        imgClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                slidingMenu.toggle();
+            }
+        });
 
         ViewPager viewPager = (ViewPager) menu.findViewById(R.id.viewpager_menu);
         if(viewPager != null) {

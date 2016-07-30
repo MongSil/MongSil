@@ -13,15 +13,17 @@
         android:layout_height="match_parent">
         <!-- 윗부분 -->
         <RelativeLayout
+            android:background="@color/menu_background"
             android:paddingLeft="10dp"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="3"
             android:layout_gravity="center_horizontal">
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/img_profile"
-                android:src="@mipmap/ic_launcher"
-                android:scaleType="fitEnd"
+                android:src="@drawable/none_my_profile"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
@@ -32,26 +34,29 @@
                 android:id="@+id/text_my_name"
                 android:text="@string/name"
                 android:textSize="24sp"
+                android:textColor="@android:color/white"
                 android:gravity="left"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/text_my_location"
-                android:layout_toRightOf="@+id/img_profile"
-                android:layout_toEndOf="@+id/img_profile" />
+                android:layout_alignTop="@+id/img_setting"
+                android:layout_alignLeft="@+id/text_my_location"
+                android:layout_alignStart="@+id/text_my_location" />
 
             <TextView
                 android:id="@+id/text_my_location"
                 android:text="@string/location"
                 android:textSize="16sp"
+                android:textColor="@android:color/white"
                 android:gravity="left"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/img_profile"
+                android:layout_below="@+id/text_my_name"
                 android:layout_toRightOf="@+id/img_profile"
                 android:layout_toEndOf="@+id/img_profile" />
             <ImageView
                 android:id="@+id/img_setting"
-                android:src="@mipmap/ic_launcher"
+                android:src="@android:drawable/ic_menu_manage"
+                android:layout_margin="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -59,7 +64,8 @@
                 android:layout_toStartOf="@+id/img_alarm" />
             <ImageView
                 android:id="@+id/img_alarm"
-                android:src="@mipmap/ic_launcher"
+                android:src="@android:drawable/ic_popup_reminder"
+                android:layout_margin="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -67,7 +73,8 @@
                 android:layout_toStartOf="@+id/img_close"/>
             <ImageView
                 android:id="@+id/img_close"
-                android:src="@mipmap/ic_launcher"
+                android:src="@android:drawable/ic_delete"
+                android:layout_margin="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -76,14 +83,22 @@
         </RelativeLayout>
 
         <!-- 탭레이아웃 부분 -->
+        <!-- layout_my_post_item.xml, layout_my_comment_item.xml -->
         <android.support.design.widget.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:tabMode="fixed"
-            app:tabMinWidth="90dp" />
+            app:tabMinWidth="90dp"
+            app:tabPaddingStart="5dp"
+            app:tabPaddingEnd="5dp"
+            app:tabIndicatorHeight="4dp"
+            app:tabIndicatorColor="@color/tabIndicator"
+            app:tabSelectedTextColor="@color/tabIndicator"/>
         <android.support.v4.view.ViewPager
             android:id="@+id/viewpager_menu"
+            android:background="@color/gray"
+            android:padding="10dp"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="7"

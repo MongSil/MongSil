@@ -6,6 +6,7 @@ package kr.co.tacademy.mongsil.mongsil;
 public class PostData {
     public static final int TYPE_LAYOUT_DATE = 0;
     public static final int TYPE_LAYOUT_POST = 1;
+    public static final int TYPE_LAYOUT_MY_POST = 2;
     int type = 1;
     String time;
     int imgProfile;

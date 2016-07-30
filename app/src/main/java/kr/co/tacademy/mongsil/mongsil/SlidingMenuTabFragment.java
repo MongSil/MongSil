@@ -39,11 +39,35 @@ public class SlidingMenuTabFragment extends Fragment {
 
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
-            recyclerView.setAdapter(new PostRecyclerViewAdapter(1));
+            PostRecyclerViewAdapter adapter = new PostRecyclerViewAdapter();
+            recyclerView.setAdapter(adapter);
+
+            ////// test code
+            PostData data = new PostData();
+            PostData data1 = new PostData();
+            PostData data2 = new PostData();
+            PostData data3 = new PostData();
+            PostData data4 = new PostData();
+            data.setTimeData(0, "Today");
+            adapter.add(data);
+            data1.setData(2, "10:25 AM", R.mipmap.ic_launcher, "스님",
+                    "날이 밝구나", 0, 0, 10);
+            adapter.add(data1);
+            data2.setData(2, "02:25 PM", R.mipmap.ic_launcher, "주지스님",
+                    "날씨가 덥구나", 0, R.drawable.test_back, 3);
+            adapter.add(data2);
+            data3.setTimeData(0, "2016.07.29");
+            adapter.add(data3);
+            data4.setData(2, "05:20 PM", R.mipmap.ic_launcher, "동자스님",
+                    "밖에 나가고 싶어요 빼앢", 0, 0, 1);
+            adapter.add(data4);
+            //////
+
         } else {
             // 내가 쓴 댓글 탭
             recyclerView.setAdapter(new MyCommentRecyclerViewAdapter());
         }
+
         return recyclerView;
     }
 
@@ -81,7 +105,7 @@ public class SlidingMenuTabFragment extends Fragment {
         public void onBindViewHolder(ViewHolder holder, int position) {
             holder.textPostContent.setText(String.valueOf("댓글 내용이다" + position));
             int date = 20+position;
-            holder.textMyCommentTime.setText(String.valueOf(String.valueOf("7월" + date)));
+            holder.textMyCommentTime.setText(String.valueOf(String.valueOf("7월 " + date + "일")));
         }
 
         @Override

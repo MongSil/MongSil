@@ -28,7 +28,7 @@ public class SplashActivity extends AppCompatActivity {
 
         imgSplash = (ImageView) findViewById(R.id.img_splash);
         // Glide.with(this).load().
-        handler.postDelayed(new ConnectThread(), 3000);
+        handler.postDelayed(new ConnectThread(), 2000);
     }
     private class ConnectThread extends Thread {
         //private boolean threadFlag;

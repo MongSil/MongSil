@@ -32,7 +32,7 @@ public class MainPostFragment extends Fragment {
                         MongSilApplication.getMongSilContext()));
         postRecyclerView.setAdapter(adapter);
 
-        ////// sample code
+        ////// test code
         PostData data = new PostData();
         PostData data1 = new PostData();
         PostData data2 = new PostData();

@@ -11,6 +11,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Created by Han on 2016-07-29.
  */
@@ -19,10 +21,11 @@ import java.util.List;
 public class PostRecyclerViewAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     List<PostData> items = new ArrayList<PostData>();
-    private int SELECTOR = 0;
+    private int selector = 0;
 
     private static final int LAYOUT_DATE = 1000;
     private static final int LAYOUT_POST = 2000;
+    private static final int LAYOUT_MY_POST = 3000;
 
     public void add(PostData data) {
         items.add(data);
@@ -30,9 +33,6 @@ public class PostRecyclerViewAdapter
     }
 
     PostRecyclerViewAdapter() { }
-    PostRecyclerViewAdapter(int selector) {
-        SELECTOR = selector;
-    }
 
     // 날짜를 표시하는 뷰홀더
     public class DateViewHolder extends RecyclerView.ViewHolder {
@@ -52,17 +52,16 @@ public class PostRecyclerViewAdapter
     }
 
     // 글목록을 표시하는 뷰홀더
-    // TODO : 나의 이야기(슬라이딩메뉴) 안나옴. 고쳐야함
     public class PostViewHolder extends RecyclerView.ViewHolder {
         final View view;
-        ImageView imgPostProfile;
+        CircleImageView imgPostProfile;
         final TextView postName, postContent, postTime;
         final Button btnNext;
 
         public PostViewHolder(View view) {
             super(view);
             this.view = view;
-            imgPostProfile = (ImageView) view.findViewById(R.id.img_post_profile);
+            imgPostProfile = (CircleImageView) view.findViewById(R.id.img_post_profile);
             postName = (TextView) view.findViewById(R.id.text_post_name);
             postContent = (TextView) view.findViewById(R.id.text_post_content);
             postTime = (TextView) view.findViewById(R.id.text_post_time);
@@ -78,22 +77,25 @@ public class PostRecyclerViewAdapter
         }
     }
 
+    // 나의 이야기 탭 부분 뷰홀더
     public class MyPostViewHolder extends RecyclerView.ViewHolder {
         final View view;
 
         ImageView imgMyPostBackGround, imgThreeDot;
+        View littleBlackBackGround;
         TextView textMyPostContent, textMyPostInfo;
 
         public MyPostViewHolder(View view) {
             super(view);
             this.view = view;
             imgMyPostBackGround = (ImageView) view.findViewById(R.id.img_my_post_background);
+            littleBlackBackGround = view.findViewById(R.id.little_black_background);
             imgThreeDot = (ImageView) view.findViewById(R.id.img_threeDot);
             imgThreeDot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     // TODO : 프레그먼트매니저를 구해서 바텀다이어로그 설정
-                    /*FragmentManager fm = FragmentManager();
+                    /*
                     fm.beginTransaction()
                             .add(new BottomDialogFragment(), "bottom")
                             .addToBackStack("bottom").commit();*/
@@ -106,6 +108,16 @@ public class PostRecyclerViewAdapter
         public void setMyData(PostData data) {
             // TODO : 서버에서 내 작성글 목록 삽입
             imgMyPostBackGround.setImageResource(data.imgBackGround);
+            if(data.imgBackGround != 0) {
+
+                littleBlackBackGround.setVisibility(View.VISIBLE);
+                textMyPostContent.setTextColor(
+                        MongSilApplication.getMongSilContext().
+                                getResources().getColor(android.R.color.white));
+                textMyPostInfo.setTextColor(
+                        MongSilApplication.getMongSilContext().
+                                getResources().getColor(android.R.color.white));
+            }
             textMyPostContent.setText(data.content);
             textMyPostInfo.setText(String.valueOf(data.time + " - 댓글 " + data.commentCount));
         }
@@ -120,12 +132,11 @@ public class PostRecyclerViewAdapter
                 view = inflater.inflate(R.layout.layout_post_date, parent, false);
                 return new DateViewHolder(view);
             case LAYOUT_POST :
-                if(SELECTOR != 0) {
-                    view = inflater.inflate(R.layout.layout_my_post_item, parent, false);
-                } else {
-                    view = inflater.inflate(R.layout.layout_post_item, parent, false);
-                }
+                view = inflater.inflate(R.layout.layout_post_item, parent, false);
                 return new PostViewHolder(view);
+            case LAYOUT_MY_POST :
+                view = inflater.inflate(R.layout.layout_my_post_item, parent, false);
+                return new MyPostViewHolder(view);
         }
         return null;
     }
@@ -137,11 +148,10 @@ public class PostRecyclerViewAdapter
                 ((DateViewHolder)holder).setMyData(items.get(position));
                 break;
             case  LAYOUT_POST :
-                if(SELECTOR != 0) {
+                ((PostViewHolder)holder).setMyData(items.get(position));
+                break;
+            case LAYOUT_MY_POST :
                     ((MyPostViewHolder)holder).setMyData(items.get(position));
-                } else {
-                    ((PostViewHolder)holder).setMyData(items.get(position));
-                }
                 break;
         }
     }
@@ -154,6 +164,8 @@ public class PostRecyclerViewAdapter
                 return LAYOUT_DATE;
             case PostData.TYPE_LAYOUT_POST :
                 return LAYOUT_POST;
+            case PostData.TYPE_LAYOUT_MY_POST :
+                return LAYOUT_MY_POST;
         }
         return super.getItemViewType(position);
     }

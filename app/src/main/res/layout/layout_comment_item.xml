@@ -11,7 +11,6 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/img_profile"
             android:src="@mipmap/ic_launcher"
-            android:scaleType="fitCenter"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
