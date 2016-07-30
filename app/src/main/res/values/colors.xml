@@ -4,9 +4,13 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="line">#10000000</color>
+    <color name="post_line">#55FFFFFF</color>
     <color name="invisible">#00ff0000</color>
     <color name="gray">#EBEBEB</color>
+    <color name="little_dark_gray">#d2d2d2</color>
     <color name="dark_gray">#5D5D5D</color>
     <color name="tabIndicator">#234d91</color>
     <color name="menu_background">#42515c</color>
+    <color name="dark_transparent_background">#DD000000</color>
+    <color name="post_background">#33000000</color>
 </resources>

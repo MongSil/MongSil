@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="kr.co.tacademy.mongsil.mongsil.PostingActivity">
+
+    <!-- 툴바 -->
+    <android.support.v7.widget.Toolbar
+        android:padding="10dp"
+        android:background="@color/dark_transparent_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:layout_gravity="right|center_vertical">
+        <TextView
+            android:id="@+id/text_posting_location"
+            android:drawableLeft="@android:drawable/ic_dialog_map"
+            android:text="@string/location"
+            android:textColor="@android:color/white"
+            android:clickable="true"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/text_save"
+            android:text="@string/save"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:background="@color/invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="right" />
+    </android.support.v7.widget.Toolbar>
+    <FrameLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/img_left_location"
+            android:src="@android:drawable/ic_media_previous"
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|left"/>
+        <!-- viewpager 내용 : layout_posting_select_weather.xml -->
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager_posting_select_weather"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </android.support.v4.view.ViewPager>
+        <ImageView
+            android:id="@+id/img_right_location"
+            android:src="@android:drawable/ic_media_next"
+            android:layout_marginRight="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"/>
+        <ImageView
+            android:id="@+id/img_preview"
+            android:src="@android:drawable/ic_menu_slideshow"
+            android:layout_margin="5dp"
+            android:layout_gravity="right|top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/text_posting"
+        android:text="@string/postring"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+    <ImageView
+        android:id="@+id/img_posting_camera"
+        android:src="@android:drawable/ic_menu_camera"
+        android:background="@color/dark_transparent_background"
+        android:scaleType="fitStart"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

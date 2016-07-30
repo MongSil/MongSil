@@ -1,5 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.Gravity;
@@ -27,12 +28,16 @@ public class BottomDialogFragment extends DialogFragment {
         View view = inflater.inflate(
                 R.layout.dialog_pic_bottom, container, false);
 
+        final Intent intent = new Intent(getActivity(), CameraGalleryActivity.class);
+
         // 카메라
         Button btnCapture = (Button) view.findViewById(R.id.btn_capture);
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // TODO: 카메라 불러옴
+                intent.putExtra("selector", 0);
+                startActivity(intent);
             }
         });
 
@@ -42,6 +47,8 @@ public class BottomDialogFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
                 // TODO: 갤러리 불러옴
+                intent.putExtra("selector", 1);
+                startActivity(intent);
             }
         });
 

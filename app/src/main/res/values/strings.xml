@@ -49,7 +49,6 @@
     <string name="select_question">친구들을 모두 초대했나요?\n아직 초대하지 않은 친구가 있다면\n초대해주세요.</string>
     <string name="post_remove_question">정말로 삭제하실거에요?</string>
     <string name="post_remove_done">삭제되었습니다.</string>
-    <string name="camera_title">카메라</string>
     <string name="next">다음</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -63,5 +62,9 @@
     <string name="comment_send">보내기</string>
     <string name="comment_content">댓글ㅇㅇㅇㅇㅇㅇ</string>
     <string name="tutorial_content_title">사진 한장에 나의 감성을</string>
+    <string name="save">저장</string>
+    <string name="postring">몽실몽실 적어봐요</string>
+    <string name="empty_search">원하는 지역을 검색해주세요</string>
+    <string name="image_content_description">Image</string>
 
 </resources>
