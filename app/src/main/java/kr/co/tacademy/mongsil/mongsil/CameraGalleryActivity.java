@@ -24,10 +24,8 @@ import java.util.List;
 /**
  * Created by Han on 2016-07-30.
  */
-public class CameraGalleryActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<List<MediaStoreData>> {
+public class CameraGalleryActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 10;
-    private static final int REQ_CODE_SELECT_IMAGE = 20;
 
     // TODO : 갤러리 리사이클러뷰의 대대적인 수정이 필요함
     // 리사이클러뷰를 사용하기 위해서
@@ -79,7 +77,8 @@ public class CameraGalleryActivity extends AppCompatActivity
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                         requestPermissions(
-                                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 10);
+                                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                                PERMISSIONS_REQUEST_READ_CONTACTS);
                                     }
                                 }
                             })
@@ -89,10 +88,6 @@ public class CameraGalleryActivity extends AppCompatActivity
                                     finish();
                                 }
                             }).create().show();
-                    // 재요청
-                    ActivityCompat.requestPermissions(
-                            this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            PERMISSIONS_REQUEST_READ_CONTACTS);
                 } else {
                     // 최초로 권한을 요청하는 경우(첫실행)
                     ActivityCompat.requestPermissions(
@@ -102,22 +97,6 @@ public class CameraGalleryActivity extends AppCompatActivity
             }
         }
     }
-
-    @Override
-    public android.content.Loader<List<MediaStoreData>> onCreateLoader(int i, Bundle bundle) {
-        new MediaStoreDataLoader(this);
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(android.content.Loader<List<MediaStoreData>> loader, List<MediaStoreData> mediaStoreDatas) {
-        GalleryRecyclerAdapter adapter =
-                new GalleryRecyclerAdapter(this, mediaStoreDatas);
-        galleryRecycler.setAdapter(adapter);
-    }
-
-    @Override
-    public void onLoaderReset(android.content.Loader<List<MediaStoreData>> loader) { }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -139,13 +118,14 @@ public class CameraGalleryActivity extends AppCompatActivity
                         this, Manifest.permission.READ_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
                     // 리사이클러로 갤러리를 받아옴
-                    getLoaderManager().initLoader(R.id.loader_id_media_store_data, null, this);
                     galleryRecycler = (RecyclerView) findViewById(R.id.gallery_recycler);
                     GridLayoutManager gridLayoutManager
                             = new GridLayoutManager(this, 3);
                     gridLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
                     galleryRecycler.setLayoutManager(gridLayoutManager);
                     galleryRecycler.setHasFixedSize(true);
+                    // TODO : 어답터에 갤러리 가져오기
+                    galleryRecycler.setAdapter(new GalleryRecyclerAdapter());
                 }
             }
             else {

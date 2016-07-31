@@ -11,6 +11,7 @@
         android:id="@+id/text_share"
         android:text="@string/share"
         android:drawableLeft="@mipmap/ic_launcher"
+        android:clickable="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <View
@@ -32,10 +33,10 @@
         <!-- layout_comment_item.xml -->
         <android.support.v7.widget.RecyclerView
             android:id="@+id/comment_recycler"
+            android:background="@color/comment_gray"
             android:visibility="gone"
-            android:background="@color/dark_gray"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent" />
         <ImageView
             android:id="@+id/img_none_comment_icon"
             android:src="@mipmap/ic_launcher"

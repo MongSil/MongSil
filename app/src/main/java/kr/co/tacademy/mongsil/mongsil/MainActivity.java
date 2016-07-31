@@ -75,8 +75,7 @@ public class MainActivity extends AppCompatActivity {
         slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
         slidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
         slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
-        slidingMenu.setMenu(
-                loadSlidingMenu());
+        slidingMenu.setMenu(loadSlidingMenu());
 
         // 날씨
         View wv = findViewById(R.id.weather_info);
@@ -97,8 +96,13 @@ public class MainActivity extends AppCompatActivity {
         });
         weatherRecyclerView.setAdapter(new WeatherRecyclerViewAdapter());
 
-        // 사진찍어 글쓰기 버튼
+        // 글쓰기 버튼
         btnCapturePost = (FloatingActionButton) findViewById(R.id.btn_capture_post);
+        btnCapturePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
     }
 
     // 슬라이딩메뉴 뷰

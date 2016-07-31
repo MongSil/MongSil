@@ -64,7 +64,8 @@
         app:titleTextAppearance="@style/ToolBar.TitleText">
         <TextView
             android:id="@+id/toolbar_title"
-            android:text="@string/app_name"
+            android:text="@string/location"
+            android:textSize="16dp"
             android:textColor="@android:color/white"
             style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
             android:gravity="center"

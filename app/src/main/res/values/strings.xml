@@ -2,7 +2,7 @@
     <string name="app_name">몽실몽실</string>
 
     <string name="tutorial_content">튜토리얼 내용</string>
-    <string name="edit_profile">프로필 편집</string>
+    <string name="setting_title">몽실 관리</string>
     <string name="my_post">내 글 보기</string>
     <string name="signed_mongsil">가입된 몽실</string>
 
@@ -66,5 +66,6 @@
     <string name="postring">몽실몽실 적어봐요</string>
     <string name="empty_search">원하는 지역을 검색해주세요</string>
     <string name="image_content_description">Image</string>
+    <string name="edit_profile">프로필 관리</string>
 
 </resources>
