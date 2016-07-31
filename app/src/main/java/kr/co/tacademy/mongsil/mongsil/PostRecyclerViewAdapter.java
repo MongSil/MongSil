@@ -1,11 +1,15 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,7 +25,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class PostRecyclerViewAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     List<PostData> items = new ArrayList<PostData>();
-    private int selector = 0;
 
     private static final int LAYOUT_DATE = 1000;
     private static final int LAYOUT_POST = 2000;
@@ -56,6 +59,7 @@ public class PostRecyclerViewAdapter
         final View view;
         CircleImageView imgPostProfile;
         final TextView postName, postContent, postTime;
+        final RelativeLayout postContainer;
         final Button btnNext;
 
         public PostViewHolder(View view) {
@@ -63,17 +67,26 @@ public class PostRecyclerViewAdapter
             this.view = view;
             imgPostProfile = (CircleImageView) view.findViewById(R.id.img_post_profile);
             postName = (TextView) view.findViewById(R.id.text_post_name);
+            postContainer = (RelativeLayout) view.findViewById(R.id.post_content_container);
             postContent = (TextView) view.findViewById(R.id.text_post_content);
             postTime = (TextView) view.findViewById(R.id.text_post_time);
             btnNext = (Button) view.findViewById(R.id.btn_next);
         }
 
-        public void setMyData(PostData data) {
+        public void setMyData(final PostData data) {
             // TODO: 서버에서 전송한 게시글 목록 삽입
             imgPostProfile.setImageResource(data.imgProfile);
             postName.setText(data.name);
             postContent.setText(data.content);
             postTime.setText(data.time);
+            postContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
+                    intent.putExtra("post_data", data);
+                    view.getContext().startActivity(intent);
+                }
+            });
         }
     }
 

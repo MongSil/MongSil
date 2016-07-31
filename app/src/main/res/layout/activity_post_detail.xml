@@ -12,6 +12,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="kr.co.tacademy.mongsil.mongsil.PostDetailActivity">
     <LinearLayout
+        android:id="@+id/post_container"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,13 +21,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize">
-            <ImageView
-                android:id="@+id/img_close"
-                android:src="@android:drawable/ic_menu_close_clear_cancel"
-                android:background="@color/invisible"
-                android:layout_gravity="left"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
             <ImageView
                 android:id="@+id/img_threeDot"
                 android:src="@mipmap/ic_launcher"
@@ -109,7 +103,7 @@
                     android:layout_weight="5"
                     android:textColor="@android:color/white" />
                 <TextView
-                    android:id="@+id/text_post_comment"
+                    android:id="@+id/text_post_comment_count"
                     android:text="@string/comment_count"
                     android:drawableLeft="@mipmap/ic_launcher"
                     android:gravity="center"
