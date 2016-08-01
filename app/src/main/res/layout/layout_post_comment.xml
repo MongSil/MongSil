@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/comment_list_layout"
     android:orientation="vertical"
+    android:visibility="gone"
     android:paddingLeft="5dp"
     android:paddingRight="5dp"
     android:background="@color/gray"

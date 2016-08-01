@@ -2,9 +2,11 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,8 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class PostDetailActivity extends AppCompatActivity {
+import com.flipboard.bottomsheet.BottomSheetLayout;
 
+public class PostDetailActivity extends BaseActivity {
+
+    BottomSheetLayout bottomSheetLayout;
     ImageView imgThreeDot, imgWeatherIcon;
     TextView postContent, postLocation, postTime, postName, postCommentCount;
 
@@ -56,38 +61,42 @@ public class PostDetailActivity extends AppCompatActivity {
         /*if(postData.commentCount != 0) {
             commentCount = postData.commentCount;
         }*/
-        final RelativeLayout commentContainer =
-                (RelativeLayout)findViewById(R.id.comment_container);
+        bottomSheetLayout =
+                (BottomSheetLayout) findViewById(R.id.bottom_sheet_container);
         postCommentCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                commentContainer.setVisibility(View.VISIBLE);
-                //showCommentSheet(commentCount);
+                showCommentSheet(commentCount);
             }
         });
     }
 
     // TODO : 댓글창 만들기
     private void showCommentSheet(int postCommentCount) {
-        /*View rootView = LayoutInflater.from(getApplicationContext())
+        View rootView = LayoutInflater.from(getApplicationContext())
                 .inflate(R.layout.layout_post_comment,
                         bottomSheetLayout, false);
-        TextView share = (TextView) rootView.findViewById(R.id.text_share);*/
-        /* 공유하기를 눌렀을 때
+        bottomSheetLayout.showWithSheetView(rootView);
+        RelativeLayout commentLayout =
+                (RelativeLayout) rootView.findViewById(R.id.comment_list_layout);
+        commentLayout.setVisibility(View.VISIBLE);
+        TextView share = (TextView) rootView.findViewById(R.id.text_share);
+        // 공유하기를 눌렀을 때
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
             }
-        });*/
+        });
 
-        /* 댓글 리사이클러뷰
-        if(postCommentCount > 0) {
+        // 댓글 리사이클러뷰
+        /*if(postCommentCount > 0) {
             RecyclerView commentRecycler =
                     (RecyclerView) rootView.findViewById(R.id.comment_recycler);
+            commentRecycler.setVisibility(View.VISIBLE);
             commentRecycler.setLayoutManager(
                     new LinearLayoutManager(getApplicationContext()));
-            commentRecycler.setAdapter( -- );
+            //commentRecycler.setAdapter( -- );
         }*/
     }
 

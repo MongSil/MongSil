@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class PostingActivity extends AppCompatActivity {
+public class PostingActivity extends BaseActivity {
 
     // 툴바 필드
     TextView location, save;

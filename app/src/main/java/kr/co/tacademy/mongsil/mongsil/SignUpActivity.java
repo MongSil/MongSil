@@ -18,7 +18,7 @@ import java.io.IOException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends BaseActivity {
     private static final int REQ_CODE_SELECT_IMAGE = 20;
 
     CircleImageView imgSignUpProfile;

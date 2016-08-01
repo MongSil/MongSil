@@ -19,15 +19,9 @@ public class MongSilApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Typekit.getInstance()
-                .addNormal(Typekit.createFromAsset(this, "fonts/NotoSansKR-Regular.otf"))
-                .addBold(Typekit.createFromAsset(this, "fonts/NotoSansKR-Bold.otf"))
-                .addCustom1(Typekit.createFromAsset(this, "fonts/NotoSansKR-Medium.otf"));
+                .addNormal(Typekit.createFromAsset(this, "fonts/NotoSansKR-Regular-Hestia.otf"))
+                .addBold(Typekit.createFromAsset(this, "fonts/NotoSansKR-Bold-Hestia.otf"));
         context = this;
-    }
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(TypekitContextWrapper.wrap(base));
     }
 
     public static Context getMongSilContext() {

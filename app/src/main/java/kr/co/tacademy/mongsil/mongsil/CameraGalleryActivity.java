@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Created by Han on 2016-07-30.
  */
-public class CameraGalleryActivity extends AppCompatActivity {
+public class CameraGalleryActivity extends BaseActivity {
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 10;
 
     // TODO : 갤러리 리사이클러뷰의 대대적인 수정이 필요함

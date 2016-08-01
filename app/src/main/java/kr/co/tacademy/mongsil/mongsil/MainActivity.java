@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     // 툴바 필드
     TextView tbTitle;
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ViewPager viewPager = (ViewPager) menu.findViewById(R.id.viewpager_menu);
+        final ViewPager viewPager = (ViewPager) menu.findViewById(R.id.viewpager_menu);
         if(viewPager != null) {
             MenuViewPagerAdapter adapter =
                     new MenuViewPagerAdapter(getSupportFragmentManager());
@@ -134,35 +135,53 @@ public class MainActivity extends AppCompatActivity {
 
         tabLayout = (TabLayout) menu.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setOnTabSelectedListener(new OnTabSelectedListener());
-        // TODO : 선택하면 Bold체로 바꾸기
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+
+            TabLayout.Tab tab = tabLayout.getTabAt(i);
+            if (tab != null) {
+
+                TextView tabTextView = new TextView(this);
+                tab.setCustomView(tabTextView);
+
+                tabTextView.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                tabTextView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+
+                tabTextView.setText(tab.getText());
+
+                // First tab is the selected tab, so if i==0 then set BOLD typeface
+                if (i == 0) {
+                    tabTextView.setTypeface(null, Typeface.BOLD);
+                }
+            }
+        }
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+
+                TextView text = (TextView) tab.getCustomView();
+
+                text.setTypeface(null, Typeface.BOLD);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                TextView text = (TextView) tab.getCustomView();
+
+                text.setTypeface(null, Typeface.NORMAL);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+
+        });
 
         return menu;
     }
 
-    class OnTabSelectedListener implements TabLayout.OnTabSelectedListener {
-
-        public void onTabSelected(TabLayout.Tab selectedTab) {
-            int tabCount = tabLayout.getTabCount();
-            for (int i = 0; i < tabCount; i++) {
-                TabLayout.Tab tab = tabLayout.getTabAt(i);
-                View tabView = tab != null ? tab.getCustomView() : null;
-                if (tabView instanceof TextView) {
-                    ((TextView) tabView).setTextAppearance(getApplicationContext(), selectedTab.equals(tab)
-                            ? R.style.SelectedTabText
-                            : R.style.TabText);
-                }
-            }
-        }
-
-        @Override
-        public void onTabUnselected(TabLayout.Tab tab) {
-        }
-
-        @Override
-        public void onTabReselected(TabLayout.Tab tab) {
-        }
-    }
     // 메뉴 뷰페이저 어답터
     private static class MenuViewPagerAdapter extends FragmentPagerAdapter {
         private final ArrayList<SlidingMenuTabFragment> fragments

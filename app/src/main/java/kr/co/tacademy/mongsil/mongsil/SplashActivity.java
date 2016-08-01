@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends BaseActivity {
 
     ImageView imgSplash, imgtextSplash;
     Handler handler = new Handler();
