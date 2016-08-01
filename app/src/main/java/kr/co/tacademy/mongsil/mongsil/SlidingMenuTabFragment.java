@@ -34,14 +34,15 @@ public class SlidingMenuTabFragment extends Fragment {
         Bundle initBundle = getArguments();
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.fragment_post, container, false);
-        recyclerView.setLayoutManager(new LinearLayoutManager(
-                MongSilApplication.getMongSilContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(
+                MongSilApplication.getMongSilContext());
+        recyclerView.setLayoutManager(layoutManager);
 
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
             PostRecyclerViewAdapter adapter = new PostRecyclerViewAdapter();
             recyclerView.setAdapter(adapter);
-
+            recyclerView.setPadding(16, 0, 16, 0);
             ////// test code
             PostData data = new PostData();
             PostData data1 = new PostData();

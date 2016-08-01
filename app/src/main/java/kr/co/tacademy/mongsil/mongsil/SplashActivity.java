@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends BaseActivity {
 
     ImageView imgSplash, imgtextSplash;
     Handler handler = new Handler();
@@ -28,7 +28,7 @@ public class SplashActivity extends AppCompatActivity {
 
         imgSplash = (ImageView) findViewById(R.id.img_splash);
         // Glide.with(this).load().
-        handler.postDelayed(new ConnectThread(), 2000);
+        handler.postDelayed(new ConnectThread(), 100); //2000
     }
     private class ConnectThread extends Thread {
         //private boolean threadFlag;
@@ -44,7 +44,7 @@ public class SplashActivity extends AppCompatActivity {
                 imgtextSplash.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(SplashActivity.this, SignUpActivity.class);
+                        Intent intent = new Intent(SplashActivity.this, AppTutorialActivity.class);
                         startActivity(intent);
                         SplashActivity.this.finish();
                         interrupt();

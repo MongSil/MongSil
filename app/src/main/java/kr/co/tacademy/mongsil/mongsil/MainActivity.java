@@ -11,11 +11,17 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,14 +31,14 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     // 툴바 필드
     TextView tbTitle;
     ImageView tbSearch;
 
     // 날씨 필드
-    ImageView imgWeatherGif, imgWeatherIcon;
+    ImageView animBackgroundWeather, imgWeatherIcon;
     TextView day, week, month;
 
     // 글작성 프레그먼트
@@ -44,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
     // 사진찍어 글쓰기 버튼
     FloatingActionButton btnCapturePost;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +79,14 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
         tbTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        tbTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(new SearchLocationDialogFragment(), "search")
+                        .addToBackStack("search").commit();
+            }
+        });
         tbSearch = (ImageView) toolbar.findViewById(R.id.toolbar_search);
 
         // 슬라이딩 메뉴(프로필 메뉴 추가)
@@ -79,14 +98,14 @@ public class MainActivity extends AppCompatActivity {
         slidingMenu.setMenu(loadSlidingMenu());
 
         // 날씨
-        imgWeatherGif = (ImageView) findViewById(R.id.gif_weather);
-        AnimationDrawable listDrawable = (AnimationDrawable) imgWeatherGif.getDrawable();
-        listDrawable.start();
-        View wv = findViewById(R.id.weather_info);
-        imgWeatherIcon = (ImageView) wv.findViewById(R.id.img_weather_icon);
-        day = (TextView) wv.findViewById(R.id.text_day);
-        week = (TextView) wv.findViewById(R.id.text_week);
-        month = (TextView) wv.findViewById(R.id.text_month);
+        animBackgroundWeather = (ImageView) findViewById(R.id.anim_background_weather);
+        ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
+        imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
+        ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        animationApplyInterpolater(R.anim.bounce_interpolator, new LinearInterpolator());
+        day = (TextView) findViewById(R.id.text_day);
+        week = (TextView) findViewById(R.id.text_week);
+        month = (TextView) findViewById(R.id.text_month);
 
         // 글쓰기 버튼
         btnCapturePost = (FloatingActionButton) findViewById(R.id.btn_capture_post);
@@ -98,6 +117,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private  void  animationApplyInterpolater(int resourceId, final Interpolator interpolator){
+        Animation animation =  AnimationUtils.loadAnimation(this, resourceId);
+        animation.setInterpolator(interpolator);
+        imgWeatherIcon.startAnimation(animation);
+    }
+
     // 슬라이딩메뉴 뷰
     public View loadSlidingMenu() {
         View menu = getLayoutInflater().inflate(R.layout.layout_sliding_menu, null);
@@ -121,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ViewPager viewPager = (ViewPager) menu.findViewById(R.id.viewpager_menu);
+        final ViewPager viewPager = (ViewPager) menu.findViewById(R.id.viewpager_menu);
         if(viewPager != null) {
             MenuViewPagerAdapter adapter =
                     new MenuViewPagerAdapter(getSupportFragmentManager());
@@ -134,35 +160,53 @@ public class MainActivity extends AppCompatActivity {
 
         tabLayout = (TabLayout) menu.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setOnTabSelectedListener(new OnTabSelectedListener());
-        // TODO : 선택하면 Bold체로 바꾸기
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+
+            TabLayout.Tab tab = tabLayout.getTabAt(i);
+            if (tab != null) {
+
+                TextView tabTextView = new TextView(this);
+                tab.setCustomView(tabTextView);
+
+                tabTextView.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                tabTextView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+
+                tabTextView.setText(tab.getText());
+
+                // First tab is the selected tab, so if i==0 then set BOLD typeface
+                if (i == 0) {
+                    tabTextView.setTypeface(null, Typeface.BOLD);
+                }
+            }
+        }
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+
+                TextView text = (TextView) tab.getCustomView();
+
+                text.setTypeface(null, Typeface.BOLD);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                TextView text = (TextView) tab.getCustomView();
+
+                text.setTypeface(null, Typeface.NORMAL);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+
+        });
 
         return menu;
     }
 
-    class OnTabSelectedListener implements TabLayout.OnTabSelectedListener {
-
-        public void onTabSelected(TabLayout.Tab selectedTab) {
-            int tabCount = tabLayout.getTabCount();
-            for (int i = 0; i < tabCount; i++) {
-                TabLayout.Tab tab = tabLayout.getTabAt(i);
-                View tabView = tab != null ? tab.getCustomView() : null;
-                if (tabView instanceof TextView) {
-                    ((TextView) tabView).setTextAppearance(getApplicationContext(), selectedTab.equals(tab)
-                            ? R.style.SelectedTabText
-                            : R.style.TabText);
-                }
-            }
-        }
-
-        @Override
-        public void onTabUnselected(TabLayout.Tab tab) {
-        }
-
-        @Override
-        public void onTabReselected(TabLayout.Tab tab) {
-        }
-    }
     // 메뉴 뷰페이저 어답터
     private static class MenuViewPagerAdapter extends FragmentPagerAdapter {
         private final ArrayList<SlidingMenuTabFragment> fragments

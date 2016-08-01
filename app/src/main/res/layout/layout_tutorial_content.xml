@@ -1,49 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:gravity="center"
+        android:orientation="vertical"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="6" >
-        <ImageView
-            android:id="@+id/img_tutorial_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/text_tutorial_title"
+            android:text="asdfdasfasdf"
+            android:textSize="20dp"
+            android:layout_marginBottom="18dp"
+            android:layout_gravity="center"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_tutorial_explain"
+            android:text="fgvcdyh"
+            android:textSize="16dp"
+            android:paddingLeft="93dp"
+            android:paddingRight="93dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <RelativeLayout
+        android:id="@+id/viewPagerIndicator"
+        android:layout_gravity="bottom"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:gravity="top"
-        android:layout_weight="4">
-        <TextView
-            android:id="@+id/text_tutorial_content_Title"
-            android:text="@string/tutorial_content_title"
+        android:layout_height="72dp"
+        android:layout_marginTop="5dp"
+        android:gravity="center">
+
+        <LinearLayout
+            android:id="@+id/viewPagerCountDots"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="52dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
             android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
-        <TextView
-            android:id="@+id/text_tutorial_content"
-            android:text="@string/tutorial_content"
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/text_tutorial_content_Title"
-            android:layout_centerHorizontal="true" />
+            android:orientation="horizontal" />
     </RelativeLayout>
-    <ImageView
-        android:id="@+id/img_viewpager_indicator"
-        android:src="@mipmap/ic_launcher"
-        android:scaleType="center"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-</LinearLayout>
+</FrameLayout>

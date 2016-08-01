@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <RelativeLayout
-        android:id="@+id/comment_layout"
+        android:id="@+id/comment_item_layout"
         android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -46,5 +46,5 @@
         android:background="@color/dark_gray"
         android:layout_width="match_parent"
         android:layout_height="0.01dp"
-        android:layout_below="@id/comment_layout"/>
+        android:layout_below="@id/comment_item_layout"/>
 </RelativeLayout>

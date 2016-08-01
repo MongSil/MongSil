@@ -3,7 +3,7 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class InviteFriendActivity extends AppCompatActivity {
+public class InviteFriendActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

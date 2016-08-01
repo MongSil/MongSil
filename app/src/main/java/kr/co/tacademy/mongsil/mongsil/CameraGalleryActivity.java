@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Created by Han on 2016-07-30.
  */
-public class CameraGalleryActivity extends AppCompatActivity {
+public class CameraGalleryActivity extends BaseActivity {
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 10;
 
     // TODO : 갤러리 리사이클러뷰의 대대적인 수정이 필요함
@@ -57,9 +57,11 @@ public class CameraGalleryActivity extends AppCompatActivity {
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             ActionBar actionBar = getSupportActionBar();
-            actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false);
+            if (actionBar != null) {
+                actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setDisplayShowTitleEnabled(false);
+            }
 
             // 퍼미션 권한 확인
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)

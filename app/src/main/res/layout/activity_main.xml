@@ -20,16 +20,57 @@
             android:layout_width="match_parent"
             android:layout_height="253dp">
             <ImageView
-                android:id="@+id/gif_weather"
+                android:id="@+id/anim_background_weather"
                 android:src="@drawable/anim_list_small_rain"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-            <include
-                android:id="@+id/weather_info"
-                android:layout_gravity="center"
+            <LinearLayout
+                android:gravity="center"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                layout="@layout/layout_weather_info" />
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/img_weather_icon"
+                    android:src="@drawable/anim_list_icon_mongsil_smallrain"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="123dp"
+                    android:layout_height="123dp"/>
+                <LinearLayout
+                    android:id="@+id/Linear_weather"
+                    android:orientation="vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/text_day"
+                            android:text="26"
+                            android:textSize="25sp"
+                            android:textStyle="bold"
+                            android:singleLine="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView
+                            android:id="@+id/text_week"
+                            android:text="Monday"
+                            android:textSize="10sp"
+                            android:singleLine="true"
+                            android:layout_marginLeft="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/text_month"
+                        android:text="December"
+                        android:textSize="20sp"
+                        android:layout_marginTop="3dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </LinearLayout>
+            </LinearLayout>
         </FrameLayout>
 
         <!-- 글목록 컨테이너 -->
@@ -54,6 +95,7 @@
             android:textSize="16dp"
             android:textColor="@android:color/white"
             style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+            android:clickable="true"
             android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
