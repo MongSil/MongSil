@@ -1,6 +1,8 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
+import android.graphics.Typeface;
+import android.graphics.drawable.AnimationDrawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -11,13 +13,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView tbSearch;
 
     // 날씨 필드
-    ImageView imgweathericon;
+    ImageView imgWeatherGif, imgWeatherIcon;
     TextView day, week, month;
 
     // 글작성 프레그먼트
@@ -42,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 슬라이딩메뉴
     SlidingMenu slidingMenu;
+    TabLayout tabLayout;
 
     // 사진찍어 글쓰기 버튼
     FloatingActionButton btnCapturePost;
@@ -63,9 +62,11 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setHomeAsUpIndicator(R.mipmap.ic_launcher);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.menu);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
+        }
         tbTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         tbSearch = (ImageView) toolbar.findViewById(R.id.toolbar_search);
 
@@ -78,33 +79,25 @@ public class MainActivity extends AppCompatActivity {
         slidingMenu.setMenu(loadSlidingMenu());
 
         // 날씨
+        imgWeatherGif = (ImageView) findViewById(R.id.gif_weather);
+        AnimationDrawable listDrawable = (AnimationDrawable) imgWeatherGif.getDrawable();
+        listDrawable.start();
         View wv = findViewById(R.id.weather_info);
-        imgweathericon = (ImageView) wv.findViewById(R.id.img_weather_icon);
+        imgWeatherIcon = (ImageView) wv.findViewById(R.id.img_weather_icon);
         day = (TextView) wv.findViewById(R.id.text_day);
         week = (TextView) wv.findViewById(R.id.text_week);
         month = (TextView) wv.findViewById(R.id.text_month);
-
-        RecyclerView weatherRecyclerView =
-                (RecyclerView)findViewById(R.id.weather_recycler);
-        weatherRecyclerView.setLayoutManager(new LinearLayoutManager(
-                this.getApplicationContext(),
-                LinearLayoutManager.HORIZONTAL, false) {
-            @Override
-            public boolean canScrollHorizontally() {
-                return false;
-            }
-        });
-        weatherRecyclerView.setAdapter(new WeatherRecyclerViewAdapter());
 
         // 글쓰기 버튼
         btnCapturePost = (FloatingActionButton) findViewById(R.id.btn_capture_post);
         btnCapturePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), PostingActivity.class));
+                finish();
             }
         });
     }
-
     // 슬라이딩메뉴 뷰
     public View loadSlidingMenu() {
         View menu = getLayoutInflater().inflate(R.layout.layout_sliding_menu, null);
@@ -139,12 +132,37 @@ public class MainActivity extends AppCompatActivity {
             viewPager.setAdapter(adapter);
         }
 
-        TabLayout tabLayout = (TabLayout) menu.findViewById(R.id.tabs);
+        tabLayout = (TabLayout) menu.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setOnTabSelectedListener(new OnTabSelectedListener());
+        // TODO : 선택하면 Bold체로 바꾸기
 
         return menu;
     }
 
+    class OnTabSelectedListener implements TabLayout.OnTabSelectedListener {
+
+        public void onTabSelected(TabLayout.Tab selectedTab) {
+            int tabCount = tabLayout.getTabCount();
+            for (int i = 0; i < tabCount; i++) {
+                TabLayout.Tab tab = tabLayout.getTabAt(i);
+                View tabView = tab != null ? tab.getCustomView() : null;
+                if (tabView instanceof TextView) {
+                    ((TextView) tabView).setTextAppearance(getApplicationContext(), selectedTab.equals(tab)
+                            ? R.style.SelectedTabText
+                            : R.style.TabText);
+                }
+            }
+        }
+
+        @Override
+        public void onTabUnselected(TabLayout.Tab tab) {
+        }
+
+        @Override
+        public void onTabReselected(TabLayout.Tab tab) {
+        }
+    }
     // 메뉴 뷰페이저 어답터
     private static class MenuViewPagerAdapter extends FragmentPagerAdapter {
         private final ArrayList<SlidingMenuTabFragment> fragments
@@ -173,45 +191,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             return tabTitle.get(position);
-        }
-    }
-
-    // 일주일 날씨 어답터
-    public static class WeatherRecyclerViewAdapter
-            extends RecyclerView.Adapter<WeatherRecyclerViewAdapter.ViewHolder> {
-        private static final int WHEATHER_COUNT = 6;
-
-        WeatherRecyclerViewAdapter() { }
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            final View view;
-            final TextView textSmallDay;
-            final ImageView imgSmallWeather;
-
-            public ViewHolder(View view) {
-                super(view);
-                this.view = view;
-                textSmallDay =
-                        (TextView) view.findViewById(R.id.text_small_day);
-                imgSmallWeather =
-                        (ImageView) view.findViewById(R.id.img_small_whether_icon);
-            }
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).
-                    inflate(R.layout.layout_small_weather_info, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.textSmallDay.setText(String.valueOf(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return WHEATHER_COUNT;
         }
     }
 

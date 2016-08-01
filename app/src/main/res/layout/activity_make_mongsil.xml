@@ -20,7 +20,7 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="@dimen/toolbar_size">
             <ImageView
                 android:id="@+id/img_back"
                 android:src="@mipmap/ic_launcher"

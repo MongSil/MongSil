@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -12,11 +12,11 @@
 
     <!-- 툴바 -->
     <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:padding="10dp"
         android:background="@color/dark_transparent_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
+        android:layout_height="@dimen/toolbar_size"
         android:layout_gravity="right|center_vertical">
         <TextView
             android:id="@+id/text_posting_location"
@@ -40,13 +40,15 @@
             android:layout_gravity="right" />
     </android.support.v7.widget.Toolbar>
     <FrameLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="100dp"
+        android:layout_below="@+id/toolbar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/frameLayout">
 
         <ImageView
-            android:id="@+id/img_left_location"
+            android:id="@+id/img_left_weather"
             android:src="@android:drawable/ic_media_previous"
             android:layout_marginLeft="20dp"
             android:layout_width="wrap_content"
@@ -59,7 +61,7 @@
             android:layout_height="wrap_content">
         </android.support.v4.view.ViewPager>
         <ImageView
-            android:id="@+id/img_right_location"
+            android:id="@+id/img_right_weather"
             android:src="@android:drawable/ic_media_next"
             android:layout_marginRight="20dp"
             android:layout_width="wrap_content"
@@ -74,14 +76,18 @@
             android:layout_height="wrap_content" />
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/text_posting"
-        android:text="@string/postring"
+    <EditText
+        android:id="@+id/edit_posting"
+        android:hint="@string/posting"
+        android:textColorHint="#000000"
+        android:cursorVisible="false"
+        android:background="@null"
         android:gravity="center"
-        android:layout_gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:padding="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/frameLayout"
+        android:layout_centerHorizontal="true" />
     <ImageView
         android:id="@+id/img_posting_camera"
         android:src="@android:drawable/ic_menu_camera"
@@ -91,5 +97,8 @@
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-</LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+</RelativeLayout >

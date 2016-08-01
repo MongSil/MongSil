@@ -54,7 +54,7 @@ public class SlidingMenuTabFragment extends Fragment {
                     "날이 밝구나", 0, 0, 10);
             adapter.add(data1);
             data2.setData(2, "02:25 PM", R.mipmap.ic_launcher, "주지스님",
-                    "날씨가 덥구나", 0, R.drawable.test_back, 3);
+                    "날씨가 덥구나", 0, R.drawable.back_cloud, 3);
             adapter.add(data2);
             data3.setTimeData(0, "2016.07.29");
             adapter.add(data3);

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+    <item android:drawable="@drawable/strong_rain01" android:duration="100" />
+    <item android:drawable="@drawable/strong_rain02" android:duration="100" />
+    <item android:drawable="@drawable/strong_rain03" android:duration="100" />
+    <item android:drawable="@drawable/strong_rain04" android:duration="100" />
+</animation-list>

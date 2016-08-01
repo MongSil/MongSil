@@ -10,8 +10,7 @@
         android:id="@+id/toolbar"
         android:background="@color/dark_transparent_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize">
+        android:layout_height="@dimen/toolbar_size">
         <TextView
             android:id="@+id/text_cancel"
             android:text="@string/cancel"

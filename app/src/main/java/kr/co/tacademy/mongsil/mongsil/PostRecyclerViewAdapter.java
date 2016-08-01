@@ -1,7 +1,5 @@
 package kr.co.tacademy.mongsil.mongsil;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -51,6 +49,7 @@ public class PostRecyclerViewAdapter
         public void setMyData(PostData data) {
             // TODO: 서버에서 전송한 '날짜'데이터 삽입, 오늘이면 Today, 어제면 어제..
             postDate.setText(data.time);
+            // TODO: 프로필이랑 글목록 크기 다르게하기( 프로필은 위에 14dp)
         }
     }
 
@@ -160,6 +159,7 @@ public class PostRecyclerViewAdapter
             case LAYOUT_DATE :
                 ((DateViewHolder)holder).setMyData(items.get(position));
                 break;
+
             case  LAYOUT_POST :
                 ((PostViewHolder)holder).setMyData(items.get(position));
                 break;

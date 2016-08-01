@@ -5,10 +5,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="kr.co.tacademy.mongsil.mongsil.MainActivity">
 
     <!-- 메인 화면 -->
@@ -17,40 +13,31 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <!-- 날씨 -->
-        <LinearLayout
+        <FrameLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
+            android:background="@drawable/background_small_rain"
             android:id="@+id/main_weather_container"
-            android:orientation="vertical"
-            android:background="@drawable/test_back"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-
+            android:layout_height="253dp">
+            <ImageView
+                android:id="@+id/gif_weather"
+                android:src="@drawable/anim_list_small_rain"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
             <include
                 android:id="@+id/weather_info"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="5"
+                android:layout_height="match_parent"
                 layout="@layout/layout_weather_info" />
-            <!-- recyclerView 내용 : layout_small_weather_info.xml -->
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/weather_recycler"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_gravity="center_horizontal">
-            </android.support.v7.widget.RecyclerView>
-
-        </LinearLayout>
+        </FrameLayout>
 
         <!-- 글목록 컨테이너 -->
         <FrameLayout
             android:id="@+id/main_post_fragment_container"
             android:background="@color/gray"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1.25">
+            android:layout_height="match_parent">
         </FrameLayout>
     </LinearLayout>
 
@@ -58,8 +45,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
+        android:layout_height="@dimen/toolbar_size"
         android:theme="@style/ToolBar"
         app:titleTextAppearance="@style/ToolBar.TitleText">
         <TextView
@@ -74,7 +60,8 @@
             android:layout_gravity="center" />
         <ImageView
             android:id="@+id/toolbar_search"
-            android:src="@android:drawable/ic_menu_search"
+            android:src="@drawable/search"
+            android:paddingRight="@dimen/activity_horizontal_padding"
             android:scaleType="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -83,11 +70,11 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_capture_post"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/btn_posting"
+        android:layout_height="@dimen/btn_posting"
         android:layout_margin="16dp"
         android:clickable="true"
-        android:src="@android:drawable/ic_menu_edit"
+        android:src="@drawable/btn_write"
         app:backgroundTint="#465A65"
         app:layout_anchor="@id/main_weather_container"
         app:layout_anchorGravity="bottom|right|end" />

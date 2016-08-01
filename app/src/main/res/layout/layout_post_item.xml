@@ -3,35 +3,32 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardview_post_item"
-    android:layout_marginBottom="10dp"
+    android:layout_marginBottom="9dp"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="87dp"
     app:cardCornerRadius="5dp"
     app:cardElevation="0dp">
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="match_parent"
+        android:paddingRight="16dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent">
         <RelativeLayout
-            android:orientation="vertical"
             android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2.3">
+            android:layout_width="90dp"
+            android:layout_height="match_parent">
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/img_post_profile"
                 android:src="@drawable/none_post_profile"
-                android:gravity="center"
                 android:layout_gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_alignLeft="@+id/text_post_name"
-                android:layout_alignStart="@+id/text_post_name" />
+                android:layout_width="58dp"
+                android:layout_height="58dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
             <TextView
                 android:id="@+id/text_post_name"
                 android:text="@string/name"
-                android:textSize="20sp"
+                android:textSize="9sp"
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
@@ -42,45 +39,40 @@
 
         <RelativeLayout
             android:id="@+id/post_content_container"
-            android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="6">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
             <TextView
                 android:id="@+id/text_post_content"
                 android:text="asdfasfasdf"
-                android:textSize="16sp"
+                android:textSize="12sp"
                 android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_above="@+id/text_post_time"
                 android:layout_toLeftOf="@+id/img_next"
-                android:layout_toStartOf="@+id/img_next"
-                android:layout_alignParentTop="true"
-                android:layout_above="@+id/text_post_time" />
+                android:layout_toStartOf="@+id/img_next" />
 
             <ImageView
                 android:id="@+id/img_next"
-                android:background="@android:drawable/ic_media_next"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
+                android:background="@drawable/triangle"
                 android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/text_post_time"
                 android:text="ㅇㅇㅇ"
-                android:textSize="12sp"
-                android:gravity="center_horizontal|bottom"
-                android:layout_marginBottom="10dp"
+                android:textSize="9sp"
+                android:gravity="center"
+                android:layout_marginBottom="7dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_toLeftOf="@+id/img_next"
-                android:layout_toStartOf="@+id/img_next"
-                android:layout_below="@+id/img_next" />
+                android:layout_alignRight="@+id/text_post_content"
+                android:layout_alignEnd="@+id/text_post_content" />
         </RelativeLayout>
 
     </LinearLayout>

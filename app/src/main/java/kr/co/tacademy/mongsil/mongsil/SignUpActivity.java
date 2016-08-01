@@ -23,8 +23,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     CircleImageView imgSignUpProfile;
     ImageView imgDone;
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -1,26 +1,19 @@
 package kr.co.tacademy.mongsil.mongsil;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.flipboard.bottomsheet.BottomSheetLayout;
 
 public class PostDetailActivity extends AppCompatActivity {
 
-    BottomSheetLayout bottomSheetLayout;
     ImageView imgThreeDot, imgWeatherIcon;
     TextView postContent, postLocation, postTime, postName, postCommentCount;
 
@@ -44,7 +37,6 @@ public class PostDetailActivity extends AppCompatActivity {
 
         // background 이미지
         LinearLayout postContainer = (LinearLayout) findViewById(R.id.post_container);
-
         postContainer.setBackgroundResource(R.drawable.test_splash);
 
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
@@ -60,29 +52,27 @@ public class PostDetailActivity extends AppCompatActivity {
         // postCommentCount.setText(postData.commentCount);
 
         // 코멘트 바텀 시트
-        bottomSheetLayout = (BottomSheetLayout) findViewById(R.id.post_detail_bottom_sheet);
-        WindowManager windowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
-        int height = windowManager.getDefaultDisplay().getHeight();
-        bottomSheetLayout.setPeekSheetTranslation(height * 0.2f);
         final int commentCount = 0;
         /*if(postData.commentCount != 0) {
             commentCount = postData.commentCount;
         }*/
+        final RelativeLayout commentContainer =
+                (RelativeLayout)findViewById(R.id.comment_container);
         postCommentCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showCommentSheet(commentCount);
+                commentContainer.setVisibility(View.VISIBLE);
+                //showCommentSheet(commentCount);
             }
         });
-
     }
 
     // TODO : 댓글창 만들기
     private void showCommentSheet(int postCommentCount) {
-        View rootView = LayoutInflater.from(getApplicationContext())
+        /*View rootView = LayoutInflater.from(getApplicationContext())
                 .inflate(R.layout.layout_post_comment,
                         bottomSheetLayout, false);
-        TextView share = (TextView) rootView.findViewById(R.id.text_share);
+        TextView share = (TextView) rootView.findViewById(R.id.text_share);*/
         /* 공유하기를 눌렀을 때
         share.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,14 +89,12 @@ public class PostDetailActivity extends AppCompatActivity {
                     new LinearLayoutManager(getApplicationContext()));
             commentRecycler.setAdapter( -- );
         }*/
-
-        bottomSheetLayout.showWithSheetView(rootView);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home :
+            case android.R.id.home:
                 finish();
                 return true;
         }

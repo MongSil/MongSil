@@ -11,8 +11,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize">
+        android:layout_height="@dimen/toolbar_size">
         <ImageView
             android:id="@+id/img_back"
             android:layout_gravity="left"

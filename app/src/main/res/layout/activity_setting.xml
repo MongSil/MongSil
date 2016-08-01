@@ -10,7 +10,7 @@
         android:orientation="horizontal"
         android:background="@color/gray"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize">
+        android:layout_height="@dimen/toolbar_size">
         <Button
             android:id="@+id/btn_cancel"
             android:text="@string/cancel"
