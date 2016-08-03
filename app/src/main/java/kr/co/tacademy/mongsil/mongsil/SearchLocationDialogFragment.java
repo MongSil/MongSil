@@ -36,7 +36,7 @@ public class SearchLocationDialogFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
+        setStyle(STYLE_NO_TITLE, R.style.LocationDialogTheme);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class SearchLocationDialogFragment extends DialogFragment {
                         editSearch.setText("");
                         imgSearchCancel.setVisibility(View.GONE);
                     }
-                });
+                });/*
                 editSearch.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -98,7 +98,7 @@ public class SearchLocationDialogFragment extends DialogFragment {
 
                     @Override
                     public void afterTextChanged(Editable editable) {
-                        /*try {
+                        *//*try {
                             //tmaptapi.invokeSearchPortal(editable.toString());
                             //POIItem = tmapdata.findAddressPOI(editable.toString());
                         } catch (IOException ie) {
@@ -107,13 +107,13 @@ public class SearchLocationDialogFragment extends DialogFragment {
                             pce.printStackTrace();
                         } catch (SAXException se) {
                             se.printStackTrace();
-                        }*/
+                        }*//*
                         adapter.notifyDataSetChanged();
                     }
-                });
+                });*/
             }
         });
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return view;
     }
 
     @Override

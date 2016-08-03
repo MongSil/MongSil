@@ -15,6 +15,16 @@ import android.widget.Button;
  * Created by ccei on 2016-07-29.
  */
 public class BottomDialogFragment extends DialogFragment {
+    private static final String DIVIDER = "divider";
+
+    public BottomDialogFragment() { }
+    public static BottomDialogFragment newInstance(int divider) {
+        BottomDialogFragment f = new BottomDialogFragment();
+        Bundle b = new Bundle();
+        b.putInt(DIVIDER, divider);
+        f.setArguments(b);
+        return f;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -25,34 +35,10 @@ public class BottomDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(
-                R.layout.dialog_pic_bottom, container, false);
+        View view = inflater.inflate(R.layout.dialog_bottom, container, false);
 
-        final Intent intent = new Intent(getActivity(), CameraGalleryActivity.class);
-
-        // 카메라
-        Button btnCapture = (Button) view.findViewById(R.id.btn_capture);
-        btnCapture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // TODO: 카메라 불러옴
-                intent.putExtra("selector", 0);
-                startActivity(intent);
-            }
-        });
-
-        // 갤러리
-        Button btnSelectGallery = (Button) view.findViewById(R.id.btn_select_gallery);
-        btnSelectGallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // TODO: 갤러리 불러옴
-                intent.putExtra("selector", 1);
-                startActivity(intent);
-            }
-        });
-
-        // 닫기
+        Button btnFirst = (Button) view.findViewById(R.id.btn_first);
+        Button btnSecond = (Button) view.findViewById(R.id.btn_second);
         Button btnClose = (Button) view.findViewById(R.id.btn_close);
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,7 +46,55 @@ public class BottomDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
-        return view;
+
+        switch (getArguments().getInt(DIVIDER)) {
+            case 0 :
+                final Intent cameraIntent = new Intent(getActivity(), CameraGalleryActivity.class);
+
+                // 카메라
+                btnFirst.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO: 카메라 불러옴
+                        cameraIntent.putExtra("selector", 0);
+                        startActivity(cameraIntent);
+                    }
+                });
+
+                // 갤러리
+                btnSecond.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO: 갤러리 불러옴
+                        cameraIntent.putExtra("selector", 1);
+                        startActivity(cameraIntent);
+                    }
+                });
+
+                return view;
+            case 1 :
+                final Intent postIntent = new Intent(getActivity(), PostDetailActivity.class);
+
+                // 글 수정
+                btnFirst.setText(getResources().getString(R.string.post_modify));
+                btnFirst.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO: 글 수정 불러옴
+                    }
+                });
+
+                // 글 삭제
+                btnSecond.setText(getResources().getString(R.string.post_remove));
+                btnSecond.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO: 글을 삭제하시겠습니까? 요청
+                    }
+                });
+                return view;
+        }
+        return null;
     }
 
     @Override

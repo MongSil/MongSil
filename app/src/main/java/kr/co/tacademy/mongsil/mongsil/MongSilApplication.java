@@ -21,7 +21,8 @@ public class MongSilApplication extends Application {
         super.onCreate();
         Typekit.getInstance()
                 .addNormal(Typekit.createFromAsset(this, "fonts/NotoSansKR-Regular.otf"))
-                .addBold(Typekit.createFromAsset(this, "fonts/NotoSansKR-Bold.otf"));
+                .addBold(Typekit.createFromAsset(this, "fonts/NotoSansKR-Bold.otf"))
+                .addCustom1(Typekit.createFromAsset(this, "fonts/NotoSansKR-Medium.otf"));
         context = this;
     }
 

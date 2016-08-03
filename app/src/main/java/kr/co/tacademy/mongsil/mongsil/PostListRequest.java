@@ -17,10 +17,15 @@ import java.text.ParseException;
  * Created by ccei on 2016-08-02.
  */
 public class PostListRequest extends NetworkRequest<Post>{
-    String area1, area2;
+    String area1 = "";
+    String area2 = "";
     String userId = null;
-    int start, end;
+    int skip;
 
+    public PostListRequest(String area1)
+            throws UnsupportedEncodingException {
+        this.area1 = URLEncoder.encode(area1, "utf8");
+    }
     public PostListRequest(String area1, String area2)
             throws UnsupportedEncodingException {
         this.area1 = URLEncoder.encode(area1, "utf8");
@@ -33,11 +38,11 @@ public class PostListRequest extends NetworkRequest<Post>{
     }
     private static final String URL_FORMAT =
             NetworkDefineConstant.SERVER_POST
-            + "?area1=%s&area2=%s&userId=%s&start=100&end=95";
+            + "?area1=%s&area2=%s&userId=%s&skip=%s";
 
     @Override
     public URL getURL() throws MalformedURLException {
-        String urlText = String.format(URL_FORMAT, area1, area2, userId);
+        String urlText = String.format(URL_FORMAT, area1, area2, userId, skip);
         return new URL(urlText);
     }
 

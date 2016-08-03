@@ -9,11 +9,13 @@ import org.json.JSONObject;
  * Created by ccei on 2016-07-27.
  */
 public class PostData implements JSONParseHandler, Parcelable {
+    int totalCount;
     Post post;
 
     @Override
     public void setData(JSONObject jsonObject) {
         JSONObject object = jsonObject.optJSONObject("post");
+        this.totalCount = object.optInt("totalCount");
         this.post = new Post();
         post.setData(object);
     }

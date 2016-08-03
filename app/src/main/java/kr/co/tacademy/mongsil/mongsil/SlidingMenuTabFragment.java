@@ -40,7 +40,7 @@ public class SlidingMenuTabFragment extends Fragment {
 
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
-            PostRecyclerViewAdapter adapter = new PostRecyclerViewAdapter();
+            PostRecyclerViewAdapter adapter = new PostRecyclerViewAdapter(getActivity().getSupportFragmentManager());
             recyclerView.setAdapter(adapter);
             recyclerView.setPadding(16, 0, 16, 0);
             ////// test code

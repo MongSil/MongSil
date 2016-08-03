@@ -33,7 +33,7 @@ public class SignUpActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
-                            .add(new BottomDialogFragment(), "bottom")
+                            .add(BottomDialogFragment.newInstance(0), "bottom")
                             .addToBackStack("bottom").commit();
             }
         });

@@ -41,7 +41,6 @@
     <string name="dialog">다이어로그</string>
     <string name="capture">직접 촬영</string>
     <string name="select_gallery">앨범사진 선택</string>
-    <string name="other_mongsil">다른 몽실에 올리기</string>
     <string name="post_modify">글 수정</string>
     <string name="post_remove">글 삭제</string>
 
@@ -61,11 +60,16 @@
     <string name="comment">몽실몽실한 한마디를 남겨보세요.</string>
     <string name="comment_send">보내기</string>
     <string name="comment_content">댓글ㅇㅇㅇㅇㅇㅇ</string>
-    <string name="tutorial_content_title">사진 한장에 나의 감성을</string>
     <string name="save">저장</string>
     <string name="posting">몽실몽실 적어봐요</string>
     <string name="empty_search">원하는 지역을 검색해주세요</string>
     <string name="image_content_description">Image</string>
     <string name="edit_profile">프로필 관리</string>
-
+    <string name="tutorial_one_title">오늘의 날씨는</string>
+    <string name="tutorial_two_title">어느 장소든</string>
+    <string name="tutorial_three_title">실시간으로</string>
+    <string name="tutorial_one_explain">포스트로 내가 사는 동네의\n실시간 날씨를 알아보아요</string>
+    <string name="tutorial_two_explain">다른 동네의 날씨가 궁금하면\n검색해보아요</string>
+    <string name="tutorial_three_explain">포스트를 작성하여 다른 살마들의\n실시간 기상캐스터가 되어보아요</string>
+    <string name="search_location_header">즐겨찾기</string>
 </resources>

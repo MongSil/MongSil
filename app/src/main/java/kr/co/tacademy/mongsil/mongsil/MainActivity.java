@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +20,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,7 +30,6 @@ import java.util.ArrayList;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends BaseActivity {
-
     // 툴바 필드
     TextView tbTitle;
     ImageView tbSearch;
@@ -60,7 +57,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         // 글 작성 프레그먼트와 슬라이딩메뉴 프레그먼트를 선언
         // TODO: 추후 프레그먼트의 newInstance를 수정
         if ( savedInstanceState == null ) {
@@ -104,8 +100,11 @@ public class MainActivity extends BaseActivity {
         ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
         animationApplyInterpolater(R.anim.bounce_interpolator, new LinearInterpolator());
         day = (TextView) findViewById(R.id.text_day);
+        day.setText(TimeData.dayFormat);
         week = (TextView) findViewById(R.id.text_week);
+        week.setText(TimeData.weakFormat);
         month = (TextView) findViewById(R.id.text_month);
+        month.setText(TimeData.monthFormat);
 
         // 글쓰기 버튼
         btnCapturePost = (FloatingActionButton) findViewById(R.id.btn_capture_post);
@@ -239,6 +238,13 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        NetworkManager.getInstance().cancelAll(this);
+    }
+
+    // 툴바 메뉴 선택
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home :
@@ -248,6 +254,7 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // 백 버튼 눌렀을 때
     @Override
     public void onBackPressed() {
         if(slidingMenu.isMenuShowing()) {

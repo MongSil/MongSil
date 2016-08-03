@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:background="@color/little_light_gray"
+    android:layout_width="match_parent"
+    android:layout_height="20dp">
+    <!-- 회색 배경 주세요 빼애액 -->
+    <TextView
+        android:id="@+id/text_search_location_header"
+        android:text="@string/search_location_header"
+        android:textSize="9sp"
+        android:paddingLeft="18dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

@@ -4,8 +4,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!-- 뷰페이저 안 : layout_tutorial_content -->
 
+    <!-- 뷰페이저 안 : layout_tutorial_content -->
     <kr.co.tacademy.mongsil.mongsil.ViewPagerParallax
         android:id="@+id/viewpager_tutorial"
         android:layout_width="match_parent"
@@ -13,10 +13,28 @@
 
     <ImageView
         android:id="@+id/img_tutorial_skip"
-        android:src="@drawable/btn_ex_skip"
+        android:src="@drawable/tutorial_skip"
         android:gravity="center"
         android:layout_marginBottom="72dp"
         android:layout_width="82dp"
         android:layout_height="32dp"
         android:layout_gravity="center_horizontal|bottom" />
+    <RelativeLayout
+        android:id="@+id/viewPager_indicator"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginTop="5dp"
+        android:gravity="center">
+
+        <LinearLayout
+            android:id="@+id/viewPager_count_dots"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="52dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:orientation="horizontal" />
+    </RelativeLayout>
 </FrameLayout>

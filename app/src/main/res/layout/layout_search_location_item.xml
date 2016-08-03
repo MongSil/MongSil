@@ -1,20 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_marginTop="16dp"
-    android:layout_marginBottom="9dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="45dp">
+
+    <ImageView
+        android:id="@+id/img_gray_star"
+        android:src="@drawable/gray_star"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="9dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
     <TextView
         android:id="@+id/text_location_item"
         android:text="지역명"
-        android:paddingLeft="36dp"
-        android:paddingBottom="16dp"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:layout_centerVertical="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/img_gray_star"
+        android:layout_toEndOf="@+id/img_gray_star" />
+
     <View
         android:background="@color/little_dark_gray"
         android:layout_width="match_parent"
-        android:layout_height="1dp" />
-</LinearLayout>
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>
