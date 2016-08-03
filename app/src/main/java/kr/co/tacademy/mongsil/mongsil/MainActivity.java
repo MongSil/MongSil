@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
@@ -98,7 +99,9 @@ public class MainActivity extends BaseActivity {
         ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
         ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
-        animationApplyInterpolater(R.anim.bounce_interpolator, new LinearInterpolator());
+        imgWeatherIcon.setAnimation(
+                AnimationApplyInterpolater(
+                        R.anim.bounce_interpolator, new LinearInterpolator()));
         day = (TextView) findViewById(R.id.text_day);
         day.setText(TimeData.dayFormat);
         week = (TextView) findViewById(R.id.text_week);
@@ -117,10 +120,12 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private  void  animationApplyInterpolater(int resourceId, final Interpolator interpolator){
-        Animation animation =  AnimationUtils.loadAnimation(this, resourceId);
+    // 애니메이션 인터폴레이터 적용
+    private Animation AnimationApplyInterpolater(
+            int resourceId, final Interpolator interpolator){
+        Animation animation = AnimationUtils.loadAnimation(this, resourceId);
         animation.setInterpolator(interpolator);
-        imgWeatherIcon.startAnimation(animation);
+        return animation;
     }
 
     // 슬라이딩메뉴 뷰

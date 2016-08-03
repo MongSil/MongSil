@@ -20,7 +20,7 @@
 
     <style name="LocationDialogTheme" parent="Theme.AppCompat.Dialog">
         <item name="android:windowFrame">@null</item>
-        <item name="android:windowBackground">@color/dark_transparent_background</item>
+        <item name="android:windowBackground">@color/invisible</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowTitleStyle">@null</item>
@@ -32,6 +32,11 @@
     <style name="BottomDialogAnimation" parent="@android:style/Theme.Dialog">
         <item name="android:windowEnterAnimation">@anim/anim_slide_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/anim_slide_out_bottom</item>
+    </style>
+
+    <style name="LocationDialogAnimation" parent="@android:style/Theme.Dialog">
+        <item name="android:windowEnterAnimation">@anim/small_to_big_interpolator</item>
+        <item name="android:windowExitAnimation">@anim/big_to_small_interpolator</item>
     </style>
 
     <style name="TabText" parent="TextAppearance.Design.Tab">

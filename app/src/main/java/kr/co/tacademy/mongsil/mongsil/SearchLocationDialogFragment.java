@@ -1,16 +1,22 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,6 +27,7 @@ import com.skp.Tmap.TMapData;
 /**
  * Created by ccei on 2016-08-02.
  */
+// TODO : 지역검색 API 공부해서 넣어야함
 public class SearchLocationDialogFragment extends DialogFragment {
     //private TMapTapi tmaptapi = new TMapTapi(MongSilApplication.getMongSilContext());
 
@@ -76,9 +83,27 @@ public class SearchLocationDialogFragment extends DialogFragment {
                 emptySearch.setVisibility(View.GONE);
                 editSearch.setVisibility(View.VISIBLE);
                 imgSearchCancel.setVisibility(View.VISIBLE);
+                editSearch.requestFocus();
+                final InputMethodManager imm =
+                        (InputMethodManager) getActivity()
+                                .getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(editSearch, InputMethodManager.SHOW_FORCED);
+                editSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                        if(i == EditorInfo.IME_ACTION_SEARCH || i == EditorInfo.IME_ACTION_NONE) {
+                            // 키보드에서 검색버튼을 누를 때
+                            imm.hideSoftInputFromWindow(editSearch.getWindowToken(), 0);
+                            editSearch.clearFocus();
+                            return true;
+                        }
+                        return false;
+                    }
+                });
                 imgSearchCancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        imm.hideSoftInputFromWindow(editSearch.getWindowToken(), 0);
                         emptySearch.setVisibility(View.VISIBLE);
                         editSearch.setVisibility(View.GONE);
                         editSearch.setText("");
@@ -121,8 +146,11 @@ public class SearchLocationDialogFragment extends DialogFragment {
         super.onActivityCreated(savedInstanceState);
         Window window = getDialog().getWindow();
         WindowManager.LayoutParams wlp = window.getAttributes();
-        //wlp.windowAnimations = R.style.BottomDialogAnimation;
-        //wlp.gravity = Gravity.BOTTOM;
+        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        wlp.windowAnimations = R.style.LocationDialogAnimation;
+        wlp.gravity = Gravity.BOTTOM;
+        wlp.height = (int)(display.getHeight() * 0.9f);
         getDialog().getWindow().setDimAmount(0);
         window.setAttributes(wlp);
     }
