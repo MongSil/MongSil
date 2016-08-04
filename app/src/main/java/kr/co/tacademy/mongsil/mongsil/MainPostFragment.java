@@ -2,6 +2,7 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,9 +26,6 @@ import java.util.ArrayList;
  * Created by ccei on 2016-07-26.
  */
 public class MainPostFragment extends Fragment {
-
-    ArrayList<Post> posts;
-
     // 임의의 지역
     String location = "대전";
 
@@ -44,11 +42,10 @@ public class MainPostFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         RecyclerView postRecyclerView =
                 (RecyclerView) inflater.inflate(R.layout.fragment_post, container, false);
-        PostRecyclerViewAdapter adapter = new PostRecyclerViewAdapter();
+
         postRecyclerView.setLayoutManager(
                 new LinearLayoutManager(
                         MongSilApplication.getMongSilContext()));
-        postRecyclerView.setAdapter(adapter);
 
         /*if(!TextUtils.isEmpty(location)) {
             try {
@@ -73,25 +70,29 @@ public class MainPostFragment extends Fragment {
         }*/
 
         ////// test code
+        final ArrayList<PostData> postDatas = new ArrayList<PostData>();
         PostData data = new PostData();
         PostData data1 = new PostData();
         PostData data2 = new PostData();
         PostData data3 = new PostData();
         PostData data4 = new PostData();
         data.setTimeData(0, "Today");
-        adapter.add(data);
+        postDatas.add(data);
         data1.setData(1, "10:25 AM", R.mipmap.ic_launcher, "스님",
                 "날이 밝구나", 0, 0, 10);
-        adapter.add(data1);
+        postDatas.add(data1);
         data2.setData(1, "02:25 PM", R.mipmap.ic_launcher, "주지스님",
                 "날씨가 덥구나", 0, R.drawable.back_cloud, 3);
-        adapter.add(data2);
+        postDatas.add(data2);
         data3.setTimeData(0, "2016.07.29");
-        adapter.add(data3);
+        postDatas.add(data3);
         data4.setData(1, "05:20 PM", R.mipmap.ic_launcher, "동자스님",
                 "밖에 나가고 싶어요 빼앢", 0, 0, 1);
-        adapter.add(data4);
+        postDatas.add(data4);
         //////
+
+        final PostRecyclerViewAdapter adapter = new PostRecyclerViewAdapter(postDatas);
+        postRecyclerView.setAdapter(adapter);
 
         return postRecyclerView;
     }

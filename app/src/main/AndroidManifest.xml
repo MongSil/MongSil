@@ -26,6 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
+        <activity android:name=".EditProfileActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".SignUpActivity" />
         <activity android:name=".PostDetailActivity" />
         <activity android:name=".InviteFriendActivity" />
@@ -35,6 +37,11 @@
         <activity android:name=".CameraGalleryActivity" />
         <activity android:name=".SettingActivity" />
         <activity android:name=".AppTutorialActivity" />
+
+        <meta-data
+            android:name=".MongSilGlideModule"
+            android:value="GlideModule" />
+
     </application>
 
 </manifest>

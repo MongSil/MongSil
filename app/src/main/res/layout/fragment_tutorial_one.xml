@@ -5,17 +5,45 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/img_cloud_cut"
+        android:id="@+id/img_one_cloud03_cut"
+        android:src="@drawable/cloud03_cut_01"
+        android:layout_marginBottom="72dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:scaleType="fitXY" />
+
+    <ImageView
+        android:id="@+id/img_one_cloud02_cut"
+        android:src="@drawable/cloud02_cut_01"
+        android:layout_marginBottom="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:scaleType="fitXY" />
+    <ImageView
         android:src="@drawable/cloud_cut_01"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
         android:scaleType="fitXY" />
+    <ImageView
+        android:id="@+id/img_twinkle"
+        android:src="@drawable/tutorial_twinkle01"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:scaleType="fitXY" />
+
+    <ImageView
+        android:src="@drawable/strong_rain01"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_gravity="center"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="90dp">
         <TextView
@@ -26,7 +54,7 @@
             android:gravity="center"
             android:layout_marginBottom="18dp"
             android:layout_gravity="center"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <TextView
@@ -36,13 +64,14 @@
             android:textColor="@android:color/white"
             android:gravity="center"
             android:layout_gravity="center"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
 
     <ImageView
         android:id="@+id/img_tutorial_mongsil"
         android:src="@drawable/tutorial_mongsil"
+        android:layout_marginTop="70dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top" />

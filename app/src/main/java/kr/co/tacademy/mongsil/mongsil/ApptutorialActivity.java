@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -28,7 +29,7 @@ public class AppTutorialActivity extends AppCompatActivity {
         pager.set_max_pages(MAX_PAGES);
         pager.setBackgroundAsset(R.drawable.tutorial_background);
         pager.setAdapter(new tutorialPagerAdapter(getSupportFragmentManager()));
-        pager.setPageTransformer(true, new CrossfadePageTransformer());
+        pager.setPageTransformer(true, new CrossFadePageTransformer());
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -51,9 +52,7 @@ public class AppTutorialActivity extends AppCompatActivity {
         imgTutorialSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(AppTutorialActivity.this, SignUpActivity.class);
-                startActivity(intent);
-                AppTutorialActivity.this.finish();
+                endTutorial();
             }
         });
     }
@@ -88,6 +87,13 @@ public class AppTutorialActivity extends AppCompatActivity {
         }
     }
 
+    private void endTutorial() {
+        Intent intent = new Intent(AppTutorialActivity.this, SignUpActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        AppTutorialActivity.this.finish();
+        pager.setBackgroundColor(getResources().getColor(R.color.invisible));
+    }
     @Override
     public void onBackPressed() {
         if (pager.getCurrentItem() == 0) {
@@ -118,7 +124,7 @@ public class AppTutorialActivity extends AppCompatActivity {
         }
     }
 
-    public class CrossfadePageTransformer implements ViewPager.PageTransformer {
+    public class CrossFadePageTransformer implements ViewPager.PageTransformer {
 
         @Override
         public void transformPage(View page, float position) {
@@ -129,16 +135,20 @@ public class AppTutorialActivity extends AppCompatActivity {
             View explain = page.findViewById(R.id.text_tutorial_explain);
 
             // 첫번째
+            View cloudCutTwo = page.findViewById(R.id.img_one_cloud02_cut);
+            View cloudCutThree = page.findViewById(R.id.img_one_cloud03_cut);
 
             // 두번째
+            View navi = page.findViewById(R.id.img_tutorial_navi);
             View city = page.findViewById(R.id.img_tutorial_city);
+            View cloud2CutTwo = page.findViewById(R.id.img_two_cloud02_cut);
+            View cloud2CutThree = page.findViewById(R.id.img_two_cloud03_cut);
 
             // 세번째
-            View write = page.findViewById(R.id.img_tutorial_write);
 
-            /*if (position <= 1) {
-                page.setTranslationX(pageWidth * -position);
-            }*/
+            View write = page.findViewById(R.id.img_tutorial_write);
+            View cloud3CutTwo = page.findViewById(R.id.img_three_cloud02_cut);
+            View cloud3CutThree = page.findViewById(R.id.img_three_cloud03_cut);
 
             if(position <= -1.0f || position >= 1.0f) {
             } else if( position == 0.0f ) {
@@ -152,13 +162,40 @@ public class AppTutorialActivity extends AppCompatActivity {
                     explain.setAlpha(1.0f - Math.abs(position));
                 }
 
-                if (city != null) {
-                    city.setTranslationX((float)(pageWidth/1.2 * position));
+                // 첫번째
+                if (cloudCutTwo != null) {
+                    cloudCutTwo.setTranslationX(-(float)(pageWidth/1.5 * position));
+                }
+                if (cloudCutThree != null) {
+                    cloudCutThree.setTranslationX(-(float)(pageWidth/0.8 * position));
                 }
 
+                // 두번째
+                if (city != null) {
+                    city.setTranslationY((float)(pageWidth/1.2 * position));
+                }
+                if (navi != null) {
+                    navi.setTranslationY((float)(pageWidth/1.2 * position));
+                }
+                if (cloud2CutTwo != null) {
+                    cloud2CutTwo.setTranslationX((float)(pageWidth * position));
+
+                }
+                if (cloud2CutThree != null) {
+                    cloud2CutThree.setTranslationX(-(float)(pageWidth/1.1 * position));
+                }
+
+                // 세번째
                 if (write != null) {
                     write.setTranslationX((float)(pageWidth/1.2 * position));
                 }
+                if (cloud3CutTwo != null) {
+                    cloud3CutTwo.setTranslationX((float)(pageWidth/0.7 * position));
+                }
+                if (cloud3CutThree != null) {
+                    cloud3CutThree.setTranslationX((float)(pageWidth/1.6 * position));
+                }
+
             }
         }
     }

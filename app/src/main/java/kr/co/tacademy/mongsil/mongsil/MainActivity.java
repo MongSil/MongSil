@@ -132,10 +132,16 @@ public class MainActivity extends BaseActivity {
     public View loadSlidingMenu() {
         View menu = getLayoutInflater().inflate(R.layout.layout_sliding_menu, null);
 
+        TextView textMyName, textMyLocation;
+
         CircleImageView imgProfile =
                 (CircleImageView) menu.findViewById(R.id.img_profile);
-
-        TextView textMyName, textMyLocation;
+        imgProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, EditProfileActivity.class));
+            }
+        });
         textMyName = (TextView) menu.findViewById(R.id.text_my_name);
         textMyLocation = (TextView) menu.findViewById(R.id.text_my_location);
         textMyName.setText("몽실이");
@@ -143,6 +149,12 @@ public class MainActivity extends BaseActivity {
 
         ImageView imgSetting, imgAlarm, imgClose;
         imgSetting = (ImageView) menu.findViewById(R.id.img_setting);
+        imgSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, SettingActivity.class));
+            }
+        });
         imgClose = (ImageView) menu.findViewById(R.id.img_close);
         imgClose.setOnClickListener(new View.OnClickListener() {
             @Override

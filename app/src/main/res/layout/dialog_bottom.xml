@@ -32,8 +32,7 @@
         <View
             android:background="@color/line"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.1"/>
+            android:layout_height="1dp"/>
 
         <Button
             android:id="@+id/btn_second"
@@ -51,7 +50,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:background="@drawable/shape_white_radius"
-        android:layout_margin="9dp"
+        android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">

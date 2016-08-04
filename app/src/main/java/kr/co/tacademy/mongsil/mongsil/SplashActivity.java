@@ -46,7 +46,6 @@ public class SplashActivity extends BaseActivity {
                     public void onClick(View view) {
                         Intent intent = new Intent(SplashActivity.this, AppTutorialActivity.class);
                         startActivity(intent);
-                        SplashActivity.this.finish();
                         interrupt();
                     }
                 });

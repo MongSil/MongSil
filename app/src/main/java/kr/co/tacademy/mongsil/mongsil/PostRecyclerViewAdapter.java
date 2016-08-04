@@ -3,12 +3,14 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -36,8 +38,11 @@ public class PostRecyclerViewAdapter
         notifyDataSetChanged();
     }
 
-    PostRecyclerViewAdapter() { }
-    PostRecyclerViewAdapter(FragmentManager fm) {
+    PostRecyclerViewAdapter(ArrayList<PostData> items) {
+        this.items = items;
+    }
+    PostRecyclerViewAdapter(FragmentManager fm, ArrayList<PostData> items) {
+        this(items);
         this.fm = fm;
     }
 
@@ -177,7 +182,7 @@ public class PostRecyclerViewAdapter
                 ((PostViewHolder)holder).setMyData(items.get(position));
                 break;
             case LAYOUT_MY_POST :
-                    ((MyPostViewHolder)holder).setMyData(items.get(position));
+                ((MyPostViewHolder)holder).setMyData(items.get(position));
                 break;
         }
     }
