@@ -40,9 +40,9 @@ public class MainPostFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        // TODO : 글목록 스와이프리프레쉬 추가
         RecyclerView postRecyclerView =
                 (RecyclerView) inflater.inflate(R.layout.fragment_post, container, false);
-
         postRecyclerView.setLayoutManager(
                 new LinearLayoutManager(
                         MongSilApplication.getMongSilContext()));

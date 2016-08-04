@@ -1,7 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.Manifest;
-import android.app.LoaderManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,15 +10,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
-import java.util.List;
 
 /**
  * Created by Han on 2016-07-30.
@@ -58,7 +54,7 @@ public class CameraGalleryActivity extends BaseActivity {
             setSupportActionBar(toolbar);
             ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
-                actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
+                actionBar.setHomeAsUpIndicator(R.drawable.icon_close);
                 actionBar.setDisplayHomeAsUpEnabled(true);
                 actionBar.setDisplayShowTitleEnabled(false);
             }
@@ -127,7 +123,7 @@ public class CameraGalleryActivity extends BaseActivity {
                     galleryRecycler.setLayoutManager(gridLayoutManager);
                     galleryRecycler.setHasFixedSize(true);
                     // TODO : 어답터에 갤러리 가져오기
-                    galleryRecycler.setAdapter(new GalleryRecyclerAdapter());
+                    galleryRecycler.setAdapter(new GalleryRecyclerViewAdapter());
                 }
             }
             else {

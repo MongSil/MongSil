@@ -7,11 +7,6 @@ import com.tsengvn.typekit.TypekitContextWrapper;
 
 /**
  * Created by Han on 2016-08-01.
- *   서버   클라
- * 1  o     o
- * 2  o     x
- * 3  x     o
- * 4  x     x
  */
 public class BaseActivity extends AppCompatActivity {
 

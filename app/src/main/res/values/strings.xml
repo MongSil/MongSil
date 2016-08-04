@@ -77,4 +77,6 @@
     <string name="normal_setting">일반</string>
     <string name="on">ON</string>
     <string name="off">OFF</string>
+    <string name="alarm_content"><b>끼미니</b>님이 게시물에 댓글을 달았습니다</string>
+    <string name="alarm_time">오전 12:50</string>
 </resources>

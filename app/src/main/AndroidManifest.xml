@@ -25,18 +25,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
-        <activity android:name=".EditProfileActivity"
-            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".AppTutorialActivity" />
         <activity android:name=".SignUpActivity" />
+
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".SettingActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".AlarmActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".EditProfileActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".PostDetailActivity" />
-        <activity android:name=".InviteFriendActivity" />
         <activity
             android:name=".PostingActivity"
             android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
         <activity android:name=".CameraGalleryActivity" />
-        <activity android:name=".SettingActivity" />
-        <activity android:name=".AppTutorialActivity" />
 
         <meta-data
             android:name=".MongSilGlideModule"

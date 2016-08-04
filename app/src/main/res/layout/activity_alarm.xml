@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 상단바 -->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:background="@color/dark_transparent_background"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_size">
+        <TextView
+            android:text="@string/alarm"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </android.support.v7.widget.Toolbar>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/alarm_swiperefresh"
+        android:background="@color/little_dark_gray"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+            <!-- RecyclerView 내용 : layout_alarm_item.xml -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/alarm_recycler"
+                android:background="@android:color/white"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>

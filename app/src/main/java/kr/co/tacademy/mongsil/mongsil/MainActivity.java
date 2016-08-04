@@ -155,6 +155,13 @@ public class MainActivity extends BaseActivity {
                 startActivity(new Intent(MainActivity.this, SettingActivity.class));
             }
         });
+        imgAlarm = (ImageView) menu.findViewById(R.id.img_alarm);
+        imgAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, AlarmActivity.class));
+            }
+        });
         imgClose = (ImageView) menu.findViewById(R.id.img_close);
         imgClose.setOnClickListener(new View.OnClickListener() {
             @Override
