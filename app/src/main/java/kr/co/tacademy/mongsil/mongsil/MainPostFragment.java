@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 public class MainPostFragment extends Fragment {
     // 임의의 지역
     String location = "대전";
+    ArrayList<Post> posts;
 
     public MainPostFragment() { }
     public static MainPostFragment newInstance() {
@@ -47,51 +49,37 @@ public class MainPostFragment extends Fragment {
                 new LinearLayoutManager(
                         MongSilApplication.getMongSilContext()));
 
-        /*if(!TextUtils.isEmpty(location)) {
+        //if(!TextUtils.isEmpty(location)) {
             try {
                 // 요청에 대한 포장 클래스
                 // 하나의 요청에 대한 클래스를 보통 정의할 수 있음
                 PostListRequest request = new PostListRequest(location);
                 request.setTag(this);
                 NetworkManager.getInstance().getNetworkData(request,
-                        new NetworkManager.OnResultListener<Post>() {
+                        new NetworkManager.OnResultListener<PostData>() {
                             @Override
-                            public void onSuccess(NetworkRequest<Post> request, Post result) {
-                                posts.add(result);
+                            public void onSuccess(NetworkRequest<PostData> request, PostData result) {
+                                if(result.post != null && result.post.size() >0 ) {
+                                    posts.addAll(result.post);
+                                } else {
+                                    Toast.makeText(getContext(), "fail", Toast.LENGTH_SHORT).show();
+                                }
                             }
+
                             @Override
-                            public void onFailure(NetworkRequest<Post> request, int errorCode, int responseCode, String message, Throwable exception) {
-                                //
+                            public void onFailure(NetworkRequest<PostData> request,
+                                                  int errorCode, int responseCode,
+                                                  String message, Throwable exception) {
+                                // TODO : 정보 받는데 실패했다(연결이 안됐다) 알려줌
                             }
                         });
             } catch (UnsupportedEncodingException uee) {
                 uee.printStackTrace();
             }
-        }*/
+        //}
 
-        ////// test code
-        final ArrayList<PostData> postDatas = new ArrayList<PostData>();
-        PostData data = new PostData();
-        PostData data1 = new PostData();
-        PostData data2 = new PostData();
-        PostData data3 = new PostData();
-        PostData data4 = new PostData();
-        data.setTimeData(0, "Today");
-        postDatas.add(data);
-        data1.setData(1, "10:25 AM", R.mipmap.ic_launcher, "스님",
-                "날이 밝구나", 0, 0, 10);
-        postDatas.add(data1);
-        data2.setData(1, "02:25 PM", R.mipmap.ic_launcher, "주지스님",
-                "날씨가 덥구나", 0, R.drawable.back_cloud, 3);
-        postDatas.add(data2);
-        data3.setTimeData(0, "2016.07.29");
-        postDatas.add(data3);
-        data4.setData(1, "05:20 PM", R.mipmap.ic_launcher, "동자스님",
-                "밖에 나가고 싶어요 빼앢", 0, 0, 1);
-        postDatas.add(data4);
-        //////
-
-        final PostRecyclerViewAdapter adapter = new PostRecyclerViewAdapter(postDatas);
+        PostListRecyclerViewAdapter adapter =
+                new PostListRecyclerViewAdapter(posts);
         postRecyclerView.setAdapter(adapter);
 
         return postRecyclerView;

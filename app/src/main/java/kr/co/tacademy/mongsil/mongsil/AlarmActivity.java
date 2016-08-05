@@ -9,13 +9,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
+import com.jcodecraeer.xrecyclerview.ArrowRefreshHeader;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
+
 /**
  * Created by Han on 2016-08-05.
  */
 public class AlarmActivity extends AppCompatActivity {
 
-    SwipeRefreshLayout alaramSwipe;
-    RecyclerView alarmRecycler;
+    XRecyclerView alarmRecycler;
     Handler handler;
 
     @Override
@@ -32,24 +34,28 @@ public class AlarmActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        alaramSwipe = (SwipeRefreshLayout) findViewById(R.id.alarm_swiperefresh);
-        alarmRecycler = (RecyclerView) findViewById(R.id.alarm_recycler);
-        final LinearLayoutManager layoutManager =
+        alarmRecycler = (XRecyclerView) findViewById(R.id.alarm_recycler);
+        LinearLayoutManager layoutManager =
                 new LinearLayoutManager(getApplicationContext());
         alarmRecycler.setLayoutManager(layoutManager);
         alarmRecycler.setAdapter(new AlarmRecyclerViewAdapter());
-
         handler = new Handler();
-        alaramSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        alarmRecycler.setLoadingListener(new XRecyclerView.LoadingListener() {
             @Override
             public void onRefresh() {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         // TODO : 서버에서 댓글 목록을 받아온다
-                        alaramSwipe.setRefreshing(false);
+                        alarmRecycler.refreshComplete();
                     }
                 }, 2000);
+
+            }
+
+            @Override
+            public void onLoadMore() {
+
             }
         });
     }

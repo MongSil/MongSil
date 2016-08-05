@@ -203,28 +203,22 @@ public class MainActivity extends BaseActivity {
             }
         }
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-
                 TextView text = (TextView) tab.getCustomView();
-
                 text.setTypeface(null, Typeface.BOLD);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
                 TextView text = (TextView) tab.getCustomView();
-
                 text.setTypeface(null, Typeface.NORMAL);
             }
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-
             }
-
         });
 
         return menu;

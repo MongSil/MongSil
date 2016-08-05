@@ -46,8 +46,9 @@ public class SearchLocationRequest extends NetworkRequest<Post>{
         Gson gson = new Gson();
         InputStreamReader isr = new InputStreamReader(is);
         try {
-            PostData data = gson.fromJson(isr, PostData.class);
-            return data.post;
+            /*PostData data = gson.fromJson(isr, PostData.class);
+            return data.post;*/
+            return null;
         } catch (JsonSyntaxException | JsonIOException je) {
             throw new ParseException(je.getMessage(), 0);
         }

@@ -3,21 +3,31 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * Created by ccei on 2016-07-27.
  */
 public class PostData implements JSONParseHandler, Parcelable {
-    int totalCount;
-    Post post;
+    Page totalCount;
+    ArrayList<Post> post;
 
     @Override
     public void setData(JSONObject jsonObject) {
-        JSONObject object = jsonObject.optJSONObject("post");
-        this.totalCount = object.optInt("totalCount");
-        this.post = new Post();
-        post.setData(object);
+        this.totalCount = new Page();
+        totalCount.setData(jsonObject);
+
+        JSONArray array = jsonObject.optJSONArray("post");
+        this.post = new ArrayList<Post>();
+        for(int i = 0; i < array.length(); i++) {
+            JSONObject jPost = array.optJSONObject(i);
+            Post postData = new Post();
+            postData.setData(jPost);
+            post.add(postData);
+        }
     }
 
     public static final int TYPE_LAYOUT_DATE = 0;

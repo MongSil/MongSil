@@ -44,7 +44,7 @@ public class NetworkManager {
     private static final int MESSAGE_SUCCESS = 0;
     private static final int MESSAGE_FAILURE = 1;
 
-    //결과 delicate 해주는 calss
+    //결과 delicate 해주는 class
     static class NetworkHandler extends Handler {
         NetworkManager manager;
         public NetworkHandler(NetworkManager manager) {

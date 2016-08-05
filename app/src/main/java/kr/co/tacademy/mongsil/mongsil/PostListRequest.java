@@ -16,10 +16,10 @@ import java.text.ParseException;
 /**
  * Created by ccei on 2016-08-02.
  */
-public class PostListRequest extends NetworkRequest<Post>{
+public class PostListRequest extends NetworkRequest<PostData>{
     String area1 = "";
     String area2 = "";
-    String userId = null;
+    int userId = 0;
     int skip;
 
     public PostListRequest(String area1)
@@ -31,28 +31,28 @@ public class PostListRequest extends NetworkRequest<Post>{
         this.area1 = URLEncoder.encode(area1, "utf8");
         this.area2 = URLEncoder.encode(area2, "utf8");
     }
-    public PostListRequest(String area1, String area2, String userId)
+    public PostListRequest(String area1, String area2, int userId)
             throws UnsupportedEncodingException {
         this(area1, area2);
         this.userId = userId;
     }
     private static final String URL_FORMAT =
             NetworkDefineConstant.SERVER_POST
-            + "?area1=%s&area2=%s&userId=%s&skip=%s";
+            + "?area1=%s&area2=%s";
 
     @Override
     public URL getURL() throws MalformedURLException {
-        String urlText = String.format(URL_FORMAT, area1, area2, userId, skip);
+        String urlText = String.format(URL_FORMAT, area1, area2);
         return new URL(urlText);
     }
 
     @Override
-    public Post parse(InputStream is) throws ParseException {
+    public PostData parse(InputStream is) throws ParseException {
         Gson gson = new Gson();
         InputStreamReader isr = new InputStreamReader(is);
         try {
             PostData data = gson.fromJson(isr, PostData.class);
-            return data.post;
+            return data;
         } catch (JsonSyntaxException | JsonIOException je) {
             throw new ParseException(je.getMessage(), 0);
         }
