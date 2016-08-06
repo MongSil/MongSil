@@ -74,6 +74,7 @@ public class BottomDialogFragment extends DialogFragment {
                 return view;
             case 1 :
                 final Intent postIntent = new Intent(getActivity(), PostDetailActivity.class);
+                // TODO : 글 수정하는 인텐트 put 만들어야함
 
                 // 글 수정
                 btnFirst.setText(getResources().getString(R.string.post_modify));

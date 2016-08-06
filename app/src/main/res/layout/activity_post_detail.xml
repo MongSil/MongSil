@@ -14,7 +14,8 @@
         android:layout_height="@dimen/toolbar_size">
         <ImageView
             android:id="@+id/img_threeDot"
-            android:src="@mipmap/ic_launcher"
+            android:src="@drawable/icon_select"
+            android:layout_marginRight="16dp"
             android:layout_gravity="right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -61,13 +62,12 @@
             android:layout_marginRight="10dp"
             android:layout_height="1dp"
             android:layout_below="@+id/text_post_content" />
-        <LinearLayout
-            android:orientation="horizontal"
+        <RelativeLayout
             android:layout_marginTop="5dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
@@ -75,40 +75,41 @@
             <TextView
                 android:id="@+id/text_post_location"
                 android:text="@string/location"
-                android:drawableLeft="@mipmap/ic_launcher"
-                android:gravity="center"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:drawableLeft="@drawable/icon_nevi_write_bottom"
+                android:drawablePadding="5dp"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
             <TextView
                 android:id="@+id/text_post_time"
                 android:text="@string/time"
                 android:textSize="12sp"
-                android:layout_gravity="center"
-                android:layout_width="0dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="3dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                android:layout_toRightOf="@+id/text_post_location"
+                android:layout_toEndOf="@+id/text_post_location" />
             <TextView
                 android:id="@+id/text_post_name"
                 android:text="@string/name"
                 android:gravity="center"
-                android:layout_gravity="center"
-                android:layout_width="0dp"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
                 android:textColor="@android:color/white" />
             <TextView
                 android:id="@+id/text_post_comment_count"
                 android:text="@string/comment_count"
-                android:drawableLeft="@mipmap/ic_launcher"
-                android:gravity="center"
-                android:layout_gravity="end"
-                android:layout_width="0dp"
+                android:textColor="@android:color/white"
+                android:drawableLeft="@drawable/icon_bubblechat_write_bottom"
+                android:drawablePadding="5dp"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:textColor="@android:color/white" />
-        </LinearLayout>
+                android:layout_alignParentRight="true"/>
+        </RelativeLayout>
     </RelativeLayout>
     <!-- 댓글 부분 : layout_post_comment.xml -->
     <RelativeLayout

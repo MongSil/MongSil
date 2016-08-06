@@ -13,8 +13,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class PostDetailActivity extends BaseActivity {
-
-
     int commentCount = 0;
 
     CoordinatorLayout postContainer;
@@ -32,7 +30,7 @@ public class PostDetailActivity extends BaseActivity {
 
         // 인텐트를 받아옴
         Intent intent = getIntent();
-        final PostData postData = intent.getParcelableExtra("post_data");
+        final Post post = intent.getParcelableExtra("post_data");
 
         // 툴바
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -51,15 +49,16 @@ public class PostDetailActivity extends BaseActivity {
 
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
         postContent = (TextView) findViewById(R.id.text_post_content);
-        postContent.setText(postData.content);
+        postContent.setText(post.content);
         postLocation = (TextView) findViewById(R.id.text_post_location);
-        postLocation.setText(postData.location);
+        //postLocation.setText(post.location);
         postTime = (TextView) findViewById(R.id.text_post_time);
-        postTime.setText(postData.time);
+        String[] date = post.date.split(" ");
+        postTime.setText(TimeData.PostTime(date[1]));
         postName = (TextView) findViewById(R.id.text_post_name);
-        postName.setText(postData.name);
+        postName.setText(post.username);
         postCommentCount = (TextView) findViewById(R.id.text_post_comment_count);
-        // postCommentCount.setText(postData.commentCount);
+        // postCommentCount.setText(post.commentCount);
 
         // 코멘트 바텀 시트
         commentBottomSheet =
@@ -70,6 +69,7 @@ public class PostDetailActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 commentBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                // TODO : 댓글 수에 따라 창의 최대 위치가 변경됨
                 if(commentCount > 3) {
 
                 } else if(commentCount > 0) {

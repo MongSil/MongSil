@@ -24,7 +24,9 @@
             android:layout_height="match_parent" />
         <ImageView
             android:id="@+id/img_threeDot"
-            android:src="@mipmap/ic_launcher"
+            android:src="@drawable/icon_select"
+            android:layout_marginTop="6dp"
+            android:layout_marginRight="6dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -32,7 +34,7 @@
             android:layout_alignParentEnd="true" />
         <TextView
             android:id="@+id/text_my_post_content"
-            android:text="둠칫 둠칫 두둠칫"
+            android:text="내 포스트 내용"
             android:paddingBottom="24dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

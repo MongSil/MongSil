@@ -20,24 +20,24 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Han on 2016-07-29.
  */
-
 // 포스트 리스트 어답터
 public class PostRecyclerViewAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    List<PostData> items = new ArrayList<PostData>();
+    // TODO : PostDetailActivity를 열 때 인텐트에 PostId정보를 서버로 보내서 받아와야함
+    // TODO : 시간과 글 내용을 나눌 방법을 찾아야함
+    List<Post> items = new ArrayList<Post>();
     FragmentManager fm;
 
     private static final int LAYOUT_DATE = 1000;
     private static final int LAYOUT_POST = 2000;
     private static final int LAYOUT_MY_POST = 3000;
 
-    public void add(PostData data) {
-        items.add(data);
-        notifyDataSetChanged();
-    }
-
     PostRecyclerViewAdapter() { }
-    PostRecyclerViewAdapter(FragmentManager fm) {
+    PostRecyclerViewAdapter(ArrayList<Post> items) {
+        this.items = items;
+    }
+    PostRecyclerViewAdapter(FragmentManager fm, ArrayList<Post> items) {
+        this(items);
         this.fm = fm;
     }
 
@@ -52,9 +52,10 @@ public class PostRecyclerViewAdapter
             postDate = (TextView) view.findViewById(R.id.text_post_date);
         }
 
-        public void setMyData(PostData data) {
+        public void setMyData(Post post) {
             // TODO: 서버에서 전송한 '날짜'데이터 삽입, 오늘이면 Today, 어제면 어제..
-            postDate.setText(data.time);
+            String[] date = post.date.split(" ");
+            postDate.setText(TimeData.dateCalculate(date[0]));
             // TODO: 프로필이랑 글목록 크기 다르게하기( 프로필은 위에 14dp)
         }
     }
@@ -78,17 +79,19 @@ public class PostRecyclerViewAdapter
             btnNext = (Button) view.findViewById(R.id.btn_next);
         }
 
-        public void setMyData(final PostData data) {
+        public void setMyData(final Post post) {
             // TODO: 서버에서 전송한 게시글 목록 삽입
-            imgPostProfile.setImageResource(data.imgProfile);
-            postName.setText(data.name);
-            postContent.setText(data.content);
-            postTime.setText(data.time);
+            //imgPostProfile.setImageResource(post.);
+            postName.setText(post.username);
+            postContent.setText(post.content);
+
+            String[] date = post.date.split(" ");
+            postTime.setText(TimeData.dateCalculate(date[1]));
             postContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
-                    intent.putExtra("post_data", data);
+                    intent.putExtra("post_data", post);
                     view.getContext().startActivity(intent);
                 }
             });
@@ -102,7 +105,7 @@ public class PostRecyclerViewAdapter
         CardView myPostCard;
         ImageView imgMyPostBackGround, imgThreeDot;
         View littleBlackBackGround;
-        TextView textMyPostContent, textMyPostInfo;
+        TextView myPostContent, myPostInfo;
 
         public MyPostViewHolder(View view) {
             super(view);
@@ -111,25 +114,30 @@ public class PostRecyclerViewAdapter
             imgMyPostBackGround = (ImageView) view.findViewById(R.id.img_my_post_background);
             littleBlackBackGround = view.findViewById(R.id.little_black_background);
             imgThreeDot = (ImageView) view.findViewById(R.id.img_threeDot);
-            textMyPostContent = (TextView) view.findViewById(R.id.text_my_post_content);
-            textMyPostInfo = (TextView) view.findViewById(R.id.text_my_post_info);
+            myPostContent = (TextView) view.findViewById(R.id.text_my_post_content);
+            myPostInfo = (TextView) view.findViewById(R.id.text_my_post_info);
         }
 
-        public void setMyData(final PostData data) {
+        public void setMyData(final Post post) {
             // TODO : 서버에서 내 작성글 목록 삽입
-            imgMyPostBackGround.setImageResource(data.imgBackGround);
-            if(data.imgBackGround != 0) {
+            /*
+            imgMyPostBackGround.setImageResource( -- 백그라운드 이미지 post.back ~ -- );
+            if(data.imgBackGround != null) {
 
                 littleBlackBackGround.setVisibility(View.VISIBLE);
-                textMyPostContent.setTextColor(
+                myPostContent.setTextColor(
                         MongSilApplication.getMongSilContext().
                                 getResources().getColor(android.R.color.white));
-                textMyPostInfo.setTextColor(
+                myPostInfo.setTextColor(
                         MongSilApplication.getMongSilContext().
                                 getResources().getColor(android.R.color.white));
-            }
-            textMyPostContent.setText(data.content);
-            textMyPostInfo.setText(String.valueOf(data.time + " - 댓글 " + data.commentCount));
+            }*/
+            myPostContent.setText(post.content);
+            String[] date = post.date.split(" ");
+            myPostInfo.setText(
+                    // 0에 댓글 카운트가 들어감
+                    String.valueOf(TimeData.PostTime(date[1])
+                            + " - 댓글 " + 0));
             imgThreeDot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -142,7 +150,7 @@ public class PostRecyclerViewAdapter
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
-                    intent.putExtra("post_data", data);
+                    intent.putExtra("post_data", post);
                     view.getContext().startActivity(intent);
                 }
             });
@@ -184,13 +192,13 @@ public class PostRecyclerViewAdapter
 
     @Override
     public int getItemViewType(int position) {
-        PostData data = items.get(position);
-        switch (data.type) {
-            case PostData.TYPE_LAYOUT_DATE :
+        Post data = items.get(position);
+        switch (data.typeCode) {
+            case Post.TYPE_LAYOUT_DATE :
                 return LAYOUT_DATE;
-            case PostData.TYPE_LAYOUT_POST :
+            case Post.TYPE_LAYOUT_POST :
                 return LAYOUT_POST;
-            case PostData.TYPE_LAYOUT_MY_POST :
+            case Post.TYPE_LAYOUT_MY_POST :
                 return LAYOUT_MY_POST;
         }
         return super.getItemViewType(position);

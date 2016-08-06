@@ -9,20 +9,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
+
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by ccei on 2016-07-29.
  */
-public class SlidingMenuTabFragment extends Fragment {
+public class ProfileMenuTabFragment extends Fragment {
     public static final String TABINFO = "tabinfo";
 
-    public SlidingMenuTabFragment() { }
+    public ProfileMenuTabFragment() { }
 
-    public static SlidingMenuTabFragment newInstance(int tabInfo) {
-        SlidingMenuTabFragment fragment = new SlidingMenuTabFragment();
+    public static ProfileMenuTabFragment newInstance(int tabInfo) {
+        ProfileMenuTabFragment fragment = new ProfileMenuTabFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(TABINFO, tabInfo);
         fragment.setArguments(bundle);
@@ -33,7 +33,7 @@ public class SlidingMenuTabFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         Bundle initBundle = getArguments();
-        RecyclerView recyclerView = (RecyclerView) inflater.inflate(
+        XRecyclerView recyclerView = (XRecyclerView) inflater.inflate(
                 R.layout.fragment_post, container, false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(
                 MongSilApplication.getMongSilContext());

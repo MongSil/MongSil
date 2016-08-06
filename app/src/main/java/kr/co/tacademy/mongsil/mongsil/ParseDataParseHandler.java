@@ -38,12 +38,14 @@ public class ParseDataParseHandler {
                 Post post = new Post();
                 JSONObject jData = jsonArray.getJSONObject(i);
 
+                post.postId = jData.getInt("postId");
                 post.content = jData.getString("content");
+                post.userId = jData.getInt("userId");
                 post.username = jData.getString("username");
+                post.profileImg = jData.getString("profileImg");
                 post.date = jData.getString("date");
                 post.area1 = jData.getString("area1");
                 post.area2 = jData.getString("area2");
-                post.postId = jData.getInt("postId");
 
                 jsonPostList.add(post);
             }

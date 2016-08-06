@@ -128,7 +128,7 @@ public class MainActivity extends BaseActivity {
 
     // 슬라이딩메뉴 뷰
     public View loadSlidingMenu() {
-        View menu = getLayoutInflater().inflate(R.layout.layout_sliding_menu, null);
+        View menu = getLayoutInflater().inflate(R.layout.layout_profile_menu, null);
 
         TextView textMyName, textMyLocation;
 
@@ -174,8 +174,8 @@ public class MainActivity extends BaseActivity {
                     new MenuViewPagerAdapter(getSupportFragmentManager());
             String[] tabTitle = MongSilApplication.getMongSilContext()
                     .getResources().getStringArray(R.array.menu_tab_title);
-            adapter.appendFragment(SlidingMenuTabFragment.newInstance(0), tabTitle[0]);
-            adapter.appendFragment(SlidingMenuTabFragment.newInstance(1), tabTitle[1]);
+            adapter.appendFragment(ProfileMenuTabFragment.newInstance(0), tabTitle[0]);
+            adapter.appendFragment(ProfileMenuTabFragment.newInstance(1), tabTitle[1]);
             viewPager.setAdapter(adapter);
         }
 
@@ -224,15 +224,15 @@ public class MainActivity extends BaseActivity {
 
     // 메뉴 뷰페이저 어답터
     private static class MenuViewPagerAdapter extends FragmentPagerAdapter {
-        private final ArrayList<SlidingMenuTabFragment> fragments
-                = new ArrayList<SlidingMenuTabFragment>();
+        private final ArrayList<ProfileMenuTabFragment> fragments
+                = new ArrayList<ProfileMenuTabFragment>();
         private final ArrayList<String> tabTitle = new ArrayList<String>();
 
         public MenuViewPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
         }
 
-        public void appendFragment(SlidingMenuTabFragment fragment, String title) {
+        public void appendFragment(ProfileMenuTabFragment fragment, String title) {
             fragments.add(fragment);
             tabTitle.add(title);
         }

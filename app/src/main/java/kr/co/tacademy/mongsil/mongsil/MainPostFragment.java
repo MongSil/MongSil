@@ -28,9 +28,6 @@ import static android.util.Log.e;
  * Created by ccei on 2016-07-26.
  */
 public class MainPostFragment extends Fragment {
-    // 임의의 지역
-    String location = "대전";
-
     XRecyclerView postRecyclerView;
     Handler handler;
 
@@ -47,9 +44,9 @@ public class MainPostFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         postRecyclerView =
                 (XRecyclerView) inflater.inflate(R.layout.fragment_post, container, false);
-        postRecyclerView.setLayoutManager(
-                new LinearLayoutManager(
-                        MongSilApplication.getMongSilContext()));
+        final LinearLayoutManager layoutManager =
+                new LinearLayoutManager(MongSilApplication.getMongSilContext());
+        postRecyclerView.setLayoutManager(layoutManager);
         postRecyclerView.setLoadingListener(new XRecyclerView.LoadingListener() {
             @Override
             public void onRefresh() {
@@ -58,30 +55,37 @@ public class MainPostFragment extends Fragment {
 
             @Override
             public void onLoadMore() {
+                handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        // TODO : execute 안에 넘길때마다 증가되는 skip 넣어야함
-                        new AsyncPostJSONList().execute();
+                        // TODO : 내릴때마다 새로 갱신되게 하지 않게해야함
+                        Bundle b = new Bundle();
+                        b.putString("location", "대전"); // 지역 바뀔때마다 바뀌어져야함
+                        b.putInt("skip", layoutManager.findLastCompletelyVisibleItemPosition()+1);
+                        new AsyncPostJSONList().execute(b);
                         postRecyclerView.refreshComplete();
                     }
                 }, 2000);
             }
         });
         //if(!TextUtils.isEmpty(location)) {
-            new AsyncPostJSONList().execute(0);
+            Bundle b = new Bundle();
+            b.putString("location", "대전");
+            b.putInt("skip", 0);
+            new AsyncPostJSONList().execute(b);
         //}
         return postRecyclerView;
     }
 
     // 글목록 가져오기
-    public class AsyncPostJSONList extends AsyncTask<Integer, Integer,
+    public class AsyncPostJSONList extends AsyncTask<Bundle, Integer,
             ArrayList<Post>> {
 
         ProgressDialog dialog;
+
         @Override
-        protected ArrayList<Post> doInBackground(
-                Integer... params) {
+        protected ArrayList<Post> doInBackground(Bundle... bundles) {
             try{
                 //OKHttp3사용
                 OkHttpClient toServer = new OkHttpClient.Builder()
@@ -89,18 +93,19 @@ public class MainPostFragment extends Fragment {
                         .readTimeout(15, TimeUnit.SECONDS)
                         .build();
 
-                // TODO : 최초 한번은 그냥 받아옴
                 // TODO : 밑으로 내려올 때마다(로딩) skip을 통해 받아와야함(한페이지 10개)
                 // TODO : 시간체크를 해서 전 시간이 다음 시간과 맞지 않으면 코드를 보냄
                 // TODO : 보내진 코드로 리사이클뷰 date로 재생성
                 // TODO : 다른사람 프로필 사진을 클릭하면 프로필이 뜨게 만들어야함
-                // TODO : 다른사람 프로필에서 리사이클러뷰는 그 사람 정보를 통해 리사이클
+                // TODO : 다른사람 프로필에서 리사이클러뷰는 그 사람 정보의 리스트
 
                 // TODO : 지역마다 바뀌는걸로 바꿔야함
                 Request request = new Request.Builder()
-                        .url(NetworkDefineConstant.SERVER_POST)
+                        .url(String.format(
+                                NetworkDefineConstant.SERVER_POST,
+                                bundles[0].getString("location"),
+                                bundles[0].getInt("skip")))
                         .build();
-
                 Response response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 boolean flag = response.isSuccessful();
@@ -116,6 +121,8 @@ public class MainPostFragment extends Fragment {
             } catch (UnsupportedEncodingException uee) {
                 e("fileUpLoad", uee.toString());
             } catch (Exception e) {
+
+
                 e("fileUpLoad", e.toString());
             }
             return null;
@@ -134,8 +141,8 @@ public class MainPostFragment extends Fragment {
             dialog.dismiss();
 
             if(result != null && result.size() > 0){
-                PostListRecyclerViewAdapter postAdapter =
-                        new PostListRecyclerViewAdapter(result);
+                PostRecyclerViewAdapter postAdapter =
+                        new PostRecyclerViewAdapter(result);
                 postAdapter.notifyDataSetChanged();
                 postRecyclerView.setAdapter(postAdapter);
             }
