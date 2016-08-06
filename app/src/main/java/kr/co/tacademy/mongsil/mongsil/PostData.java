@@ -11,10 +11,10 @@ import java.util.ArrayList;
 /**
  * Created by ccei on 2016-07-27.
  */
-public class PostData implements JSONParseHandler, Parcelable {
+public class PostData implements Parcelable {
     Page totalCount;
     ArrayList<Post> post;
-
+/*
     @Override
     public void setData(JSONObject jsonObject) {
         this.totalCount = new Page();
@@ -29,6 +29,7 @@ public class PostData implements JSONParseHandler, Parcelable {
             post.add(postData);
         }
     }
+*/
 
     public static final int TYPE_LAYOUT_DATE = 0;
     public static final int TYPE_LAYOUT_POST = 1;

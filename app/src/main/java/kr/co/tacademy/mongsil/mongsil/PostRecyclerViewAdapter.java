@@ -147,17 +147,14 @@ public class PostRecyclerViewAdapter
     @Override
     public int getItemViewType(int position) {
         PostData data = items.get(position);
-        if(data != null) {
-            switch (data.type) {
-                case PostData.TYPE_LAYOUT_DATE:
-                    return LAYOUT_DATE;
-                case PostData.TYPE_LAYOUT_MY_POST:
-                    return LAYOUT_MY_POST;
-            }
+        switch (data.type) {
+            case PostData.TYPE_LAYOUT_DATE:
+                return LAYOUT_DATE;
+            case PostData.TYPE_LAYOUT_MY_POST:
+                return LAYOUT_MY_POST;
         }
-        return super.getItemViewType(position);
+        return LAYOUT_DATE;
     }
-
     @Override
     public int getItemCount() {
         return items.size();

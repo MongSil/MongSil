@@ -69,35 +69,22 @@ public class PostListRecyclerViewAdapter
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = null;
-        switch (viewType) {
-            case LAYOUT_POST :
-                view = inflater.inflate(R.layout.layout_post_item, parent, false);
-                return new PostViewHolder(view);
-        }
-        return null;
+        View view = inflater.inflate(R.layout.layout_post_item, parent, false);
+        return new PostViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        switch (getItemViewType(position)) {
-            case  LAYOUT_POST :
                 ((PostViewHolder)holder).setMyData(postItems.get(position));
-                break;
-        }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        Post post = postItems.get(position);
-        if(post != null) {
-            return LAYOUT_POST;
-        }
-        return super.getItemViewType(position);
     }
 
     @Override
     public int getItemCount() {
-        return postItems.size();
+        if(postItems != null) {
+            return postItems.size();
+        } else {
+            return 0;
+        }
+
     }
 }
