@@ -69,8 +69,8 @@ public class PostListRecyclerViewAdapter
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.layout_post_item, parent, false);
-        return new PostViewHolder(view);
+        View view = null;
+        view = inflater.inflate(R.layout.layout_post_item, parent, false);return new PostViewHolder(view);
     }
 
     @Override
@@ -80,11 +80,6 @@ public class PostListRecyclerViewAdapter
 
     @Override
     public int getItemCount() {
-        if(postItems != null) {
-            return postItems.size();
-        } else {
-            return 0;
-        }
-
+        return postItems.size();
     }
 }

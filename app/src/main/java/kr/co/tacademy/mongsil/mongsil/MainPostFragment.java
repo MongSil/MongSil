@@ -3,17 +3,18 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
+
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -30,7 +31,8 @@ public class MainPostFragment extends Fragment {
     // 임의의 지역
     String location = "대전";
 
-    RecyclerView postRecyclerView;
+    XRecyclerView postRecyclerView;
+    Handler handler;
 
     public MainPostFragment() { }
     public static MainPostFragment newInstance() {
@@ -43,27 +45,43 @@ public class MainPostFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        // TODO : 글목록 스와이프리프레쉬 추가
         postRecyclerView =
-                (RecyclerView) inflater.inflate(R.layout.fragment_post, container, false);
+                (XRecyclerView) inflater.inflate(R.layout.fragment_post, container, false);
         postRecyclerView.setLayoutManager(
                 new LinearLayoutManager(
                         MongSilApplication.getMongSilContext()));
+        postRecyclerView.setLoadingListener(new XRecyclerView.LoadingListener() {
+            @Override
+            public void onRefresh() {
+                // TODO : 기능 사용할까 물어봐야함
+            }
 
+            @Override
+            public void onLoadMore() {
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // TODO : execute 안에 넘길때마다 증가되는 skip 넣어야함
+                        new AsyncPostJSONList().execute();
+                        postRecyclerView.refreshComplete();
+                    }
+                }, 2000);
+            }
+        });
         //if(!TextUtils.isEmpty(location)) {
-            new AsyncPostJSONList().execute("jsonlist");
+            new AsyncPostJSONList().execute(0);
         //}
         return postRecyclerView;
     }
 
     // 글목록 가져오기
-    public class AsyncPostJSONList extends AsyncTask<String, Integer,
+    public class AsyncPostJSONList extends AsyncTask<Integer, Integer,
             ArrayList<Post>> {
 
         ProgressDialog dialog;
         @Override
         protected ArrayList<Post> doInBackground(
-                String... params) {
+                Integer... params) {
             try{
                 //OKHttp3사용
                 OkHttpClient toServer = new OkHttpClient.Builder()
@@ -71,10 +89,18 @@ public class MainPostFragment extends Fragment {
                         .readTimeout(15, TimeUnit.SECONDS)
                         .build();
 
+                // TODO : 최초 한번은 그냥 받아옴
+                // TODO : 밑으로 내려올 때마다(로딩) skip을 통해 받아와야함(한페이지 10개)
+                // TODO : 시간체크를 해서 전 시간이 다음 시간과 맞지 않으면 코드를 보냄
+                // TODO : 보내진 코드로 리사이클뷰 date로 재생성
+                // TODO : 다른사람 프로필 사진을 클릭하면 프로필이 뜨게 만들어야함
+                // TODO : 다른사람 프로필에서 리사이클러뷰는 그 사람 정보를 통해 리사이클
+
+                // TODO : 지역마다 바뀌는걸로 바꿔야함
                 Request request = new Request.Builder()
                         .url(NetworkDefineConstant.SERVER_POST)
                         .build();
-                //동기 방식
+
                 Response response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 boolean flag = response.isSuccessful();
@@ -84,15 +110,15 @@ public class MainPostFragment extends Fragment {
                     return ParseDataParseHandler.getJSONPostRequestAllList(
                             new StringBuilder(responseBody.string()));
                 }
+                responseBody.close();
             }catch (UnknownHostException une) {
                 e("fileUpLoad", une.toString());
             } catch (UnsupportedEncodingException uee) {
-                e("fileUpLoad2", uee.toString());
+                e("fileUpLoad", uee.toString());
             } catch (Exception e) {
-                e("fileUpLoad3", e.toString());
+                e("fileUpLoad", e.toString());
             }
             return null;
-
         }
 
         @Override
@@ -115,32 +141,4 @@ public class MainPostFragment extends Fragment {
             }
         }
     }
-
-/*
-    private class PostListTask extends AsyncTask<String, Integer, Post> {
-        @Override
-        protected Post doInBackground(String... strings) {
-            String urlText = NetworkDefineConstant.SERVER_POST;
-            try {
-                URL url = new URL(urlText);
-                HttpURLConnection connection =
-                        (HttpURLConnection) url.openConnection();
-                connection.setRequestProperty("Accept", "application/json");
-                int code = connection.getResponseCode();
-                if(code >= HttpURLConnection.HTTP_OK &&
-                        code < HttpURLConnection.HTTP_MULT_CHOICE) {
-                    Gson gson = new Gson();
-                    InputStream is = connection.getInputStream();
-                    InputStreamReader isr = new InputStreamReader(is);
-                    PostData data = gson.fromJson(isr, PostData.class);
-                    return data.post;
-                }
-            } catch (MalformedURLException mue) {
-                mue.printStackTrace();
-            } catch (IOException ie) {
-                ie.printStackTrace();
-            }
-            return null;
-        }
-    }*/
 }

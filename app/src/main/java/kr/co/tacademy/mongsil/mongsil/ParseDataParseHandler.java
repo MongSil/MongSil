@@ -13,8 +13,6 @@ public class ParseDataParseHandler {
     public static ArrayList<Post> getJSONPostRequestAllList(
             StringBuilder buf) {
 
-        ArrayList<Post> jsonPostList = null;
-
         // 전체 - msg 생략
         JSONObject jsonObject = null;
 
@@ -23,6 +21,8 @@ public class ParseDataParseHandler {
 
         // post
         JSONArray jsonArray = null;
+        ArrayList<Post> jsonPostList = null;
+
         try {
             jsonObject = new JSONObject(buf.toString());
 

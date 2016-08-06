@@ -41,33 +41,13 @@ public class SlidingMenuTabFragment extends Fragment {
 
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
-
-            ////// test code
-            final ArrayList<PostData> postDatas = new ArrayList<PostData>();
-            PostData data = new PostData();
-            PostData data1 = new PostData();
-            PostData data2 = new PostData();
-            PostData data3 = new PostData();
-            PostData data4 = new PostData();
-            data.setTimeData(0, "Today");
-            postDatas.add(data);
-            data1.setData(1, "10:25 AM", R.mipmap.ic_launcher, "스님",
-                    "날이 밝구나", 0, 0, 10);
-            postDatas.add(data1);
-            data2.setData(1, "02:25 PM", R.mipmap.ic_launcher, "주지스님",
-                    "날씨가 덥구나", 0, R.drawable.back_cloud, 3);
-            postDatas.add(data2);
-            data3.setTimeData(0, "2016.07.29");
-            postDatas.add(data3);
-            data4.setData(1, "05:20 PM", R.mipmap.ic_launcher, "동자스님",
-                    "밖에 나가고 싶어요 빼앢", 0, 0, 1);
-            postDatas.add(data4);
-            //////
+            // TODO : 만들어야함
+            ArrayList<Post> posts = new ArrayList<>();
 
             recyclerView.setPadding(16, 0, 16, 0);
             PostRecyclerViewAdapter adapter =
                     new PostRecyclerViewAdapter(
-                            getActivity().getSupportFragmentManager(), postDatas);
+                            getActivity().getSupportFragmentManager(), posts);
             recyclerView.setAdapter(adapter);
 
         } else {
