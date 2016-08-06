@@ -33,12 +33,13 @@ public class PostRecyclerViewAdapter
     private static final int LAYOUT_MY_POST = 3000;
 
     PostRecyclerViewAdapter() { }
-    PostRecyclerViewAdapter(ArrayList<Post> items) {
-        this.items = items;
-    }
-    PostRecyclerViewAdapter(FragmentManager fm, ArrayList<Post> items) {
-        this(items);
+    PostRecyclerViewAdapter(FragmentManager fm) {
         this.fm = fm;
+    }
+
+    public void add(ArrayList<Post> items) {
+        this.items.addAll(items);
+        notifyDataSetChanged();
     }
 
     // 날짜를 표시하는 뷰홀더
@@ -54,8 +55,7 @@ public class PostRecyclerViewAdapter
 
         public void setMyData(Post post) {
             // TODO: 서버에서 전송한 '날짜'데이터 삽입, 오늘이면 Today, 어제면 어제..
-            String[] date = post.date.split(" ");
-            postDate.setText(TimeData.dateCalculate(date[0]));
+            postDate.setText(TimeData.dateCalculate(post.date));
             // TODO: 프로필이랑 글목록 크기 다르게하기( 프로필은 위에 14dp)
         }
     }
@@ -85,8 +85,7 @@ public class PostRecyclerViewAdapter
             postName.setText(post.username);
             postContent.setText(post.content);
 
-            String[] date = post.date.split(" ");
-            postTime.setText(TimeData.dateCalculate(date[1]));
+            postTime.setText(TimeData.dateCalculate(post.date));
             postContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -29,6 +29,7 @@ import static android.util.Log.e;
  */
 public class MainPostFragment extends Fragment {
     XRecyclerView postRecyclerView;
+    PostRecyclerViewAdapter postAdapter;
     Handler handler;
 
     public MainPostFragment() { }
@@ -47,6 +48,7 @@ public class MainPostFragment extends Fragment {
         final LinearLayoutManager layoutManager =
                 new LinearLayoutManager(MongSilApplication.getMongSilContext());
         postRecyclerView.setLayoutManager(layoutManager);
+        postRecyclerView.setPullRefreshEnabled(false);
         postRecyclerView.setLoadingListener(new XRecyclerView.LoadingListener() {
             @Override
             public void onRefresh() {
@@ -55,18 +57,19 @@ public class MainPostFragment extends Fragment {
 
             @Override
             public void onLoadMore() {
+                //
                 handler = new Handler();
-                handler.postDelayed(new Runnable() {
+                handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        // TODO : 내릴때마다 새로 갱신되게 하지 않게해야함
+                        // TODO : 내릴때마다 화면이 새로 갱신되게 하지 않게해야함
                         Bundle b = new Bundle();
                         b.putString("location", "대전"); // 지역 바뀔때마다 바뀌어져야함
                         b.putInt("skip", layoutManager.findLastCompletelyVisibleItemPosition()+1);
                         new AsyncPostJSONList().execute(b);
-                        postRecyclerView.refreshComplete();
+                        postRecyclerView.loadMoreComplete();
                     }
-                }, 2000);
+                });
             }
         });
         //if(!TextUtils.isEmpty(location)) {
@@ -121,8 +124,6 @@ public class MainPostFragment extends Fragment {
             } catch (UnsupportedEncodingException uee) {
                 e("fileUpLoad", uee.toString());
             } catch (Exception e) {
-
-
                 e("fileUpLoad", e.toString());
             }
             return null;
@@ -140,11 +141,21 @@ public class MainPostFragment extends Fragment {
                                              result) {
             dialog.dismiss();
 
+            // TODO : 리사이클러뷰에 새로 추가를 하는 로직이 필요함
             if(result != null && result.size() > 0){
-                PostRecyclerViewAdapter postAdapter =
-                        new PostRecyclerViewAdapter(result);
-                postAdapter.notifyDataSetChanged();
-                postRecyclerView.setAdapter(postAdapter);
+                result.add(0, new Post(0, result.get(0).date));
+                String compare = result.get(1).date.split(" ")[0];
+                for (int i = 2; i < result.size() ; i++) {
+                    String toCompare = result.get(i).date.split(" ")[0];
+                    if(TimeData.compareDate(compare, toCompare)) {
+                        result.set(i, new Post(0, result.get(i-1).date));
+                        compare = toCompare;
+                    }
+
+                    postAdapter = new PostRecyclerViewAdapter();
+                    postAdapter.add(result);
+                    postRecyclerView.setAdapter(postAdapter);
+                }
             }
         }
     }

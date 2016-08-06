@@ -25,19 +25,35 @@ public class TimeData {
 
     // date formats
     private static SimpleDateFormat dateFormat =
-          new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
-    private static SimpleDateFormat timeFormat =
-            new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
+          new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
+    private static SimpleDateFormat dateCompareFormat =
+            new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
 
 
     // Calendar 객체 생성
     private static Calendar cal = Calendar.getInstance();
 
+    public static boolean compareDate(String firstDate, String secondDate) {
+        try {
+            long first = dateCompareFormat.parse(firstDate).getTime();
+            long second = dateCompareFormat.parse(secondDate).getTime();
+
+            if(first > second) {
+                return true;
+            }
+        } catch (ParseException pe) {
+            pe.printStackTrace();
+        }
+        return false;
+    }
+
     // 현재 날짜에서 얼마나 날짜가 지났는지 계산하는 메소드
     public static String dateCalculate(String date) {
         try {
             Date tempDate = dateFormat.parse(date);
-            if (tempDate.equals(now)) {
+
+            if (tempDate.getTime() / (1000*60*60*24)
+                    == now.getTime() / (1000*60*60*24) ) {
                 return "Today";
             } else if (tempDate.before(now)) {
                 int subDay = (int)((now.getTime() - tempDate.getTime()) / (1000*60*60*24));
@@ -48,7 +64,6 @@ public class TimeData {
             }
         } catch (ParseException pe) {
             pe.printStackTrace();
-            return "error";
         }
         return "error";
     }
@@ -69,8 +84,9 @@ public class TimeData {
     // 현재 시간에서 얼마나 시간이 지났는지 계산하는 메소드 (알람 사용)
     public static String timeCalculate(String time) {
         try {
-            Date tempTime = timeFormat.parse(time);
-            if (tempTime.equals(now)) {
+            Date tempTime = dateFormat.parse(time);
+            if (tempTime.getTime() / (1000*60*60*24)
+                    == now.getTime() / (1000*60*60*24)) {
                 return "지금";
             } else if (tempTime.before(now)) {
                 long subTime = (now.getTime() - tempTime.getTime()) / 1000;
@@ -99,7 +115,6 @@ public class TimeData {
             }
         } catch (ParseException pe) {
             pe.printStackTrace();
-            return "error";
         }
         return "error";
     }

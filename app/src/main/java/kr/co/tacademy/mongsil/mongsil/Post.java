@@ -24,6 +24,10 @@ public class Post implements Parcelable {
     String area2;
 
     Post() { }
+    Post(int typeCode, String date) {
+        this.typeCode = typeCode;
+        this.date = date;
+    }
     private Post(Parcel in) {
         postId = in.readInt();
         content = in.readString();
