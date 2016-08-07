@@ -11,11 +11,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
+// okHttp3를 쓰기로 해서 쓰지 않음 - 혹시 몰라서 남겨둠
 public class HttpAPIHelperHandler {
     private static final String DEBUG_TAG = "HttpAPIHelperHandler";
 
-    public static ArrayList<Post> PostJSONAllSelect() {
-        ArrayList<Post> posts = null;
+    public static PostData PostJSONLoad() {
+        PostData postData = null;
         BufferedReader jsonStreamData = null;
         HttpURLConnection connection = null;
         try {
@@ -32,12 +33,12 @@ public class HttpAPIHelperHandler {
                 while ((jsonLine = jsonStreamData.readLine()) != null) {
                     jsonBuf.append(jsonLine);
                 }
-                posts = ParseDataParseHandler.
+                postData = ParseDataParseHandler.
                                 getJSONPostRequestAllList(jsonBuf);
             }
 
         } catch (IOException e) {
-            Log.e("postJSONAllSelect()", e.toString());
+            Log.e("postJSONLoad()", e.toString());
         } finally {
             if (jsonStreamData != null) {
                 try {
@@ -49,6 +50,6 @@ public class HttpAPIHelperHandler {
 
         }
 
-        return posts;
+        return postData;
     }
 }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class ParseDataParseHandler {
 
-    public static ArrayList<Post> getJSONPostRequestAllList(
+    public static PostData getJSONPostRequestAllList(
             StringBuilder buf) {
 
         // 전체 - msg 생략
@@ -18,18 +18,20 @@ public class ParseDataParseHandler {
 
         // page
         JSONObject jsonPage = null;
+        Page pageData = null;
 
         // post
         JSONArray jsonArray = null;
+        PostData jsonPostData;
         ArrayList<Post> jsonPostList = null;
 
         try {
             jsonObject = new JSONObject(buf.toString());
 
             jsonPage = jsonObject.getJSONObject("page");
-            Page page = new Page();
-            page.totalCount = jsonPage.getInt("totalCount");
-            page.count = jsonPage.getInt("count");
+            pageData = new Page();
+            pageData.totalCount = jsonPage.getInt("totalCount");
+            pageData.count = jsonPage.getInt("count");
 
             jsonArray = jsonObject.getJSONArray("post");
             jsonPostList = new ArrayList<Post>();
@@ -49,9 +51,10 @@ public class ParseDataParseHandler {
 
                 jsonPostList.add(post);
             }
+            return new PostData(pageData, jsonPostList);
         } catch (JSONException je) {
             Log.e("RequestAllList", "JSON파싱 중 에러발생", je);
         }
-        return jsonPostList;
+        return null;
     }
 }

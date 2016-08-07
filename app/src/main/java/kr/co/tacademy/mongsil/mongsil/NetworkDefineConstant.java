@@ -8,7 +8,7 @@ public class NetworkDefineConstant {
     public static final String HOST_URL = "52.78.101.201";
     public static final String PORT_NUMBER = ":3000";
     public static final String SERVER_POST
-            = "http://" + HOST_URL + PORT_NUMBER + "/post?locaiton=%s&skip=%s";
+            = "http://" + HOST_URL + PORT_NUMBER + "/post?area1=%s&skip=%s";
     public static final String SERVER_USER_POST
             = "http://" + HOST_URL + PORT_NUMBER + "/post?userId=%s&skip=%s";
     public static final String SERVER_USER

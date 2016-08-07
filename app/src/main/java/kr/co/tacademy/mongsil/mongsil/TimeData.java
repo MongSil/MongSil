@@ -38,7 +38,7 @@ public class TimeData {
             long first = dateCompareFormat.parse(firstDate).getTime();
             long second = dateCompareFormat.parse(secondDate).getTime();
 
-            if(first > second) {
+            if(first < second) {
                 return true;
             }
         } catch (ParseException pe) {

@@ -3,6 +3,7 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,9 +32,14 @@ import static android.util.Log.e;
 public class ProfileMenuTabFragment extends Fragment {
     public static final String TABINFO = "tabinfo";
     public static final String USERID = "userid";
+    public static final String SKIP = "skip";
 
     XRecyclerView userPostRecycler;
     PostRecyclerViewAdapter postAdapter;
+    Handler handler;
+
+    private int loadOnResult = 0;
+    private int maxLoadSize = 1;
 
     public ProfileMenuTabFragment() { }
 
@@ -62,23 +68,35 @@ public class ProfileMenuTabFragment extends Fragment {
             // 나의 이야기 탭
             // TODO : 만들어야함
             userPostRecycler.setPadding(16, 0, 16, 0);
+            userPostRecycler.setPullRefreshEnabled(false);
             userPostRecycler.setLoadingListener(new XRecyclerView.LoadingListener() {
                 @Override
                 public void onRefresh() {
-
+                    // 사용하지 않음
                 }
 
                 @Override
                 public void onLoadMore() {
-                    Bundle b = new Bundle();
-                    b.putInt(USERID, userId);
-                    b.putInt("skip", layoutManager.findLastCompletelyVisibleItemPosition()+1);
-                    new AsyncUserPostJSONList().execute(b);
+                    if (loadOnResult != maxLoadSize) {
+                        handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Bundle b = new Bundle();
+                                b.putInt(USERID, userId);
+                                b.putInt(SKIP, loadOnResult);
+                                new AsyncUserPostJSONList().execute(b);
+                                userPostRecycler.loadMoreComplete();
+                            }
+                        }, 1500);
+                    } else {
+                        userPostRecycler.noMoreLoading();
+                    }
                 }
             });
             Bundle b = new Bundle();
             b.putInt(USERID, userId);
-            b.putInt("skip", 0);
+            b.putInt(SKIP, 0);
             new AsyncUserPostJSONList().execute(b);
 
         } else {
@@ -133,12 +151,12 @@ public class ProfileMenuTabFragment extends Fragment {
     }
     // 글목록 가져오기
     public class AsyncUserPostJSONList extends AsyncTask<Bundle, Integer,
-            ArrayList<Post>> {
+            PostData> {
 
         ProgressDialog dialog;
 
         @Override
-        protected ArrayList<Post> doInBackground(Bundle... bundles) {
+        protected PostData doInBackground(Bundle... bundles) {
             try{
                 //OKHttp3사용
                 OkHttpClient toServer = new OkHttpClient.Builder()
@@ -150,13 +168,14 @@ public class ProfileMenuTabFragment extends Fragment {
                         .url(String.format(
                                 NetworkDefineConstant.SERVER_USER_POST,
                                 bundles[0].getInt(USERID),
-                                bundles[0].getInt("skip")))
+                                bundles[0].getInt(SKIP)))
                         .build();
                 Response response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 boolean flag = response.isSuccessful();
                 //응답 코드 200등등
                 int responseCode = response.code();
+                if (responseCode >= 400) return null;
                 if (flag) {
                     return ParseDataParseHandler.getJSONPostRequestAllList(
                             new StringBuilder(responseBody.string()));
@@ -180,28 +199,33 @@ public class ProfileMenuTabFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Post>
-                                             result) {
+        protected void onPostExecute(PostData result) {
             dialog.dismiss();
 
-            if(result != null && result.size() > 0){
-                result.add(0, new Post(0, result.get(0).date));
-                String compare = result.get(1).date.split(" ")[0];
-                result.get(1).typeCode = 2;
-                for (int i = 2; i < result.size() ; i++) {
-                    String toCompare = result.get(i).date.split(" ")[0];
-                    if(TimeData.compareDate(compare, toCompare)) {
-                        result.set(i, new Post(0, result.get(i-1).date));
-                        compare = toCompare;
-                    } else {
-                        result.get(i).typeCode = 2;
-                    }
+            if(result != null && result.post.size() > 0){
+                int maxResultSize = result.post.size();
+                loadOnResult += maxResultSize;
+                maxLoadSize = result.page.totalCount;
 
-                    postAdapter =
-                            new PostRecyclerViewAdapter(getActivity().getSupportFragmentManager());
-                    postAdapter.add(result);
-                    userPostRecycler.setAdapter(postAdapter);
+                String compare = result.post.get(maxResultSize - 1).date.split(" ")[0];
+                result.post.get(maxResultSize - 1).typeCode = 2;
+                for (int i = maxResultSize - 1; i >= 0 ; i--) {
+                    result.post.get(i).typeCode = 2;
+
+                    String toCompare = result.post.get(i).date.split(" ")[0];
+                    if(TimeData.compareDate(compare, toCompare)) {
+                        result.post.add(i+1, new Post(0, result.post.get(i+1).date));
+                        compare = toCompare;
+                    }
+                    if(i == 0) {
+                        result.post.add(0, new Post(0, result.post.get(0).date));
+                    }
                 }
+
+                postAdapter =
+                        new PostRecyclerViewAdapter(getActivity().getSupportFragmentManager());
+                userPostRecycler.setAdapter(postAdapter);
+                postAdapter.add(result.post);
             }
         }
     }

@@ -8,4 +8,9 @@ import java.util.ArrayList;
 public class PostData {
     Page page;
     ArrayList<Post> post;
+
+    PostData (Page page, ArrayList<Post> post) {
+        this.page = page;
+        this.post = post;
+    }
 }

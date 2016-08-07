@@ -175,8 +175,8 @@ public class MainActivity extends BaseActivity {
             String[] tabTitle = MongSilApplication.getMongSilContext()
                     .getResources().getStringArray(R.array.menu_tab_title);
             // 자신의 USERID를 newInstance(0, "여기")에 넣는다 테스트로 1이라 가정
-            adapter.appendFragment(ProfileMenuTabFragment.newInstance(0, 1), tabTitle[0]);
-            adapter.appendFragment(ProfileMenuTabFragment.newInstance(1, 1), tabTitle[1]);
+            adapter.appendFragment(ProfileMenuTabFragment.newInstance(0, 23), tabTitle[0]);
+            adapter.appendFragment(ProfileMenuTabFragment.newInstance(1, 23), tabTitle[1]);
             viewPager.setAdapter(adapter);
         }
 
