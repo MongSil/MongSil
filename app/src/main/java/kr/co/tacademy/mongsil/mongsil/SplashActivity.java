@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -27,8 +29,9 @@ public class SplashActivity extends BaseActivity {
         setContentView(R.layout.activity_splash);
 
         imgSplash = (ImageView) findViewById(R.id.img_splash);
-        // Glide.with(this).load().
-        handler.postDelayed(new ConnectThread(), 100); //2000
+        Animation animation =  AnimationUtils.loadAnimation(this, R.anim.splash_interpolator);
+        imgSplash.startAnimation(animation);
+        handler.postDelayed(new ConnectThread(), 2000);
     }
     private class ConnectThread extends Thread {
         //private boolean threadFlag;

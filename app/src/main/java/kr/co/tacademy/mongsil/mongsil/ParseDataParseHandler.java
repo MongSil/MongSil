@@ -16,10 +16,6 @@ public class ParseDataParseHandler {
         // 전체 - msg 생략
         JSONObject jsonObject = null;
 
-        // page
-        JSONObject jsonPage = null;
-        Page pageData = null;
-
         // post
         JSONArray jsonArray = null;
         PostData jsonPostData;
@@ -27,11 +23,6 @@ public class ParseDataParseHandler {
 
         try {
             jsonObject = new JSONObject(buf.toString());
-
-            jsonPage = jsonObject.getJSONObject("page");
-            pageData = new Page();
-            pageData.totalCount = jsonPage.getInt("totalCount");
-            pageData.count = jsonPage.getInt("count");
 
             jsonArray = jsonObject.getJSONArray("post");
             jsonPostList = new ArrayList<Post>();
@@ -51,7 +42,11 @@ public class ParseDataParseHandler {
 
                 jsonPostList.add(post);
             }
-            return new PostData(pageData, jsonPostList);
+
+            jsonPostData = new PostData(jsonPostList);
+            jsonPostData.totalCount = jsonObject.getInt("totalCount");
+
+            return jsonPostData;
         } catch (JSONException je) {
             Log.e("RequestAllList", "JSON파싱 중 에러발생", je);
         }

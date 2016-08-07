@@ -36,7 +36,8 @@
         android:scaleType="fitXY" />
 
     <ImageView
-        android:src="@drawable/strong_rain01"
+        android:id="@+id/img_tutorial_rain"
+        android:src="@drawable/anim_list_strong_rain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

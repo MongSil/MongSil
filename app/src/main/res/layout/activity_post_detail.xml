@@ -26,7 +26,7 @@
         android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/img_weather_icon"
-            android:src="@mipmap/ic_launcher"
+            android:src="@drawable/icon_mongsil_smallrain_01"
             android:layout_width="wrap_content"
             android:layout_height="123dp"
             android:layout_alignParentTop="true"
@@ -75,6 +75,8 @@
             <TextView
                 android:id="@+id/text_post_location"
                 android:text="@string/location"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
                 android:drawableLeft="@drawable/icon_nevi_write_bottom"
                 android:drawablePadding="5dp"
                 android:layout_centerVertical="true"
@@ -94,14 +96,16 @@
             <TextView
                 android:id="@+id/text_post_name"
                 android:text="@string/name"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
                 android:gravity="center"
                 android:layout_centerInParent="true"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white" />
+                android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/text_post_comment_count"
                 android:text="@string/comment_count"
+                android:textSize="12sp"
                 android:textColor="@android:color/white"
                 android:drawableLeft="@drawable/icon_bubblechat_write_bottom"
                 android:drawablePadding="5dp"
@@ -127,10 +131,13 @@
         <TextView
             android:id="@+id/text_share"
             android:text="@string/share"
-            android:drawableLeft="@mipmap/ic_launcher"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginLeft="16dp"
+            android:drawableLeft="@drawable/icon_share"
             android:clickable="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="23dp" />
         <View
             android:background="@color/dark_gray"
             android:layout_width="match_parent"
@@ -142,10 +149,13 @@
             android:gravity="center"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginBottom="13dp"
             android:layout_below="@+id/view"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
+            android:layout_alignParentStart="true"
+            android:id="@+id/linearLayout2">
             <!-- layout_comment_item.xml -->
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/comment_recycler"
@@ -155,12 +165,14 @@
                 android:layout_height="match_parent" />
             <ImageView
                 android:id="@+id/img_none_comment_icon"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/icon_circlebubble"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/text_none_coment"
                 android:text="@string/none_coment"
+                android:textSize="15sp"
+                android:textColor="@color/dark_gray"
                 android:paddingLeft="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -168,21 +180,28 @@
         <RelativeLayout
             android:background="@android:color/white"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_height="36dp"
+            android:layout_below="@+id/linearLayout2"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true">
             <TextView
                 android:id="@+id/text_comment"
                 android:text="@string/comment"
+                android:textSize="13sp"
+                android:textColor="@color/light_gray"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="16dp" />
             <Button
                 android:id="@+id/btn_comment_send"
                 android:text="@string/comment_send"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:textStyle="italic"
+                android:background="@android:color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"

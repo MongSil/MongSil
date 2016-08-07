@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -23,14 +25,17 @@ import de.hdodenhof.circleimageview.CircleImageView;
 // 포스트 리스트 어답터
 public class PostRecyclerViewAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    // TODO : PostDetailActivity를 열 때 인텐트에 PostId정보를 서버로 보내서 받아와야함
-    // TODO : 시간과 글 내용을 나눌 방법을 찾아야함
-    List<Post> items = new ArrayList<Post>();
-    FragmentManager fm;
-
     private static final int LAYOUT_DATE = 1000;
     private static final int LAYOUT_POST = 2000;
     private static final int LAYOUT_MY_POST = 3000;
+    private static final int LAYOUT_MORE = 9999;
+    // TODO : PostDetailActivity를 열 때 인텐트에 PostId정보를 서버로 보내서 받아와야함
+    // TODO : 시간과 글 내용을 나눌 방법을 찾아야함
+
+    List<Post> items = new ArrayList<Post>();
+    FragmentManager fm;
+
+    public boolean isFooterEnable = false;
 
     PostRecyclerViewAdapter() { }
     PostRecyclerViewAdapter(FragmentManager fm) {
@@ -38,8 +43,10 @@ public class PostRecyclerViewAdapter
     }
 
     public void add(ArrayList<Post> items) {
-        this.items.addAll(items);
-        notifyDataSetChanged();
+        for(int i = 0 ; i < items.size() ; i++) {
+            this.items.add(items.get(i));
+        }
+        this.notifyDataSetChanged();
     }
 
     // 날짜를 표시하는 뷰홀더
@@ -53,7 +60,7 @@ public class PostRecyclerViewAdapter
             postDate = (TextView) view.findViewById(R.id.text_post_date);
         }
 
-        public void setMyData(Post post) {
+        public void setData(Post post) {
             // TODO: 서버에서 전송한 '날짜'데이터 삽입, 오늘이면 Today, 어제면 어제..
             postDate.setText(TimeData.dateCalculate(post.date));
             // TODO: 프로필이랑 글목록 크기 다르게하기( 프로필은 위에 14dp)
@@ -79,7 +86,7 @@ public class PostRecyclerViewAdapter
             btnNext = (Button) view.findViewById(R.id.btn_next);
         }
 
-        public void setMyData(final Post post) {
+        public void setData(final Post post) {
             // TODO: 서버에서 전송한 게시글 목록 삽입
             //imgPostProfile.setImageResource(post.);
             postName.setText(post.username);
@@ -117,7 +124,7 @@ public class PostRecyclerViewAdapter
             myPostInfo = (TextView) view.findViewById(R.id.text_my_post_info);
         }
 
-        public void setMyData(final Post post) {
+        public void setData(final Post post) {
             // TODO : 서버에서 내 작성글 목록 삽입
             /*
             imgMyPostBackGround.setImageResource( -- 백그라운드 이미지 post.back ~ -- );
@@ -156,6 +163,23 @@ public class PostRecyclerViewAdapter
         }
     }
 
+    // 하단 로딩 뷰홀더
+    public class FootViewHolder extends RecyclerView.ViewHolder {
+        final View view;
+        final ProgressBar loadProgress;
+
+        public FootViewHolder(View view) {
+            super(view);
+            this.view = view;
+            loadProgress = (ProgressBar) view.findViewById(R.id.load_progress);
+        }
+
+        public void setData() {
+            loadProgress.setIndeterminate(true);
+        }
+
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -170,6 +194,9 @@ public class PostRecyclerViewAdapter
             case LAYOUT_MY_POST :
                 view = inflater.inflate(R.layout.layout_my_post_item, parent, false);
                 return new MyPostViewHolder(view);
+            case LAYOUT_MORE :
+                view = inflater.inflate(R.layout.layout_foot_more, parent, false);
+                return new FootViewHolder(view);
         }
         return null;
     }
@@ -177,20 +204,28 @@ public class PostRecyclerViewAdapter
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
-            case LAYOUT_DATE :
-                ((DateViewHolder)holder).setMyData(items.get(position));
+            case LAYOUT_DATE:
+                ((DateViewHolder) holder).setData(items.get(position));
                 break;
-            case  LAYOUT_POST :
-                ((PostViewHolder)holder).setMyData(items.get(position));
+            case LAYOUT_POST:
+                ((PostViewHolder) holder).setData(items.get(position));
                 break;
-            case LAYOUT_MY_POST :
-                ((MyPostViewHolder)holder).setMyData(items.get(position));
+            case LAYOUT_MY_POST:
+                ((MyPostViewHolder) holder).setData(items.get(position));
+                break;
+            case LAYOUT_MORE:
+                if (isFooterEnable) {
+                    ((FootViewHolder) holder).setData();
+                }
                 break;
         }
     }
 
     @Override
     public int getItemViewType(int position) {
+        if (position == items.size() && isFooterEnable) {
+            return LAYOUT_MORE;
+        }
         Post data = items.get(position);
         switch (data.typeCode) {
             case Post.TYPE_LAYOUT_DATE :
@@ -205,6 +240,15 @@ public class PostRecyclerViewAdapter
 
     @Override
     public int getItemCount() {
-        return items.size();
+        int count = 0;
+        if (items != null) {
+            count = items.size();
+        } else {
+            return 0;
+        }
+        if (isFooterEnable) {
+            count++;
+        }
+        return count;
     }
 }

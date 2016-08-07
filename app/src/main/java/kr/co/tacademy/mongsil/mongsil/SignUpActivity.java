@@ -1,34 +1,36 @@
 package kr.co.tacademy.mongsil.mongsil;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.provider.MediaStore;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
+import android.widget.EditText;
 import android.widget.ImageView;
-
-import com.bumptech.glide.Glide;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import android.widget.LinearLayout;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SignUpActivity extends BaseActivity {
-    private static final int REQ_CODE_SELECT_IMAGE = 20;
 
-    CircleImageView imgSignUpProfile;
+    // 프로필 사진 첨부 부분(삭제하기로 함)
+    //CircleImageView imgSignUpProfile;
+
+    // 이름, 지역 부분
+    LinearLayout nameLayout, locationLayout;
+    EditText editName, editLocation;
+    View underlineName, underlineLocation;
+    Animation anim;
+    boolean isScaleAnim;
+
+    // 완료
     ImageView imgDone;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        imgSignUpProfile = (CircleImageView)findViewById(R.id.img_signup_profile);
+        /*imgSignUpProfile = (CircleImageView)findViewById(R.id.img_signup_profile);
         imgSignUpProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -36,7 +38,48 @@ public class SignUpActivity extends BaseActivity {
                             .add(BottomDialogFragment.newInstance(0), "bottom")
                             .addToBackStack("bottom").commit();
             }
+        });*/
+
+        nameLayout = (LinearLayout) findViewById(R.id.name_layout);
+        editName = (EditText) findViewById(R.id.edit_name);
+        underlineName = findViewById(R.id.underline_name);
+        nameLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scaleToBig(nameLayout);
+                underlineName.setBackgroundColor(getResources().getColor(R.color.gray));
+                editName.requestFocus();
+            }
         });
+        /*editName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b){
+                    scaleToSmall(nameLayout);
+                }
+            }
+        });*/
+
+        locationLayout = (LinearLayout) findViewById(R.id.location_layout);
+        editLocation = (EditText) findViewById(R.id.edit_location);
+        underlineLocation = findViewById(R.id.underline_location);
+        locationLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scaleToBig(locationLayout);
+                underlineLocation.setBackgroundColor(getResources().getColor(R.color.gray));
+                editName.requestFocus();
+            }
+        });
+        /*editLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b){
+                    scaleToSmall(locationLayout);
+                }
+            }
+        });*/
+
         imgDone = (ImageView) findViewById(R.id.img_signup_done);
         imgDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,25 +90,20 @@ public class SignUpActivity extends BaseActivity {
         });
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == REQ_CODE_SELECT_IMAGE)
-        {
-            if(resultCode== Activity.RESULT_OK)
-            {
-                try {
-                    //이미지 데이터를 비트맵으로 받아옴
-                    Bitmap image_bitmap = MediaStore.Images.Media
-                            .getBitmap(getContentResolver(), data.getData());
-                    Glide.with(this).load(image_bitmap).into(imgSignUpProfile);
-                } catch (FileNotFoundException fe) {
-                    fe.printStackTrace();
-                } catch (IOException ie) {
-                    ie.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    public void scaleToBig(View v) {
+        this.isScaleAnim = true;
+        this.anim = new ScaleAnimation(
+                1f, 0.2f, // Start and end values for the X axis scaling
+                1f, 0.5f, // Start and end values for the Y axis scaling
+                Animation.RELATIVE_TO_SELF, 0f, // Pivot point of X scaling
+                Animation.RELATIVE_TO_SELF, 0f); // Pivot point of Y scaling
+        anim.setFillAfter(true); // Needed to keep the result of the animation
+        v.startAnimation(anim);
+    }
+
+    public void scaleToSmall(View v) {
+        this.isScaleAnim = false;
+        anim.setFillBefore(true);
+        v.startAnimation(anim);
     }
 }

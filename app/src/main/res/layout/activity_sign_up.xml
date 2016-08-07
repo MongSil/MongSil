@@ -3,10 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:background="@drawable/test_signup"
+    android:background="@color/dark_gray"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SignUpActivity">
+
     <ImageView
         android:id="@+id/img_signup_mongsil"
         android:src="@mipmap/ic_launcher"
@@ -16,7 +17,7 @@
         android:layout_above="@+id/img_signup_profile"
         android:layout_centerHorizontal="true" />
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <!--<de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_signup_profile"
         android:src="@drawable/img_profile"
         android:layout_marginBottom="40dp"
@@ -24,95 +25,119 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_above="@+id/signup_name_container"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true" />-->
 
     <!-- 인폴레이터로 위로 스르륵 올라가게 함 -->
     <!-- 밑줄 색 editText.getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);으로 바꿈 -->
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/signup_name_container"
-        android:orientation="vertical"
-        android:gravity="start"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_marginLeft="90dp"
         android:layout_marginRight="90dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="10dp"
         android:layout_centerInParent="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="36dp">
 
         <LinearLayout
+            android:id="@+id/name_layout"
             android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical">
             <ImageView
-                android:id="@+id/img_name"
-                android:src="@mipmap/ic_launcher"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:src="@drawable/profile"
+                android:layout_gravity="center_vertical"
+                android:layout_width="16dp"
+                android:layout_height="16dp" />
             <TextView
-                android:id="@+id/text_name"
                 android:text="@string/name"
+                android:textSize="16sp"
                 android:textColor="@android:color/white"
+                android:layout_marginLeft="5dp"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
+
         <EditText
             android:id="@+id/edit_name"
-            android:visibility="visible"
+            android:textColor="@android:color/white"
+            android:paddingLeft="20dp"
+            android:paddingBottom="3dp"
+            android:layout_gravity="bottom"
+            android:background="@null"
+            android:nextFocusDown="@id/edit_location"
+            android:imeOptions="actionNext"
+            android:inputType="text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-    </RelativeLayout>
+            android:layout_height="wrap_content" />
 
-    <RelativeLayout
-        android:orientation="vertical"
-        android:gravity="start"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        <View
+            android:id="@+id/underline_name"
+            android:background="@color/light_gray"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="1dp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_below="@+id/signup_name_container"
         android:layout_alignLeft="@+id/signup_name_container"
         android:layout_alignStart="@+id/signup_name_container"
         android:layout_alignRight="@+id/signup_name_container"
-        android:layout_alignEnd="@+id/signup_name_container">
+        android:layout_alignEnd="@+id/signup_name_container"
+        android:layout_width="match_parent"
+        android:layout_height="36dp">
 
         <LinearLayout
+            android:id="@+id/location_layout"
             android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical">
             <ImageView
                 android:id="@+id/img_location"
-                android:src="@mipmap/ic_launcher"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:src="@drawable/icon_nevi_write_bottom"
+                android:layout_gravity="center_vertical"
+                android:layout_width="16dp"
+                android:layout_height="16dp" />
             <TextView
                 android:id="@+id/text_location"
                 android:text="@string/location"
+                android:textSize="16sp"
                 android:textColor="@android:color/white"
+                android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
+
         <EditText
             android:id="@+id/edit_location"
-            android:visibility="visible"
+            android:textColor="@android:color/white"
+            android:paddingLeft="20dp"
+            android:paddingBottom="3dp"
+            android:layout_gravity="bottom"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:background="@null"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-    </RelativeLayout>
+            android:layout_height="wrap_content" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal">
-
-    </LinearLayout>
+        <View
+            android:id="@+id/underline_location"
+            android:background="@color/light_gray"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="1dp" />
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/img_signup_done"
-        android:src="@android:drawable/star_big_on"
+        android:src="@drawable/tutorial_skip"
         android:gravity="center"
         android:layout_gravity="center"
         android:layout_width="wrap_content"

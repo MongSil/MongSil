@@ -7,10 +7,10 @@
     android:background="@drawable/test_splash"
     tools:context=".SplashActivity">
 
+        <!-- 여기의 날씨는 몽실몽실 이미지로 달라하기 -->
         <ImageView
             android:id="@+id/img_splash"
-            android:src="@android:drawable/ic_menu_slideshow"
-            android:visibility="invisible"
+            android:src="@drawable/splash_mongsil"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true" />

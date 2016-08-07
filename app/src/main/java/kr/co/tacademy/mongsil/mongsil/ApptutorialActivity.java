@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -92,7 +91,6 @@ public class AppTutorialActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         AppTutorialActivity.this.finish();
-        pager.setBackgroundColor(getResources().getColor(R.color.invisible));
     }
     @Override
     public void onBackPressed() {
@@ -172,13 +170,13 @@ public class AppTutorialActivity extends AppCompatActivity {
 
                 // 두번째
                 if (city != null) {
-                    city.setTranslationY((float)(pageWidth/1.2 * position));
+                    city.setTranslationX((float)(pageWidth/1.2 * position));
                 }
                 if (navi != null) {
-                    navi.setTranslationY((float)(pageWidth/1.2 * position));
+                    navi.setTranslationX((float)(pageWidth/1.2 * position));
                 }
                 if (cloud2CutTwo != null) {
-                    cloud2CutTwo.setTranslationX((float)(pageWidth * position));
+                    cloud2CutTwo.setTranslationX((float)(pageWidth/0.7 * position));
 
                 }
                 if (cloud2CutThree != null) {

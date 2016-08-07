@@ -19,10 +19,16 @@
             android:layout_height="match_parent">
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/img_post_profile"
-                android:src="@drawable/none_post_profile"
+                android:src="@color/little_dark_gray"
                 android:layout_gravity="center"
                 android:layout_width="58dp"
                 android:layout_height="58dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
+            <ImageView
+                android:src="@drawable/profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true" />
             <TextView

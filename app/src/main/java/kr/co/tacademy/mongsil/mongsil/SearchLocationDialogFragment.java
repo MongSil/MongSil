@@ -27,7 +27,7 @@ import com.skp.Tmap.TMapData;
 /**
  * Created by ccei on 2016-08-02.
  */
-// TODO : 지역검색 API 공부해서 넣어야함
+// TODO : DB에서 지역검색 -> Google GeoCoding으로 위도경도 변환 -> 날씨 API
 public class SearchLocationDialogFragment extends DialogFragment {
     //private TMapTapi tmaptapi = new TMapTapi(MongSilApplication.getMongSilContext());
 

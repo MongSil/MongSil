@@ -6,11 +6,10 @@ import java.util.ArrayList;
  * Created by ccei on 2016-07-27.
  */
 public class PostData {
-    Page page;
+    int totalCount;
     ArrayList<Post> post;
 
-    PostData (Page page, ArrayList<Post> post) {
-        this.page = page;
+    PostData (ArrayList<Post> post) {
         this.post = post;
     }
 }

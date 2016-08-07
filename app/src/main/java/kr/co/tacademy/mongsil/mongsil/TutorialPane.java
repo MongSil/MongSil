@@ -2,11 +2,13 @@ package kr.co.tacademy.mongsil.mongsil;
 
 
 import android.content.res.Resources;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -36,6 +38,8 @@ public class TutorialPane extends Fragment{
                 view = inflater.inflate(
                                 res.getLayout(R.layout.fragment_tutorial_one),
                                 container, false);
+                ImageView rain = (ImageView) view.findViewById(R.id.img_tutorial_rain);
+                ((AnimationDrawable) rain.getDrawable()).start();
                 break;
             case 1:
                 view = inflater.inflate(

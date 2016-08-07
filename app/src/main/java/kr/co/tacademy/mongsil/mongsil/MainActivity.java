@@ -3,6 +3,7 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -83,6 +84,16 @@ public class MainActivity extends BaseActivity {
             }
         });
         tbSearch = (ImageView) toolbar.findViewById(R.id.toolbar_search);
+        tbSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                if(Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT){
+                    intent.addFlags(Intent.FLAG_ACTIVITY_RETAIN_IN_RECENTS);
+                }
+                startActivity(intent);
+            }
+        });
 
         // 슬라이딩 메뉴(프로필 메뉴 추가)
         slidingMenu = new SlidingMenu(this);
@@ -174,9 +185,9 @@ public class MainActivity extends BaseActivity {
                     new MenuViewPagerAdapter(getSupportFragmentManager());
             String[] tabTitle = MongSilApplication.getMongSilContext()
                     .getResources().getStringArray(R.array.menu_tab_title);
-            // 자신의 USERID를 newInstance(0, "여기")에 넣는다 테스트로 1이라 가정
-            adapter.appendFragment(ProfileMenuTabFragment.newInstance(0, 23), tabTitle[0]);
-            adapter.appendFragment(ProfileMenuTabFragment.newInstance(1, 23), tabTitle[1]);
+            // 자신의 USERID를 newInstance(0, "여기")에 넣는다 테스트로 24이라 가정
+            adapter.appendFragment(ProfileMenuTabFragment.newInstance(0, 24), tabTitle[0]);
+            adapter.appendFragment(ProfileMenuTabFragment.newInstance(1, 24), tabTitle[1]);
             viewPager.setAdapter(adapter);
         }
 

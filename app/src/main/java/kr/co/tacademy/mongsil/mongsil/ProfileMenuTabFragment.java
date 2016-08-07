@@ -12,8 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.jcodecraeer.xrecyclerview.XRecyclerView;
-
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -34,12 +32,14 @@ public class ProfileMenuTabFragment extends Fragment {
     public static final String USERID = "userid";
     public static final String SKIP = "skip";
 
-    XRecyclerView userPostRecycler;
+    RecyclerView userPostRecycler;
     PostRecyclerViewAdapter postAdapter;
     Handler handler;
+    static ArrayList<Post> posts;
 
-    private int loadOnResult = 0;
-    private int maxLoadSize = 1;
+    int lastVisibleItem;
+    private static int loadOnResult = 0;
+    private static int maxLoadSize = 1;
 
     public ProfileMenuTabFragment() { }
 
@@ -60,38 +60,34 @@ public class ProfileMenuTabFragment extends Fragment {
         final LinearLayoutManager layoutManager = new LinearLayoutManager(
                 MongSilApplication.getMongSilContext());
 
-        userPostRecycler = (XRecyclerView) inflater.inflate(
+        userPostRecycler = (RecyclerView) inflater.inflate(
                 R.layout.fragment_post, container, false);
         userPostRecycler.setLayoutManager(layoutManager);
+        postAdapter = new PostRecyclerViewAdapter(getActivity().getSupportFragmentManager());
+        posts = new ArrayList<Post>();
 
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
             // TODO : 만들어야함
             userPostRecycler.setPadding(16, 0, 16, 0);
-            userPostRecycler.setPullRefreshEnabled(false);
-            userPostRecycler.setLoadingListener(new XRecyclerView.LoadingListener() {
+            userPostRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
-                public void onRefresh() {
-                    // 사용하지 않음
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE
+                            && lastVisibleItem + 1 == postAdapter.getItemCount()) {
+                        postAdapter.isFooterEnable = true;
+                        LoadMore(userId);
+                        postAdapter.notifyItemChanged(loadOnResult + 1);
+                    }
                 }
 
                 @Override
-                public void onLoadMore() {
-                    if (loadOnResult != maxLoadSize) {
-                        handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Bundle b = new Bundle();
-                                b.putInt(USERID, userId);
-                                b.putInt(SKIP, loadOnResult);
-                                new AsyncUserPostJSONList().execute(b);
-                                userPostRecycler.loadMoreComplete();
-                            }
-                        }, 1500);
-                    } else {
-                        userPostRecycler.noMoreLoading();
-                    }
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    lastVisibleItem = ((LinearLayoutManager)
+                            recyclerView.getLayoutManager()).findLastVisibleItemPosition();
                 }
             });
             Bundle b = new Bundle();
@@ -106,7 +102,12 @@ public class ProfileMenuTabFragment extends Fragment {
 
         return userPostRecycler;
     }
-
+    private void LoadMore(final int userId) {
+        Bundle b = new Bundle();
+        b.putInt(USERID, userId); // 지역 바뀔때마다 바뀌어져야함
+        b.putInt(SKIP, loadOnResult);
+        new AsyncUserPostJSONList().execute(b);
+    }
     // 내가 쓴 댓글 어답터
     public static class MyCommentRecyclerViewAdapter
             extends RecyclerView.Adapter<MyCommentRecyclerViewAdapter.ViewHolder> {
@@ -205,7 +206,7 @@ public class ProfileMenuTabFragment extends Fragment {
             if(result != null && result.post.size() > 0){
                 int maxResultSize = result.post.size();
                 loadOnResult += maxResultSize;
-                maxLoadSize = result.page.totalCount;
+                maxLoadSize = result.totalCount;
 
                 String compare = result.post.get(maxResultSize - 1).date.split(" ")[0];
                 result.post.get(maxResultSize - 1).typeCode = 2;
@@ -221,11 +222,10 @@ public class ProfileMenuTabFragment extends Fragment {
                         result.post.add(0, new Post(0, result.post.get(0).date));
                     }
                 }
-
-                postAdapter =
-                        new PostRecyclerViewAdapter(getActivity().getSupportFragmentManager());
+                posts.addAll(result.post);
+                postAdapter.isFooterEnable = false;
+                postAdapter.add(posts);
                 userPostRecycler.setAdapter(postAdapter);
-                postAdapter.add(result.post);
             }
         }
     }

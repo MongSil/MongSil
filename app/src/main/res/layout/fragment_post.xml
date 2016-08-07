@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- recyclerView 내용 : -->
 <!-- layout_post_date, layout_post_item.xml, layout_my_post_item -->
-<com.jcodecraeer.xrecyclerview.XRecyclerView
+<android.support.v7.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/post_recycler"
     android:paddingTop="6dp"
