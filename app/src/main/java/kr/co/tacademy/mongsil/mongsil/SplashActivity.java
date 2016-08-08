@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -23,11 +22,10 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         splashContainer = (LinearLayout) findViewById(R.id.splash_container);
+
+        // 타이틀
         imgSplashHere = (ImageView) findViewById(R.id.img_splash_title_text);
         imgSplashTitle = (ImageView) findViewById(R.id.img_splash_title);
-        final Animation titleAnimation =
-                AnimationUtils.loadAnimation(
-                        getApplicationContext(), R.anim.anim_alpha);
         handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -51,6 +49,7 @@ public class SplashActivity extends BaseActivity {
             }
         }, 3500);
 
+        // 몽실 이미지
         imgSplashMongsil = (ImageView) findViewById(R.id.img_splash_mongsil);
         ((AnimationDrawable) imgSplashMongsil.getDrawable()).start();
         Animation mongsilAnimation =
@@ -58,6 +57,7 @@ public class SplashActivity extends BaseActivity {
                         this, R.anim.splash_interpolator);
         imgSplashMongsil.startAnimation(mongsilAnimation);
 
+        // 몽실 그림자
         imgSplashShadow = (ImageView) findViewById(R.id.img_splash_mongsil_shadow);
         Animation shadowAnimation =
                 AnimationUtils.loadAnimation(
@@ -82,6 +82,7 @@ public class SplashActivity extends BaseActivity {
                     Intent intent = new Intent(SplashActivity.this, AppTutorialActivity.class);
                     startActivity(intent);
                     interrupt();
+                    finish();
                 }
             });
             /*catch (IOException e) {
@@ -89,12 +90,5 @@ public class SplashActivity extends BaseActivity {
             }*/
         }
 
-    }
-
-    private Animation AnimationApplyInterpolater(
-            int resourceId, final Interpolator interpolator){
-        Animation animation = AnimationUtils.loadAnimation(this, resourceId);
-        animation.setInterpolator(interpolator);
-        return animation;
     }
 }

@@ -3,6 +3,7 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -25,11 +26,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+
+import java.io.UnsupportedEncodingException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
-public class MainActivity extends BaseActivity {
+import static android.util.Log.e;
+
+public class MainActivity extends BaseActivity implements SearchPoiDialogFragment.OnSelectListener {
     // 툴바 필드
     TextView tbTitle;
     ImageView tbSearch;
@@ -266,9 +277,11 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
+    public void onSelect(Poi poi) {
+        if(poi != null) {
+            tbTitle.setText(poi.upperAddrName);
+            new AsyncWeatherJSONList().execute(poi.noorLat, poi.noorLon);
+        }
     }
 
     // 툴바 메뉴 선택
@@ -290,5 +303,50 @@ public class MainActivity extends BaseActivity {
             return;
         }
         super.onBackPressed();
+    }
+
+
+    // 날씨 AsyncTask
+    public class AsyncWeatherJSONList extends AsyncTask<String, Integer, SearchPoiInfo> {
+        @Override
+        protected SearchPoiInfo doInBackground(String... args) {
+            try{
+                OkHttpClient toServer = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                Request request = new Request.Builder()
+                        .addHeader("Accept", "application/json")
+                        .addHeader("appKey", NetworkDefineConstant.SK_APP_KEY)
+                        .url(String.format(
+                                NetworkDefineConstant.SK_WEATHER_LAT_LON,
+                                args[0], args[1]))
+                        .build();
+                Response response = toServer.newCall(request).execute();
+                ResponseBody responseBody = response.body();
+
+                boolean flag = response.isSuccessful();
+                int responseCode = response.code();
+                if (responseCode >= 400) return null;
+                if (flag) {
+                    /*return ParseDataParseHandler.getJSONWeatherList(
+                            new StringBuilder(responseBody.string()));*/
+                }
+                responseBody.close();
+            }catch (UnknownHostException une) {
+                e("connectionFail", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                e("connectionFail", uee.toString());
+            } catch (Exception e) {
+                e("connectionFail", e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(SearchPoiInfo result) {
+
+        }
     }
 }

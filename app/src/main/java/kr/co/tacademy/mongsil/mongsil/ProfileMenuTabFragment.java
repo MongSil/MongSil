@@ -60,6 +60,7 @@ public class ProfileMenuTabFragment extends Fragment {
         final LinearLayoutManager layoutManager = new LinearLayoutManager(
                 MongSilApplication.getMongSilContext());
 
+        // TODO : View로 바꿔야함
         userPostRecycler = (RecyclerView) inflater.inflate(
                 R.layout.fragment_post, container, false);
         userPostRecycler.setLayoutManager(layoutManager);

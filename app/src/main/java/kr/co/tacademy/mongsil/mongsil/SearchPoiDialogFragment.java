@@ -18,12 +18,10 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -43,12 +41,27 @@ public class SearchPoiDialogFragment extends DialogFragment {
     TextView emptySearch;
     EditText editSearch;
     ImageView imgSearchCancel;
+    InputMethodManager imm;
 
     RecyclerView searchRecycler;
     SearchPoiRecyclerViewAdapter poiAdapter;
     ArrayList<Poi> poi;
 
     public SearchPoiDialogFragment() { }
+
+    public static interface OnSelectListener {
+        public abstract void onSelect(Poi poi);
+    }
+
+    private OnSelectListener selectListener;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnSelectListener) {
+            selectListener = (OnSelectListener) context;
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,8 +94,7 @@ public class SearchPoiDialogFragment extends DialogFragment {
                 editSearch.setVisibility(View.VISIBLE);
                 imgSearchCancel.setVisibility(View.VISIBLE);
                 editSearch.requestFocus();
-                final InputMethodManager imm =
-                        (InputMethodManager) getActivity()
+                imm = (InputMethodManager) getActivity()
                                 .getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(editSearch, InputMethodManager.SHOW_FORCED);
                 editSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -101,16 +113,20 @@ public class SearchPoiDialogFragment extends DialogFragment {
                 imgSearchCancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        imm.hideSoftInputFromWindow(editSearch.getWindowToken(), 0);
-                        emptySearch.setVisibility(View.VISIBLE);
-                        editSearch.setVisibility(View.GONE);
-                        editSearch.setText("");
-                        imgSearchCancel.setVisibility(View.GONE);
+                        cancelSearch();
                     }
                 });
             }
         });
         return view;
+    }
+
+    private void cancelSearch() {
+        imm.hideSoftInputFromWindow(editSearch.getWindowToken(), 0);
+        emptySearch.setVisibility(View.VISIBLE);
+        editSearch.setVisibility(View.GONE);
+        editSearch.setText("");
+        imgSearchCancel.setVisibility(View.GONE);
     }
 
     @Override
@@ -153,8 +169,16 @@ public class SearchPoiDialogFragment extends DialogFragment {
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
+        public void onBindViewHolder(ViewHolder holder, final int position) {
             holder.locationItem.setText(poi.get(position).name);
+            holder.locationItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectListener.onSelect(poi.get(position));
+                    cancelSearch();
+                    dismiss();
+                }
+            });
         }
 
         @Override
@@ -214,5 +238,4 @@ public class SearchPoiDialogFragment extends DialogFragment {
             }
         }
     }
-
 }

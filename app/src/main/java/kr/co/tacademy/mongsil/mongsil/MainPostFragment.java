@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
@@ -32,11 +33,12 @@ public class MainPostFragment extends Fragment {
     public static final String SKIP = "skip";
 
     RecyclerView postRecyclerView;
-    int lastVisibleItem;
-    static ArrayList<Post> posts;
-
-    Bundle b;
+    ProgressBar footerProgress;
     PostRecyclerViewAdapter postAdapter;
+    static ArrayList<Post> posts;
+    int lastVisibleItem;
+    boolean isFooterEnable;
+
     Handler handler;
 
     private static int loadOnResult = 0;
@@ -52,8 +54,10 @@ public class MainPostFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_post, container, false);
         postRecyclerView =
-                (RecyclerView) inflater.inflate(R.layout.fragment_post, container, false);
+                (RecyclerView) view.findViewById(R.id.post_recycler);
+        footerProgress = (ProgressBar) view.findViewById(R.id.footer_progress);
         postAdapter = new PostRecyclerViewAdapter();
         posts = new ArrayList<Post>();
         final LinearLayoutManager layoutManager =
@@ -63,49 +67,63 @@ public class MainPostFragment extends Fragment {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-
-                if (newState == RecyclerView.SCROLL_STATE_IDLE
-                        && lastVisibleItem + 1 == postAdapter.getItemCount()) {
-                    postAdapter.isFooterEnable = true;
-                    LoadMore();
-                    postAdapter.notifyItemChanged(loadOnResult + 1);
-                }
             }
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
+
+                int total = layoutManager.getItemCount();
+                int firstVisibleItemCount = layoutManager.findFirstVisibleItemPosition();
+                // header를 위한 firstItemCount
+                int lastVisibleItemCount = layoutManager.findLastVisibleItemPosition();
+
+                //to avoid multiple calls to loadMore() method
+                //maintain a boolean value (isLoading). if loadMore() task started set to true and completes set to false
+                if (!isFooterEnable) {
+                    if (total > 0) {
+                        if ((total - 1) == lastVisibleItemCount) {
+                            LoadMore();
+                            isFooterEnable = true;
+                            postAdapter.notifyItemChanged(loadOnResult + 1);
+                            footerProgress.setVisibility(View.VISIBLE);
+                        } else {
+                            footerProgress.setVisibility(View.GONE);
+                        }
+                    }
+                }
             }
         });
-        b = new Bundle();
-        b.putString(AREA1, "");
-        b.putInt(SKIP, 0);
 
-
-        return postRecyclerView;
+        return view;
     }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        new AsyncPostJSONList().execute(b);
+        new AsyncPostJSONList().execute("", "");
     }
 
     private void LoadMore() {
-        b.putString(AREA1, "대전"); // 지역 바뀔때마다 바뀌어져야함
-        b.putInt(SKIP, loadOnResult);
-        new AsyncPostJSONList().execute(b);
+        handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                new AsyncPostJSONList().execute("대전", String.valueOf(loadOnResult));
+                // 지역 바뀔때마다 바뀌어야함
+            }
+        }, 2000);
     }
 
 
     // 글목록 가져오기
-    // TODO : String으로 바꿔야함
-    public class AsyncPostJSONList extends AsyncTask<Bundle, Integer, PostData> {
+    public class AsyncPostJSONList extends AsyncTask<String, Integer, PostData> {
 
         ProgressDialog dialog;
 
         @Override
-        protected PostData doInBackground(Bundle... bundles) {
+        protected PostData doInBackground(String... args) {
             try{
                 //OKHttp3사용
                 OkHttpClient toServer = new OkHttpClient.Builder()
@@ -122,8 +140,7 @@ public class MainPostFragment extends Fragment {
                 Request request = new Request.Builder()
                         .url(String.format(
                                 NetworkDefineConstant.SERVER_POST,
-                                bundles[0].getString(AREA1),
-                                String.valueOf(bundles[0].getInt(SKIP))))
+                                args[0], args[1]))
                         .build();
                 Response response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();

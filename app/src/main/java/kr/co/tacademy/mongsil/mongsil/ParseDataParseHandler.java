@@ -51,24 +51,24 @@ public class ParseDataParseHandler {
         }
         return null;
     }
-    public static SearchPoiInfo getJSONPoiList(
-            StringBuilder buf) {
+    public static SearchPoiInfo getJSONPoiList(StringBuilder buf) {
 
         // 전체
         JSONObject jsonObject = null;
 
         // searchPoiInfo
-        JSONObject jsonSearchPoiInfo = null;
-        JSONObject jsonPois = null;
-        JSONArray jsonArray = null;
         SearchPoiInfo searchPoiInfo;
+        JSONObject jsonPois = null;
+
+        // poi Array
+        JSONArray jsonArray = null;
         ArrayList<Poi> jsonPoiList = null;
 
         try {
-            jsonObject = new JSONObject(buf.toString());
-            jsonSearchPoiInfo = jsonObject.getJSONObject("searchPoiInfo");
+            jsonObject = new JSONObject(buf.toString())
+                    .getJSONObject("searchPoiInfo");
 
-            jsonPois = jsonSearchPoiInfo.getJSONObject("pois");
+            jsonPois = jsonObject.getJSONObject("pois");
             jsonArray = jsonPois.getJSONArray("poi");
 
             jsonPoiList = new ArrayList<Poi>();
@@ -88,12 +88,40 @@ public class ParseDataParseHandler {
             }
 
             searchPoiInfo = new SearchPoiInfo(jsonPoiList);
-            searchPoiInfo.totalCount = jsonSearchPoiInfo.getInt("totalCount");
-            searchPoiInfo.page = jsonSearchPoiInfo.getInt("page");
+            searchPoiInfo.totalCount = jsonObject.getInt("totalCount");
+            searchPoiInfo.page = jsonObject.getInt("page");
 
             return searchPoiInfo;
         } catch (JSONException je) {
             Log.e("GET:PoiAllList", "JSON파싱 중 에러발생", je);
+        }
+        return null;
+    }
+    public static WeatherData getJSONWeatherList(
+            StringBuilder buf) {
+
+        // 전체
+        JSONObject jsonObject = null;
+
+        // weather - minutely
+        JSONArray jsonMinutely = null;
+        JSONObject jsonrain = null;
+
+        // weather
+        WeatherData data;
+
+        try {
+            jsonObject = new JSONObject(buf.toString())
+                    .getJSONObject("weather").getJSONArray("minutely")
+                    .getJSONObject(0).getJSONObject("sky");
+            data = new WeatherData();
+
+            data.name = jsonObject.getString("name");
+            data.code = jsonObject.getString("code");
+
+            return data;
+        } catch (JSONException je) {
+            Log.e("GET:WeatherList", "JSON파싱 중 에러발생", je);
         }
         return null;
     }
