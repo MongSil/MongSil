@@ -2,13 +2,7 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.app.Application;
 import android.content.Context;
-import android.graphics.Typeface;
-
-import com.skp.Tmap.TMapTapi;
 import com.tsengvn.typekit.Typekit;
-import com.tsengvn.typekit.TypekitContextWrapper;
-
-import java.lang.reflect.Field;
 
 /**
  * Created by ccei on 2016-07-27.

@@ -45,7 +45,7 @@ public class PostDetailActivity extends BaseActivity {
 
         // background 이미지
         postContainer = (CoordinatorLayout) findViewById(R.id.post_container);
-        postContainer.setBackgroundResource(R.drawable.test_splash);
+        postContainer.setBackgroundResource(R.drawable.splash_background);
 
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
         postContent = (TextView) findViewById(R.id.text_post_content);

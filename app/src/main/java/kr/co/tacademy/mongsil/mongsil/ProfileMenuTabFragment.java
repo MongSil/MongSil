@@ -169,7 +169,7 @@ public class ProfileMenuTabFragment extends Fragment {
                         .url(String.format(
                                 NetworkDefineConstant.SERVER_USER_POST,
                                 bundles[0].getInt(USERID),
-                                bundles[0].getInt(SKIP)))
+                                String.valueOf(bundles[0].getInt(SKIP))))
                         .build();
                 Response response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();

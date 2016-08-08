@@ -1,12 +1,11 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -20,25 +19,36 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.skp.Tmap.TMapData;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
+import static android.util.Log.e;
 
 /**
  * Created by ccei on 2016-08-02.
  */
-// TODO : DB에서 지역검색 -> Google GeoCoding으로 위도경도 변환 -> 날씨 API
-public class SearchLocationDialogFragment extends DialogFragment {
-    //private TMapTapi tmaptapi = new TMapTapi(MongSilApplication.getMongSilContext());
-
-    //ArrayList<TMapPOIItem> POIItem = null;
-    //String[] recyclerItem;
-
+// TODO : POI 검색 -> 지역 선택 -> 위도경도 불러옴 -> 날씨 API
+public class SearchPoiDialogFragment extends DialogFragment {
     TextView emptySearch;
     EditText editSearch;
     ImageView imgSearchCancel;
 
-    public SearchLocationDialogFragment() { }
+    RecyclerView searchRecycler;
+    SearchPoiRecyclerViewAdapter poiAdapter;
+    ArrayList<Poi> poi;
+
+    public SearchPoiDialogFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,31 +61,18 @@ public class SearchLocationDialogFragment extends DialogFragment {
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(
                 R.layout.dialog_select_locaiton, container, false);
-       /* tmapdata = new TMapData();
-        tmaptapi.setSKPMapAuthentication (NetworkDefineConstant.APP_KEY);
-        tmaptapi.setOnAuthenticationListener(new TMapTapi.OnAuthenticationListenerCallback() {
-            @Override
-            public void SKPMapApikeySucceed() {
-                // pass
-            }
 
-            @Override
-            public void SKPMapApikeyFailed(String s) {
-                //onDismiss(getDialog());
-            }
-        });*/
-
-        final LinearLayout searchContainer =
-                (LinearLayout) view.findViewById(R.id.search_container);
+        RelativeLayout searchContainer =
+                (RelativeLayout) view.findViewById(R.id.search_container);
         emptySearch = (TextView) view.findViewById(R.id.text_empty_search);
         editSearch = (EditText) view.findViewById(R.id.edit_search);
         imgSearchCancel = (ImageView) view.findViewById(R.id.img_search_cancel);
-        final RecyclerView searchRecycler =
-                (RecyclerView) view.findViewById(R.id.search_recycler);
+
+        searchRecycler = (RecyclerView) view.findViewById(R.id.search_recycler);
         searchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        final LocationSearchRecyclerViewAdapter adapter
-                                = new LocationSearchRecyclerViewAdapter();
-        searchRecycler.setAdapter(adapter);
+        poi = new ArrayList<Poi>();
+        poiAdapter = new SearchPoiRecyclerViewAdapter();
+        searchRecycler.setAdapter(poiAdapter);
 
         searchContainer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +91,7 @@ public class SearchLocationDialogFragment extends DialogFragment {
                         if(i == EditorInfo.IME_ACTION_SEARCH || i == EditorInfo.IME_ACTION_NONE) {
                             // 키보드에서 검색버튼을 누를 때
                             imm.hideSoftInputFromWindow(editSearch.getWindowToken(), 0);
+                            new AsyncPoiJSONList().execute(editSearch.getText().toString());
                             editSearch.clearFocus();
                             return true;
                         }
@@ -109,33 +107,7 @@ public class SearchLocationDialogFragment extends DialogFragment {
                         editSearch.setText("");
                         imgSearchCancel.setVisibility(View.GONE);
                     }
-                });/*
-                editSearch.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable editable) {
-                        *//*try {
-                            //tmaptapi.invokeSearchPortal(editable.toString());
-                            //POIItem = tmapdata.findAddressPOI(editable.toString());
-                        } catch (IOException ie) {
-                            ie.printStackTrace();
-                        } catch (ParserConfigurationException pce) {
-                            pce.printStackTrace();
-                        } catch (SAXException se) {
-                            se.printStackTrace();
-                        }*//*
-                        adapter.notifyDataSetChanged();
-                    }
-                });*/
+                });
             }
         });
         return view;
@@ -156,10 +128,10 @@ public class SearchLocationDialogFragment extends DialogFragment {
     }
 
     // 주소 검색 리사이클러
-    public class LocationSearchRecyclerViewAdapter
-            extends RecyclerView.Adapter<LocationSearchRecyclerViewAdapter.ViewHolder> {
+    public class SearchPoiRecyclerViewAdapter
+            extends RecyclerView.Adapter<SearchPoiRecyclerViewAdapter.ViewHolder> {
 
-        LocationSearchRecyclerViewAdapter() { }
+        SearchPoiRecyclerViewAdapter() { }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             final View view;
@@ -182,13 +154,64 @@ public class SearchLocationDialogFragment extends DialogFragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            /*if(POIItem.get(position) != null)
-                holder.locationItem.setText(POIItem.get(position).getPOIName());*/
+            holder.locationItem.setText(poi.get(position).name);
         }
 
         @Override
         public int getItemCount() {
-            return 0;//POIItem.size();
+            return poi.size();
+        }
+    }
+
+    // 지역검색 AsyncTask
+    public class AsyncPoiJSONList extends AsyncTask<String, Integer, SearchPoiInfo> {
+        @Override
+        protected SearchPoiInfo doInBackground(String... args) {
+            try{
+                OkHttpClient toServer = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                Request request = new Request.Builder()
+                        .addHeader("Accept", "application/json")
+                        .addHeader("appKey", NetworkDefineConstant.SK_APP_KEY)
+                        .url(String.format(
+                                NetworkDefineConstant.SK_POI_SEARCH,
+                                args[0]))
+                        .build();
+                Response response = toServer.newCall(request).execute();
+                ResponseBody responseBody = response.body();
+
+                boolean flag = response.isSuccessful();
+                int responseCode = response.code();
+                if (responseCode >= 400) return null;
+                if (flag) {
+                    return ParseDataParseHandler.getJSONPoiList(
+                            new StringBuilder(responseBody.string()));
+                }
+                responseBody.close();
+            }catch (UnknownHostException une) {
+                e("connectionFail", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                e("connectionFail", uee.toString());
+            } catch (Exception e) {
+                e("connectionFail", e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(SearchPoiInfo result) {
+            if(result != null && result.poi.size() > 0){
+                poi.clear();
+                for(int i = 0 ; i < result.poi.size() ; i++) {
+                    poi.add(result.poi.get(i));
+                }
+                poiAdapter.notifyDataSetChanged();
+                searchRecycler.setAdapter(poiAdapter);
+
+            }
         }
     }
 

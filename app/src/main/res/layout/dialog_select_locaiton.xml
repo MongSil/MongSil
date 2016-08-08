@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
     <ImageView
         android:background="@color/invisible"
         android:src="@drawable/search_box_top"
@@ -12,66 +12,73 @@
     <FrameLayout
         android:background="@android:color/white"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
+        android:layout_height="wrap_content">
+        <RelativeLayout
             android:id="@+id/search_container"
-            android:orientation="horizontal"
             android:background="@color/little_dark_gray"
             android:gravity="center"
             android:clickable="true"
-            android:layout_margin="5dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="7dp"
             android:paddingLeft="5dp"
-            android:paddingRight="5dp"
+            android:paddingRight="6dp"
             android:focusableInTouchMode="true"
             android:layout_width="match_parent"
-            android:layout_height="22dp">
+            android:layout_height="30dp">
             <ImageView
                 android:id="@+id/img_search"
                 android:src="@drawable/search_box_in"
-                android:layout_marginRight="7dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_centerVertical="true"
+                android:layout_marginRight="6dp"
+                android:layout_width="15dp"
+                android:layout_height="15dp" />
             <TextView
                 android:id="@+id/text_empty_search"
                 android:text="@string/empty_search"
-                android:textSize="12sp"
+                android:textSize="15sp"
                 android:textColor="@color/dark_gray"
                 android:visibility="visible"
+                android:layout_centerVertical="true"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/img_search"
+                android:layout_toEndOf="@+id/img_search" />
+            <ImageView
+                android:id="@+id/img_search_cancel"
+                android:src="@drawable/search_box_in_close"
+                android:visibility="gone"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_alignTop="@+id/img_search"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
             <EditText
                 android:id="@+id/edit_search"
                 android:textColor="@color/dark_gray"
-                android:textSize="12sp"
+                android:textSize="15sp"
                 android:background="@null"
                 android:visibility="gone"
                 android:singleLine="true"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
+                android:paddingLeft="21dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="10"/>
-            <ImageView
-                android:id="@+id/img_search_cancel"
-                android:src="@drawable/search_box_in_close"
-                android:visibility="gone"
-                android:layout_width="17dp"
-                android:layout_height="17dp"
-                android:layout_weight="1"/>
-        </LinearLayout>
+                android:layout_alignLeft="@+id/img_search"
+                android:layout_alignStart="@+id/img_search"
+                android:layout_toLeftOf="@+id/img_search_cancel"
+                android:layout_toStartOf="@+id/img_search_cancel" />
+        </RelativeLayout>
     </FrameLayout>
     <View
         android:background="@color/little_dark_gray"
         android:layout_width="match_parent"
         android:layout_height="1dp" />
-    <!-- layout_search_location_item.xml -->
-    <RelativeLayout
-        android:background="@android:color/white"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <!-- layout_search_location_header.xml & layout_search_location_item.xml -->
         <android.support.v7.widget.RecyclerView
             android:id="@+id/search_recycler"
+            android:background="@android:color/white"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-    </RelativeLayout>
 </LinearLayout>

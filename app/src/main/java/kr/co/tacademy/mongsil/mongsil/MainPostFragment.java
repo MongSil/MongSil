@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +35,7 @@ public class MainPostFragment extends Fragment {
     int lastVisibleItem;
     static ArrayList<Post> posts;
 
+    Bundle b;
     PostRecyclerViewAdapter postAdapter;
     Handler handler;
 
@@ -76,16 +78,20 @@ public class MainPostFragment extends Fragment {
                 lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
             }
         });
-        Bundle b = new Bundle();
+        b = new Bundle();
         b.putString(AREA1, "");
         b.putInt(SKIP, 0);
-        new AsyncPostJSONList().execute(b);
+
 
         return postRecyclerView;
     }
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        new AsyncPostJSONList().execute(b);
+    }
 
     private void LoadMore() {
-        Bundle b = new Bundle();
         b.putString(AREA1, "대전"); // 지역 바뀔때마다 바뀌어져야함
         b.putInt(SKIP, loadOnResult);
         new AsyncPostJSONList().execute(b);
@@ -93,6 +99,7 @@ public class MainPostFragment extends Fragment {
 
 
     // 글목록 가져오기
+    // TODO : String으로 바꿔야함
     public class AsyncPostJSONList extends AsyncTask<Bundle, Integer, PostData> {
 
         ProgressDialog dialog;
@@ -116,7 +123,7 @@ public class MainPostFragment extends Fragment {
                         .url(String.format(
                                 NetworkDefineConstant.SERVER_POST,
                                 bundles[0].getString(AREA1),
-                                bundles[0].getInt(SKIP)))
+                                String.valueOf(bundles[0].getInt(SKIP))))
                         .build();
                 Response response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
@@ -167,10 +174,11 @@ public class MainPostFragment extends Fragment {
                         result.post.add(0, new Post(0, result.post.get(0).date));
                     }
                 }
-                posts.addAll(result.post);
+
                 postAdapter.isFooterEnable = false;
-                postAdapter.add(posts);
+                postAdapter.add(result.post);
                 postRecyclerView.setAdapter(postAdapter);
+
             }
         }
     }

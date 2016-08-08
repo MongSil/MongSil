@@ -79,7 +79,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(new SearchLocationDialogFragment(), "search")
+                        .add(new SearchPoiDialogFragment(), "search")
                         .addToBackStack("search").commit();
             }
         });

@@ -1,9 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <set
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:interpolator="@android:anim/bounce_interpolator">
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <translate
-        android:fromYDelta="-400"
+        android:fromYDelta="-300"
+        android:interpolator="@android:anim/accelerate_interpolator"
         android:fillAfter="true"
-        android:duration="3000" />
+        android:duration="2000" />
+    <translate
+        android:fromYDelta="100"
+        android:interpolator="@android:anim/accelerate_interpolator"
+        android:fillAfter="true"
+        android:duration="1000"
+        android:startOffset="2000" />
+    <translate
+        android:fromYDelta="-20"
+        android:interpolator="@android:anim/accelerate_interpolator"
+        android:fillAfter="true"
+        android:duration="500"
+        android:startOffset="3000" />
+    <translate
+        android:fromYDelta="20"
+        android:interpolator="@android:anim/accelerate_interpolator"
+        android:fillAfter="true"
+        android:duration="500"
+        android:startOffset="3500" />
+    <translate
+        android:fromYDelta="-20"
+        android:interpolator="@android:anim/accelerate_interpolator"
+        android:fillAfter="true"
+        android:duration="500"
+        android:startOffset="4000" />
 </set>

@@ -1,37 +1,71 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Handler;
-import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-
-import com.bumptech.glide.Glide;
-
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
+import android.widget.LinearLayout;
 
 public class SplashActivity extends BaseActivity {
 
-    ImageView imgSplash, imgtextSplash;
-    Handler handler = new Handler();
+    LinearLayout splashContainer;
+    ImageView imgSplashHere, imgSplashTitle;
+    ImageView imgSplashMongsil, imgSplashShadow;
+    Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        splashContainer = (LinearLayout) findViewById(R.id.splash_container);
+        imgSplashHere = (ImageView) findViewById(R.id.img_splash_title_text);
+        imgSplashTitle = (ImageView) findViewById(R.id.img_splash_title);
+        final Animation titleAnimation =
+                AnimationUtils.loadAnimation(
+                        getApplicationContext(), R.anim.anim_alpha);
+        handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                imgSplashHere.setVisibility(View.VISIBLE);
+                Animation titleAnimation =
+                        AnimationUtils.loadAnimation(
+                                getApplicationContext(), R.anim.anim_alpha);
+                imgSplashHere.startAnimation(titleAnimation);
+            }
+        }, 3000);
+        handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                imgSplashTitle.setVisibility(View.VISIBLE);
+                Animation titleAnimation2 =
+                        AnimationUtils.loadAnimation(
+                                getApplicationContext(), R.anim.anim_alpha);
+                imgSplashTitle.startAnimation(titleAnimation2);
+            }
+        }, 3500);
 
-        imgSplash = (ImageView) findViewById(R.id.img_splash);
-        Animation animation =  AnimationUtils.loadAnimation(this, R.anim.splash_interpolator);
-        imgSplash.startAnimation(animation);
-        handler.postDelayed(new ConnectThread(), 2000);
+        imgSplashMongsil = (ImageView) findViewById(R.id.img_splash_mongsil);
+        ((AnimationDrawable) imgSplashMongsil.getDrawable()).start();
+        Animation mongsilAnimation =
+                AnimationUtils.loadAnimation(
+                        this, R.anim.splash_interpolator);
+        imgSplashMongsil.startAnimation(mongsilAnimation);
+
+        imgSplashShadow = (ImageView) findViewById(R.id.img_splash_mongsil_shadow);
+        Animation shadowAnimation =
+                AnimationUtils.loadAnimation(
+                        this, R.anim.anim_alpha_shadow);
+        imgSplashShadow.startAnimation(shadowAnimation);
+
+        handler = new Handler();
+        handler.postDelayed(new ConnectThread(), 4500);
     }
     private class ConnectThread extends Thread {
         //private boolean threadFlag;
@@ -42,20 +76,25 @@ public class SplashActivity extends BaseActivity {
             // TODO: if - UUID가 서버에 존재하는지 여부 검사
             // TODO: UUID가 서버에 존재하면 바로 메인으로
             // TODO: UUID가 서버에 없다면 텍스트를 띄움(테스트는 텍스트를 띄움)
-                imgtextSplash = (ImageView) findViewById(R.id.img_text_splash);
-                imgtextSplash.setVisibility(View.VISIBLE);
-                imgtextSplash.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(SplashActivity.this, AppTutorialActivity.class);
-                        startActivity(intent);
-                        interrupt();
-                    }
-                });
+            splashContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(SplashActivity.this, AppTutorialActivity.class);
+                    startActivity(intent);
+                    interrupt();
+                }
+            });
             /*catch (IOException e) {
                 Log.e("Server Connection Error", "서버에 접속할 수 없습니다.");
             }*/
         }
 
+    }
+
+    private Animation AnimationApplyInterpolater(
+            int resourceId, final Interpolator interpolator){
+        Animation animation = AnimationUtils.loadAnimation(this, resourceId);
+        animation.setInterpolator(interpolator);
+        return animation;
     }
 }

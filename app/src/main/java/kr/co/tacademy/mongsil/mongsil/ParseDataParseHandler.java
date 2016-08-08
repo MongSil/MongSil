@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class ParseDataParseHandler {
-
     public static PostData getJSONPostRequestAllList(
             StringBuilder buf) {
 
@@ -48,7 +47,53 @@ public class ParseDataParseHandler {
 
             return jsonPostData;
         } catch (JSONException je) {
-            Log.e("RequestAllList", "JSON파싱 중 에러발생", je);
+            Log.e("GET:PostRequestAllList", "JSON파싱 중 에러발생", je);
+        }
+        return null;
+    }
+    public static SearchPoiInfo getJSONPoiList(
+            StringBuilder buf) {
+
+        // 전체
+        JSONObject jsonObject = null;
+
+        // searchPoiInfo
+        JSONObject jsonSearchPoiInfo = null;
+        JSONObject jsonPois = null;
+        JSONArray jsonArray = null;
+        SearchPoiInfo searchPoiInfo;
+        ArrayList<Poi> jsonPoiList = null;
+
+        try {
+            jsonObject = new JSONObject(buf.toString());
+            jsonSearchPoiInfo = jsonObject.getJSONObject("searchPoiInfo");
+
+            jsonPois = jsonSearchPoiInfo.getJSONObject("pois");
+            jsonArray = jsonPois.getJSONArray("poi");
+
+            jsonPoiList = new ArrayList<Poi>();
+            int jsonArrSize = jsonArray.length();
+            for (int i = 0; i < jsonArrSize; i++) {
+                Poi poi = new Poi();
+                JSONObject jData = jsonArray.getJSONObject(i);
+
+                poi.name = jData.getString("name");
+                poi.noorLat = jData.getString("noorLat");
+                poi.noorLon = jData.getString("noorLon");
+                poi.upperAddrName = jData.getString("upperAddrName");
+                poi.middleAddrName = jData.getString("middleAddrName");
+                poi.lowerAddrName = jData.getString("lowerAddrName");
+
+                jsonPoiList.add(poi);
+            }
+
+            searchPoiInfo = new SearchPoiInfo(jsonPoiList);
+            searchPoiInfo.totalCount = jsonSearchPoiInfo.getInt("totalCount");
+            searchPoiInfo.page = jsonSearchPoiInfo.getInt("page");
+
+            return searchPoiInfo;
+        } catch (JSONException je) {
+            Log.e("GET:PoiAllList", "JSON파싱 중 에러발생", je);
         }
         return null;
     }

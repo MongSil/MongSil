@@ -42,9 +42,9 @@ public class PostRecyclerViewAdapter
         this.fm = fm;
     }
 
-    public void add(ArrayList<Post> items) {
-        for(int i = 0 ; i < items.size() ; i++) {
-            this.items.add(items.get(i));
+    public void add(ArrayList<Post> postItems) {
+        for(int i = 0 ; i < postItems.size() ; i++) {
+            items.add(postItems.get(i));
         }
         this.notifyDataSetChanged();
     }

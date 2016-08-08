@@ -1,29 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/splash_container"
+    android:orientation="vertical"
+    android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/test_splash"
+    android:background="@drawable/splash_background"
     tools:context=".SplashActivity">
 
-        <!-- 여기의 날씨는 몽실몽실 이미지로 달라하기 -->
         <ImageView
-            android:id="@+id/img_splash"
-            android:src="@drawable/splash_mongsil"
+            android:id="@+id/img_splash_title_text"
+            android:src="@drawable/splash_title_here"
+            android:visibility="invisible"
+            android:paddingLeft="15dp"
+            android:paddingBottom="9dp"
+            android:layout_marginTop="100dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
-        <RelativeLayout
-            android:layout_below="@id/img_splash"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-                <ImageView
-                    android:id="@+id/img_text_splash"
-                    android:src="@mipmap/ic_launcher"
-                    android:visibility="invisible"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true" />
-        </RelativeLayout>
-</RelativeLayout>
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/img_splash_title"
+            android:src="@drawable/splash_title_mongsil"
+            android:visibility="invisible"
+            android:paddingLeft="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/img_splash_mongsil"
+            android:src="@drawable/anim_list_splash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/img_splash_mongsil_shadow"
+            android:src="@drawable/splash_mongsil_shadow"
+            android:paddingLeft="10dp"
+            android:layout_marginTop="35dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+</LinearLayout>

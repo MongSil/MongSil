@@ -88,7 +88,6 @@ public class AppTutorialActivity extends AppCompatActivity {
 
     private void endTutorial() {
         Intent intent = new Intent(AppTutorialActivity.this, SignUpActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         AppTutorialActivity.this.finish();
     }
