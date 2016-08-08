@@ -45,12 +45,12 @@ public class SearchPoiDialogFragment extends DialogFragment {
 
     RecyclerView searchRecycler;
     SearchPoiRecyclerViewAdapter poiAdapter;
-    ArrayList<Poi> poi;
+    ArrayList<POIData> POIData;
 
     public SearchPoiDialogFragment() { }
 
     public static interface OnSelectListener {
-        public abstract void onSelect(Poi poi);
+        public abstract void onSelect(POIData POIData);
     }
 
     private OnSelectListener selectListener;
@@ -83,7 +83,7 @@ public class SearchPoiDialogFragment extends DialogFragment {
 
         searchRecycler = (RecyclerView) view.findViewById(R.id.search_recycler);
         searchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        poi = new ArrayList<Poi>();
+        POIData = new ArrayList<POIData>();
         poiAdapter = new SearchPoiRecyclerViewAdapter();
         searchRecycler.setAdapter(poiAdapter);
 
@@ -170,11 +170,11 @@ public class SearchPoiDialogFragment extends DialogFragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
-            holder.locationItem.setText(poi.get(position).name);
+            holder.locationItem.setText(POIData.get(position).name);
             holder.locationItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    selectListener.onSelect(poi.get(position));
+                    selectListener.onSelect(POIData.get(position));
                     cancelSearch();
                     dismiss();
                 }
@@ -183,7 +183,7 @@ public class SearchPoiDialogFragment extends DialogFragment {
 
         @Override
         public int getItemCount() {
-            return poi.size();
+            return POIData.size();
         }
     }
 
@@ -227,10 +227,10 @@ public class SearchPoiDialogFragment extends DialogFragment {
 
         @Override
         protected void onPostExecute(SearchPoiInfo result) {
-            if(result != null && result.poi.size() > 0){
-                poi.clear();
-                for(int i = 0 ; i < result.poi.size() ; i++) {
-                    poi.add(result.poi.get(i));
+            if(result != null && result.POIData.size() > 0){
+                POIData.clear();
+                for(int i = 0; i < result.POIData.size() ; i++) {
+                    POIData.add(result.POIData.get(i));
                 }
                 poiAdapter.notifyDataSetChanged();
                 searchRecycler.setAdapter(poiAdapter);

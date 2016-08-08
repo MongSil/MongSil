@@ -3,7 +3,7 @@ package kr.co.tacademy.mongsil.mongsil;
 /**
  * Created by ccei on 2016-08-08.
  */
-public class Poi {
+public class POIData {
     String name;
     String noorLat;
     String noorLon;
@@ -11,5 +11,5 @@ public class Poi {
     String middleAddrName;
     String lowerAddrName;
 
-    Poi() { }
+    POIData() { }
 }

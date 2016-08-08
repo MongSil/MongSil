@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
@@ -30,16 +31,15 @@ import static android.util.Log.e;
 public class ProfileMenuTabFragment extends Fragment {
     public static final String TABINFO = "tabinfo";
     public static final String USERID = "userid";
-    public static final String SKIP = "skip";
 
+    ProgressBar footerProgress;
     RecyclerView userPostRecycler;
     PostRecyclerViewAdapter postAdapter;
     Handler handler;
-    static ArrayList<Post> posts;
 
     int lastVisibleItem;
-    private static int loadOnResult = 0;
-    private static int maxLoadSize = 1;
+    private int loadOnResult = 0;
+    private int maxLoadSize = 1;
 
     public ProfileMenuTabFragment() { }
 
@@ -55,59 +55,50 @@ public class ProfileMenuTabFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_post, container, false);
         final Bundle initBundle = getArguments();
-        final int userId = initBundle.getInt(USERID);
+        final String userId = String.valueOf(initBundle.getInt(USERID));
         final LinearLayoutManager layoutManager = new LinearLayoutManager(
                 MongSilApplication.getMongSilContext());
 
-        // TODO : View로 바꿔야함
-        userPostRecycler = (RecyclerView) inflater.inflate(
-                R.layout.fragment_post, container, false);
+        userPostRecycler = (RecyclerView) view.findViewById(R.id.post_recycler);
+        footerProgress = (ProgressBar) view.findViewById(R.id.footer_progress);
         userPostRecycler.setLayoutManager(layoutManager);
         postAdapter = new PostRecyclerViewAdapter(getActivity().getSupportFragmentManager());
-        posts = new ArrayList<Post>();
 
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
             // TODO : 만들어야함
             userPostRecycler.setPadding(16, 0, 16, 0);
-            userPostRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                    super.onScrollStateChanged(recyclerView, newState);
-
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE
-                            && lastVisibleItem + 1 == postAdapter.getItemCount()) {
-                        postAdapter.isFooterEnable = true;
-                        LoadMore(userId);
-                        postAdapter.notifyItemChanged(loadOnResult + 1);
-                    }
-                }
-
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    lastVisibleItem = ((LinearLayoutManager)
-                            recyclerView.getLayoutManager()).findLastVisibleItemPosition();
-                }
-            });
-            Bundle b = new Bundle();
-            b.putInt(USERID, userId);
-            b.putInt(SKIP, 0);
-            new AsyncUserPostJSONList().execute(b);
-
+            userPostRecycler.setOnScrollListener(
+                    new EndlessRecyclerOnScrollListener(layoutManager) {
+                        @Override
+                        public void onLoadMore(int current_page) {
+                            if(maxLoadSize != loadOnResult) {
+                                LoadMore(userId);
+                            } else {
+                                this.setLoadingState(false);
+                            }
+                        }
+                    });
+            new AsyncUserPostJSONList().execute(userId, "");
         } else {
             // 내가 쓴 댓글 탭
             userPostRecycler.setAdapter(new MyCommentRecyclerViewAdapter());
         }
 
-        return userPostRecycler;
+        return view;
     }
-    private void LoadMore(final int userId) {
-        Bundle b = new Bundle();
-        b.putInt(USERID, userId); // 지역 바뀔때마다 바뀌어져야함
-        b.putInt(SKIP, loadOnResult);
-        new AsyncUserPostJSONList().execute(b);
+    private void LoadMore(final String userId) {
+        handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                new AsyncUserPostJSONList().execute(
+                        String.valueOf(userId),
+                        String.valueOf(loadOnResult));
+            }
+        }, 2000);
     }
     // 내가 쓴 댓글 어답터
     public static class MyCommentRecyclerViewAdapter
@@ -152,13 +143,12 @@ public class ProfileMenuTabFragment extends Fragment {
         }
     }
     // 글목록 가져오기
-    public class AsyncUserPostJSONList extends AsyncTask<Bundle, Integer,
-            PostData> {
+    public class AsyncUserPostJSONList extends AsyncTask<String, Integer, PostData> {
 
         ProgressDialog dialog;
 
         @Override
-        protected PostData doInBackground(Bundle... bundles) {
+        protected PostData doInBackground(String... args) {
             try{
                 //OKHttp3사용
                 OkHttpClient toServer = new OkHttpClient.Builder()
@@ -169,8 +159,7 @@ public class ProfileMenuTabFragment extends Fragment {
                 Request request = new Request.Builder()
                         .url(String.format(
                                 NetworkDefineConstant.SERVER_USER_POST,
-                                bundles[0].getInt(USERID),
-                                String.valueOf(bundles[0].getInt(SKIP))))
+                                args[0], args[1]))
                         .build();
                 Response response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
@@ -223,9 +212,7 @@ public class ProfileMenuTabFragment extends Fragment {
                         result.post.add(0, new Post(0, result.post.get(0).date));
                     }
                 }
-                posts.addAll(result.post);
-                postAdapter.isFooterEnable = false;
-                postAdapter.add(posts);
+                postAdapter.add(result.post);
                 userPostRecycler.setAdapter(postAdapter);
             }
         }

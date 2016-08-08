@@ -9,26 +9,29 @@
     tools:context=".SignUpActivity">
 
     <ImageView
-        android:id="@+id/img_signup_mongsil"
-        android:src="@mipmap/ic_launcher"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="9dp"
+        android:src="@drawable/backbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/img_splash_title_text"
+        android:src="@drawable/splash_title_here"
+        android:paddingLeft="5dp"
+        android:paddingBottom="9dp"
+        android:layout_marginTop="85dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_above="@+id/img_signup_profile"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+    <ImageView
+        android:id="@+id/img_splash_title"
+        android:src="@drawable/splash_title_mongsil"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img_splash_title_text"
         android:layout_centerHorizontal="true" />
 
-    <!--<de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/img_signup_profile"
-        android:src="@drawable/img_profile"
-        android:layout_marginBottom="40dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_above="@+id/signup_name_container"
-        android:layout_centerHorizontal="true" />-->
-
-    <!-- 인폴레이터로 위로 스르륵 올라가게 함 -->
-    <!-- 밑줄 색 editText.getBackground().setColorFilter(color, PorterDuff.Mode.SRC_IN);으로 바꿈 -->
     <FrameLayout
         android:id="@+id/signup_name_container"
         android:focusable="true"
@@ -40,37 +43,20 @@
         android:layout_width="match_parent"
         android:layout_height="36dp">
 
-        <LinearLayout
-            android:id="@+id/name_layout"
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left|center_vertical">
-            <ImageView
-                android:src="@drawable/profile"
-                android:layout_gravity="center_vertical"
-                android:layout_width="16dp"
-                android:layout_height="16dp" />
-            <TextView
-                android:text="@string/name"
-                android:textSize="16sp"
-                android:textColor="@android:color/white"
-                android:layout_marginLeft="5dp"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
         <EditText
             android:id="@+id/edit_name"
+            android:text="@string/name"
+            android:textSize="15sp"
+            android:textColorHint="@android:color/white"
             android:textColor="@android:color/white"
             android:paddingLeft="20dp"
             android:paddingBottom="3dp"
             android:layout_gravity="bottom"
             android:background="@null"
-            android:nextFocusDown="@id/edit_location"
             android:imeOptions="actionNext"
             android:inputType="text"
+            android:singleLine="true"
+            android:maxLength="10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -83,6 +69,7 @@
     </FrameLayout>
 
     <FrameLayout
+        android:id="@+id/signup_location_container"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:layout_below="@+id/signup_name_container"
@@ -93,37 +80,15 @@
         android:layout_width="match_parent"
         android:layout_height="36dp">
 
-        <LinearLayout
-            android:id="@+id/location_layout"
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left|center_vertical">
-            <ImageView
-                android:id="@+id/img_location"
-                android:src="@drawable/icon_nevi_write_bottom"
-                android:layout_gravity="center_vertical"
-                android:layout_width="16dp"
-                android:layout_height="16dp" />
-            <TextView
-                android:id="@+id/text_location"
-                android:text="@string/location"
-                android:textSize="16sp"
-                android:textColor="@android:color/white"
-                android:layout_marginLeft="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <EditText
-            android:id="@+id/edit_location"
+        <TextView
+            android:id="@+id/text_location"
+            android:text="@string/location"
+            android:textSize="15sp"
+            android:textColorHint="@android:color/white"
             android:textColor="@android:color/white"
             android:paddingLeft="20dp"
             android:paddingBottom="3dp"
             android:layout_gravity="bottom"
-            android:imeOptions="actionDone"
-            android:inputType="text"
-            android:background="@null"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -137,7 +102,7 @@
 
     <ImageView
         android:id="@+id/img_signup_done"
-        android:src="@drawable/tutorial_skip"
+        android:src="@drawable/btn_done"
         android:gravity="center"
         android:layout_gravity="center"
         android:layout_width="wrap_content"

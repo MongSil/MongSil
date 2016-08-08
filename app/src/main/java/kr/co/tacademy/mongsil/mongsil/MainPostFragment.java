@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,7 +14,6 @@ import android.widget.ProgressBar;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -35,63 +33,42 @@ public class MainPostFragment extends Fragment {
     RecyclerView postRecyclerView;
     ProgressBar footerProgress;
     PostRecyclerViewAdapter postAdapter;
-    static ArrayList<Post> posts;
-    int lastVisibleItem;
-    boolean isFooterEnable;
 
     Handler handler;
 
-    private static int loadOnResult = 0;
-    private static int maxLoadSize = 1;
+    private int loadOnResult = 0;
+    private int maxLoadSize = 1;
 
     public MainPostFragment() {
     }
-    public static MainPostFragment newInstance() {
-        MainPostFragment f = new MainPostFragment();
-        return f;
+    public static MainPostFragment newInstance(String location) {
+        MainPostFragment fragment = new MainPostFragment();
+        Bundle b = new Bundle();
+        b.putString(AREA1, location);
+        fragment.setArguments(b);
+        return fragment;
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_post, container, false);
+        final Bundle initBundle = getArguments();
         postRecyclerView =
                 (RecyclerView) view.findViewById(R.id.post_recycler);
         footerProgress = (ProgressBar) view.findViewById(R.id.footer_progress);
         postAdapter = new PostRecyclerViewAdapter();
-        posts = new ArrayList<Post>();
         final LinearLayoutManager layoutManager =
                 new LinearLayoutManager(MongSilApplication.getMongSilContext());
         postRecyclerView.setLayoutManager(layoutManager);
-        postRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        postRecyclerView.setOnScrollListener(
+                new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
-
-                int total = layoutManager.getItemCount();
-                int firstVisibleItemCount = layoutManager.findFirstVisibleItemPosition();
-                // header를 위한 firstItemCount
-                int lastVisibleItemCount = layoutManager.findLastVisibleItemPosition();
-
-                //to avoid multiple calls to loadMore() method
-                //maintain a boolean value (isLoading). if loadMore() task started set to true and completes set to false
-                if (!isFooterEnable) {
-                    if (total > 0) {
-                        if ((total - 1) == lastVisibleItemCount) {
-                            LoadMore();
-                            isFooterEnable = true;
-                            postAdapter.notifyItemChanged(loadOnResult + 1);
-                            footerProgress.setVisibility(View.VISIBLE);
-                        } else {
-                            footerProgress.setVisibility(View.GONE);
-                        }
-                    }
+            public void onLoadMore(int current_page) {
+                if(maxLoadSize != loadOnResult) {
+                    LoadMore(initBundle.getString(AREA1));
+                } else {
+                    this.setLoadingState(false);
                 }
             }
         });
@@ -100,17 +77,17 @@ public class MainPostFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         new AsyncPostJSONList().execute("", "");
     }
 
-    private void LoadMore() {
+    private void LoadMore(final String location) {
         handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                new AsyncPostJSONList().execute("대전", String.valueOf(loadOnResult));
+                new AsyncPostJSONList().execute(location, String.valueOf(loadOnResult));
                 // 지역 바뀔때마다 바뀌어야함
             }
         }, 2000);
@@ -166,6 +143,7 @@ public class MainPostFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            // TODO : NullPointer가 떴었음.
             dialog = ProgressDialog.show(getContext(),
                     "","잠시만 기다려 주세요 ...", true);
         }
@@ -191,11 +169,8 @@ public class MainPostFragment extends Fragment {
                         result.post.add(0, new Post(0, result.post.get(0).date));
                     }
                 }
-
-                postAdapter.isFooterEnable = false;
                 postAdapter.add(result.post);
                 postRecyclerView.setAdapter(postAdapter);
-
             }
         }
     }

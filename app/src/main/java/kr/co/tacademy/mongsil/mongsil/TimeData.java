@@ -74,14 +74,14 @@ public class TimeData {
                 new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
         try {
             Date tempTime = timeFormat.parse(time);
-            return new SimpleDateFormat("HH:mm a", Locale.KOREA).format(tempTime);
+            return new SimpleDateFormat("HH:mm a", Locale.ENGLISH).format(tempTime);
         } catch (ParseException pe) {
             pe.printStackTrace();
         }
         return "error";
     }
 
-    // 현재 시간에서 얼마나 시간이 지났는지 계산하는 메소드 (알람 사용)
+    // 현재 시간에서 얼마나 시간이 지났는지 계산하는 메소드
     public static String timeCalculate(String time) {
         try {
             Date tempTime = dateFormat.parse(time);
@@ -95,8 +95,8 @@ public class TimeData {
                 long hourSubTime = subTime / (60 * 60);
                 long minuteSubTime = ((subTime / 60)) % 60;
 
-                if (hourSubTime > 60) {
-                    long monthSubTime = subTime / 30;
+                if (daySubTime > 60) {
+                    long monthSubTime = daySubTime / 30;
                     return String.valueOf(monthSubTime) + "달 전";
                 }
 

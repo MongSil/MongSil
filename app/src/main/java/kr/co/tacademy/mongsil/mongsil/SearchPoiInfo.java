@@ -8,9 +8,9 @@ import java.util.ArrayList;
 public class SearchPoiInfo {
     int totalCount;
     int page;
-    ArrayList<Poi> poi;
+    ArrayList<POIData> POIData;
 
-    SearchPoiInfo(ArrayList<Poi> poi) {
-        this.poi = poi;
+    SearchPoiInfo(ArrayList<POIData> POIData) {
+        this.POIData = POIData;
     }
 }

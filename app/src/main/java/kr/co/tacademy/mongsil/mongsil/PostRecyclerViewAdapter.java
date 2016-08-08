@@ -32,17 +32,22 @@ public class PostRecyclerViewAdapter
     // TODO : PostDetailActivity를 열 때 인텐트에 PostId정보를 서버로 보내서 받아와야함
     // TODO : 시간과 글 내용을 나눌 방법을 찾아야함
 
-    List<Post> items = new ArrayList<Post>();
+    List<Post> items;
     FragmentManager fm;
 
-    public boolean isFooterEnable = false;
-
-    PostRecyclerViewAdapter() { }
+    PostRecyclerViewAdapter() {
+        items = new ArrayList<Post>();
+    }
     PostRecyclerViewAdapter(FragmentManager fm) {
+        this();
         this.fm = fm;
     }
 
     public void add(ArrayList<Post> postItems) {
+        if(postItems.get(0).typeCode == 0 &&
+                items.size() != 0) {
+            postItems.remove(0);
+        }
         for(int i = 0 ; i < postItems.size() ; i++) {
             items.add(postItems.get(i));
         }
@@ -92,7 +97,7 @@ public class PostRecyclerViewAdapter
             postName.setText(post.username);
             postContent.setText(post.content);
 
-            postTime.setText(TimeData.dateCalculate(post.date));
+            postTime.setText(TimeData.timeCalculate(post.date));
             postContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -213,19 +218,11 @@ public class PostRecyclerViewAdapter
             case LAYOUT_MY_POST:
                 ((MyPostViewHolder) holder).setData(items.get(position));
                 break;
-            case LAYOUT_MORE:
-                if (isFooterEnable) {
-                    ((FootViewHolder) holder).setData();
-                }
-                break;
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == items.size() && isFooterEnable) {
-            return LAYOUT_MORE;
-        }
         Post data = items.get(position);
         switch (data.typeCode) {
             case Post.TYPE_LAYOUT_DATE :
@@ -240,15 +237,6 @@ public class PostRecyclerViewAdapter
 
     @Override
     public int getItemCount() {
-        int count = 0;
-        if (items != null) {
-            count = items.size();
-        } else {
-            return 0;
-        }
-        if (isFooterEnable) {
-            count++;
-        }
-        return count;
+        return items.size();
     }
 }

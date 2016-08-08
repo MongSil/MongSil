@@ -95,6 +95,8 @@
             android:textSize="16dp"
             android:textColor="@android:color/white"
             android:drawableLeft="@drawable/icon_nevi"
+            android:drawablePadding="5dp"
+            android:layout_marginRight="8dp"
             style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
             android:clickable="true"
             android:gravity="center"

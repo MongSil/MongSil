@@ -60,9 +60,9 @@ public class ParseDataParseHandler {
         SearchPoiInfo searchPoiInfo;
         JSONObject jsonPois = null;
 
-        // poi Array
+        // POIData Array
         JSONArray jsonArray = null;
-        ArrayList<Poi> jsonPoiList = null;
+        ArrayList<POIData> jsonPOIDataList = null;
 
         try {
             jsonObject = new JSONObject(buf.toString())
@@ -71,23 +71,23 @@ public class ParseDataParseHandler {
             jsonPois = jsonObject.getJSONObject("pois");
             jsonArray = jsonPois.getJSONArray("poi");
 
-            jsonPoiList = new ArrayList<Poi>();
+            jsonPOIDataList = new ArrayList<POIData>();
             int jsonArrSize = jsonArray.length();
             for (int i = 0; i < jsonArrSize; i++) {
-                Poi poi = new Poi();
+                POIData POIData = new POIData();
                 JSONObject jData = jsonArray.getJSONObject(i);
 
-                poi.name = jData.getString("name");
-                poi.noorLat = jData.getString("noorLat");
-                poi.noorLon = jData.getString("noorLon");
-                poi.upperAddrName = jData.getString("upperAddrName");
-                poi.middleAddrName = jData.getString("middleAddrName");
-                poi.lowerAddrName = jData.getString("lowerAddrName");
+                POIData.name = jData.getString("name");
+                POIData.noorLat = jData.getString("noorLat");
+                POIData.noorLon = jData.getString("noorLon");
+                POIData.upperAddrName = jData.getString("upperAddrName");
+                POIData.middleAddrName = jData.getString("middleAddrName");
+                POIData.lowerAddrName = jData.getString("lowerAddrName");
 
-                jsonPoiList.add(poi);
+                jsonPOIDataList.add(POIData);
             }
 
-            searchPoiInfo = new SearchPoiInfo(jsonPoiList);
+            searchPoiInfo = new SearchPoiInfo(jsonPOIDataList);
             searchPoiInfo.totalCount = jsonObject.getInt("totalCount");
             searchPoiInfo.page = jsonObject.getInt("page");
 

@@ -69,12 +69,13 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // 글 작성 프레그먼트와 슬라이딩메뉴 프레그먼트를 선언
-        // TODO: 추후 프레그먼트의 newInstance를 수정
+        // TODO : GPS가 켜져 있을 경우 - GPS 지역
+        // TODO : 안켜짐 - 가입시 선택한 지역 반환
         if ( savedInstanceState == null ) {
-            mainPostFragment = MainPostFragment.newInstance();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.main_post_fragment_container, mainPostFragment);
-            ft.commit();
+            mainPostFragment = MainPostFragment.newInstance(""); // 임시 - 전국 보여줌
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_post_fragment_container, mainPostFragment)
+                    .commit();
         }
         // 툴바 추가
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -277,10 +278,15 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
     }
 
     @Override
-    public void onSelect(Poi poi) {
-        if(poi != null) {
-            tbTitle.setText(poi.upperAddrName);
-            new AsyncWeatherJSONList().execute(poi.noorLat, poi.noorLon);
+    public void onSelect(POIData POIData) {
+        if(POIData != null) {
+            String location = POIData.upperAddrName;
+            tbTitle.setText(location);
+            new AsyncWeatherJSONList().execute(POIData.noorLat, POIData.noorLon);
+            mainPostFragment = MainPostFragment.newInstance(location);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_post_fragment_container, mainPostFragment)
+                    .commit();
         }
     }
 
@@ -305,11 +311,10 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         super.onBackPressed();
     }
 
-
     // 날씨 AsyncTask
-    public class AsyncWeatherJSONList extends AsyncTask<String, Integer, SearchPoiInfo> {
+    public class AsyncWeatherJSONList extends AsyncTask<String, Integer, WeatherData> {
         @Override
-        protected SearchPoiInfo doInBackground(String... args) {
+        protected WeatherData doInBackground(String... args) {
             try{
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
@@ -330,8 +335,8 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
                 int responseCode = response.code();
                 if (responseCode >= 400) return null;
                 if (flag) {
-                    /*return ParseDataParseHandler.getJSONWeatherList(
-                            new StringBuilder(responseBody.string()));*/
+                    return ParseDataParseHandler.getJSONWeatherList(
+                            new StringBuilder(responseBody.string()));
                 }
                 responseBody.close();
             }catch (UnknownHostException une) {
@@ -345,8 +350,9 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         }
 
         @Override
-        protected void onPostExecute(SearchPoiInfo result) {
-
+        protected void onPostExecute(WeatherData result) {
+            // TODO : animBackgroundWeather.setBackground( ~~ );
+            imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.code));
         }
     }
 }
