@@ -73,7 +73,7 @@ public class BottomDialogFragment extends DialogFragment {
 
                 return view;
             case 1 :
-                final Intent postIntent = new Intent(getActivity(), PostDetailActivity.class);
+                final Intent postIntent = new Intent(getActivity(), PostingActivity.class);
                 // TODO : 글 수정하는 인텐트 put 만들어야함
 
                 // 글 수정
@@ -91,6 +91,10 @@ public class BottomDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(View view) {
                         // TODO: 글을 삭제하시겠습니까? 요청
+                        dismiss();
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .add(MiddleDialogFragment.newInstance(0), "middle")
+                                .addToBackStack("middle").commit();
                     }
                 });
                 return view;

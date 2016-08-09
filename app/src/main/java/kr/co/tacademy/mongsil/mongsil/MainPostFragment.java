@@ -28,13 +28,9 @@ import static android.util.Log.e;
  */
 public class MainPostFragment extends Fragment {
     public static final String AREA1 = "area1";
-    public static final String SKIP = "skip";
 
     RecyclerView postRecyclerView;
-    ProgressBar footerProgress;
     PostRecyclerViewAdapter postAdapter;
-
-    Handler handler;
 
     private int loadOnResult = 0;
     private int maxLoadSize = 1;
@@ -43,20 +39,19 @@ public class MainPostFragment extends Fragment {
     }
     public static MainPostFragment newInstance(String location) {
         MainPostFragment fragment = new MainPostFragment();
-        Bundle b = new Bundle();
-        b.putString(AREA1, location);
-        fragment.setArguments(b);
+        Bundle bundle;
+        bundle = new Bundle();
+        bundle.putString(AREA1, location);
+        fragment.setArguments(bundle);
         return fragment;
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_post, container, false);
-        final Bundle initBundle = getArguments();
         postRecyclerView =
-                (RecyclerView) view.findViewById(R.id.post_recycler);
-        footerProgress = (ProgressBar) view.findViewById(R.id.footer_progress);
+                (RecyclerView) inflater.inflate(R.layout.fragment_post, container, false);
+
         postAdapter = new PostRecyclerViewAdapter();
         final LinearLayoutManager layoutManager =
                 new LinearLayoutManager(MongSilApplication.getMongSilContext());
@@ -66,54 +61,43 @@ public class MainPostFragment extends Fragment {
             @Override
             public void onLoadMore(int current_page) {
                 if(maxLoadSize != loadOnResult) {
-                    LoadMore(initBundle.getString(AREA1));
+                    LoadMore();
                 } else {
                     this.setLoadingState(false);
                 }
             }
         });
 
-        return view;
+        return postRecyclerView;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        new AsyncPostJSONList().execute("", "");
+        Bundle bundle = getArguments();
+        new AsyncPostJSONList().execute(bundle.getString(AREA1), "");
+        postAdapter.items.clear();
+        postAdapter.notifyDataSetChanged();
     }
 
-    private void LoadMore(final String location) {
-        handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                new AsyncPostJSONList().execute(location, String.valueOf(loadOnResult));
-                // 지역 바뀔때마다 바뀌어야함
-            }
-        }, 2000);
+    private void LoadMore() {
+        Bundle bundle = getArguments();
+        new AsyncPostJSONList().execute(bundle.getString(AREA1), String.valueOf(loadOnResult));
     }
 
 
     // 글목록 가져오기
     public class AsyncPostJSONList extends AsyncTask<String, Integer, PostData> {
-
-        ProgressDialog dialog;
-
         @Override
         protected PostData doInBackground(String... args) {
             try{
-                //OKHttp3사용
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
                         .build();
-
-                // TODO : 밑으로 내려올 때마다(로딩) skip을 통해 받아와야함(한페이지 10개)
-
                 // TODO : 다른사람 프로필 사진을 클릭하면 프로필이 뜨게 만들어야함
                 // TODO : 다른사람 프로필에서 리사이클러뷰는 그 사람 정보의 리스트
 
-                // TODO : 지역마다 바뀌는걸로 바꿔야함
                 Request request = new Request.Builder()
                         .url(String.format(
                                 NetworkDefineConstant.SERVER_POST,
@@ -122,7 +106,7 @@ public class MainPostFragment extends Fragment {
                 Response response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 boolean flag = response.isSuccessful();
-                //응답 코드 200등등
+
                 int responseCode = response.code();
                 if (responseCode >= 400) return null;
                 if (flag) {
@@ -141,16 +125,7 @@ public class MainPostFragment extends Fragment {
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // TODO : NullPointer가 떴었음.
-            dialog = ProgressDialog.show(getContext(),
-                    "","잠시만 기다려 주세요 ...", true);
-        }
-
-        @Override
         protected void onPostExecute(PostData result) {
-            dialog.dismiss();
 
             // TODO : 리사이클러뷰에 새로 추가를 하는 로직이 필요함
             if(result != null && result.post.size() > 0){
@@ -158,6 +133,7 @@ public class MainPostFragment extends Fragment {
                 loadOnResult += maxResultSize;
                 maxLoadSize = result.totalCount;
 
+                // Result의 Date와 오늘 날짜를 비교하는 로직
                 String compare = result.post.get(maxResultSize - 1).date.split(" ")[0];
                 for (int i = maxResultSize - 1 ; i >= 0 ; i--) {
                     String toCompare = result.post.get(i).date.split(" ")[0];
@@ -169,6 +145,7 @@ public class MainPostFragment extends Fragment {
                         result.post.add(0, new Post(0, result.post.get(0).date));
                     }
                 }
+
                 postAdapter.add(result.post);
                 postRecyclerView.setAdapter(postAdapter);
             }

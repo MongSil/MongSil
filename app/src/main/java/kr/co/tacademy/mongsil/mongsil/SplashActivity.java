@@ -4,13 +4,19 @@ import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Handler;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import java.io.UnsupportedEncodingException;
+import java.util.UUID;
+
 public class SplashActivity extends BaseActivity {
+    private final static String CACHE_DEVICE_ID = "CacheDeviceID";
 
     LinearLayout splashContainer;
     ImageView imgSplashHere, imgSplashTitle;
@@ -76,6 +82,9 @@ public class SplashActivity extends BaseActivity {
             // TODO: if - UUID가 서버에 존재하는지 여부 검사
             // TODO: UUID가 서버에 존재하면 바로 메인으로
             // TODO: UUID가 서버에 없다면 텍스트를 띄움(테스트는 텍스트를 띄움)
+            /*if (!getDevicesUUID().equals("")) {
+                String userId = PropertyManager.getInstance().getUserId();
+            }*/
             splashContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -89,6 +98,38 @@ public class SplashActivity extends BaseActivity {
                 Log.e("Server Connection Error", "서버에 접속할 수 없습니다.");
             }*/
         }
-
     }
+    /*private String getDevicesUUID(){
+        UUID deviceUUID = null;
+        String deviceId = PropertyManager.getInstance().getDeviceId();
+        if (deviceId != null || deviceId==null) {
+            deviceUUID = UUID.fromString(deviceId);
+        } else {
+            final String androidUniqueID = Settings.Secure.getString(
+                    getContentResolver(), Settings.Secure.ANDROID_ID);
+            try {
+                if (androidUniqueID.equals("")) {
+                    deviceUUID = UUID.nameUUIDFromBytes(androidUniqueID.getBytes("utf8"));
+                } else {
+                    final String anotherUniqueID
+                            = ((TelephonyManager) getSystemService(
+                            TELEPHONY_SERVICE)).getDeviceId();
+                    if (anotherUniqueID != null) {
+                        deviceUUID = UUID.nameUUIDFromBytes(
+                                anotherUniqueID.getBytes("utf8"));
+                    } else {
+                        deviceUUID = UUID.randomUUID();
+                    }
+                }
+            } catch (UnsupportedEncodingException uee) {
+                uee.printStackTrace();
+            }
+        }
+        if(deviceUUID != null) {
+            PropertyManager.getInstance().setDeviceId(deviceUUID.toString());
+            return deviceUUID.toString();
+        }
+        return "error";
+    }*/
+
 }

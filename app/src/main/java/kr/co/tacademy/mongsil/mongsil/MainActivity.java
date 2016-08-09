@@ -60,11 +60,6 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
     FloatingActionButton btnCapturePost;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -197,9 +192,9 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
                     new MenuViewPagerAdapter(getSupportFragmentManager());
             String[] tabTitle = MongSilApplication.getMongSilContext()
                     .getResources().getStringArray(R.array.menu_tab_title);
-            // 자신의 USERID를 newInstance(0, "여기")에 넣는다 테스트로 24이라 가정
-            adapter.appendFragment(ProfileMenuTabFragment.newInstance(0, 24), tabTitle[0]);
-            adapter.appendFragment(ProfileMenuTabFragment.newInstance(1, 24), tabTitle[1]);
+            // 자신의 USERID를 newInstance(0, "여기")에 넣는다 테스트로 7이라 가정
+            adapter.appendFragment(ProfileMenuTabFragment.newInstance(0, "7"), tabTitle[0]);
+            adapter.appendFragment(ProfileMenuTabFragment.newInstance(1, "7"), tabTitle[1]);
             viewPager.setAdapter(adapter);
         }
 
@@ -277,6 +272,7 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         }
     }
 
+    // 날씨를 검색해서 지역 정보를 받아옴
     @Override
     public void onSelect(POIData POIData) {
         if(POIData != null) {
@@ -351,8 +347,8 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
 
         @Override
         protected void onPostExecute(WeatherData result) {
-            // TODO : animBackgroundWeather.setBackground( ~~ );
-            imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.code));
+            imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.code, 0));
+            // TODO : animBackgroundWeather.setBackground(WeatherData.imgFromWeatherCode(result.code, 1));
         }
     }
 }

@@ -24,6 +24,10 @@ public class AppTutorialActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_tutorial);
 
+        if(savedInstanceState != null) {
+            pager.setBackgroundAsset(R.drawable.tutorial_background);
+        }
+
         pager = (ViewPagerParallax) findViewById(R.id.viewpager_tutorial);
         pager.set_max_pages(MAX_PAGES);
         pager.setBackgroundAsset(R.drawable.tutorial_background);

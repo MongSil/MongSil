@@ -14,6 +14,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +70,10 @@ public class PostRecyclerViewAdapter
         public void setData(Post post) {
             // TODO: 서버에서 전송한 '날짜'데이터 삽입, 오늘이면 Today, 어제면 어제..
             postDate.setText(TimeData.dateCalculate(post.date));
+            if(post.typeCode == 2) {
+                postDate.setTextColor(0xEBEBEB);
+                postDate.setPadding(0, 9, 0, 0);
+            }
             // TODO: 프로필이랑 글목록 크기 다르게하기( 프로필은 위에 14dp)
         }
     }
@@ -102,7 +108,7 @@ public class PostRecyclerViewAdapter
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
-                    intent.putExtra("post_data", post);
+                    intent.putExtra("postid", String.valueOf(post.postId));
                     view.getContext().startActivity(intent);
                 }
             });
@@ -131,24 +137,21 @@ public class PostRecyclerViewAdapter
 
         public void setData(final Post post) {
             // TODO : 서버에서 내 작성글 목록 삽입
-            /*
-            imgMyPostBackGround.setImageResource( -- 백그라운드 이미지 post.back ~ -- );
-            if(data.imgBackGround != null) {
-
-                littleBlackBackGround.setVisibility(View.VISIBLE);
+            if(!post.bgImg.isEmpty()) {
+                Glide.with(MongSilApplication.getMongSilContext()
+                                ).load(post.bgImg).into(imgMyPostBackGround);
                 myPostContent.setTextColor(
                         MongSilApplication.getMongSilContext().
                                 getResources().getColor(android.R.color.white));
                 myPostInfo.setTextColor(
                         MongSilApplication.getMongSilContext().
                                 getResources().getColor(android.R.color.white));
-            }*/
+            }
             myPostContent.setText(post.content);
             String[] date = post.date.split(" ");
             myPostInfo.setText(
-                    // 0에 댓글 카운트가 들어감
                     String.valueOf(TimeData.PostTime(date[1])
-                            + " - 댓글 " + 0));
+                            + " - 댓글 " + post.replyCount));
             imgThreeDot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -161,7 +164,7 @@ public class PostRecyclerViewAdapter
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
-                    intent.putExtra("post_data", post);
+                    intent.putExtra("postid", String.valueOf(post.postId));
                     view.getContext().startActivity(intent);
                 }
             });

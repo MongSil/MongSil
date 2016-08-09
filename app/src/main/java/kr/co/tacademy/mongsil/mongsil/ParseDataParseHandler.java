@@ -31,13 +31,17 @@ public class ParseDataParseHandler {
                 JSONObject jData = jsonArray.getJSONObject(i);
 
                 post.postId = jData.getInt("postId");
-                post.content = jData.getString("content");
                 post.userId = jData.getInt("userId");
                 post.username = jData.getString("username");
                 post.profileImg = jData.getString("profileImg");
-                post.date = jData.getString("date");
+                post.content = jData.getString("content");
+                post.bgImg = jData.getString("bgImg");
+                post.weatherCode = jData.getInt("weatherCode");
+                post.iconCode = jData.getInt("iconCode");
                 post.area1 = jData.getString("area1");
                 post.area2 = jData.getString("area2");
+                post.date = jData.getString("date");
+                post.replyCount = jData.getInt("replyCount");
 
                 jsonPostList.add(post);
             }
@@ -51,6 +55,77 @@ public class ParseDataParseHandler {
         }
         return null;
     }
+
+    public static Post getJSONPostDetailRequestList(
+            StringBuilder buf) {
+
+        // data
+        JSONObject jsonObject = null;
+        JSONObject jsonData = null;
+
+        try {
+            jsonObject = new JSONObject(buf.toString());
+            jsonData = jsonObject.getJSONObject("data");
+                Post post = new Post();
+
+                post.postId = jsonData.getInt("postId");
+                post.userId = jsonData.getInt("userId");
+                post.username = jsonData.getString("username");
+                post.content = jsonData.getString("content");
+                post.bgImg = jsonData.getString("bgImg");
+                post.weatherCode = jsonData.getInt("weatherCode");
+                post.iconCode = jsonData.getInt("iconCode");
+                post.area1 = jsonData.getString("area1");
+                post.area2 = jsonData.getString("area2");
+                post.date = jsonData.getString("date");
+                post.replyCount = jsonData.getInt("replyCount");
+
+            return post;
+        } catch (JSONException je) {
+            Log.e("GET:PostRequestAllList", "JSON파싱 중 에러발생", je);
+        }
+        return null;
+    }
+
+    public static ArrayList<ReplyData> getJSONUsersReplyRequestList(
+            StringBuilder buf) {
+
+        // data
+        JSONObject jsonObject = null;
+        JSONArray jsonUsersReply = null;
+        ArrayList<ReplyData> jsonReplyList;
+
+        try {
+            jsonObject = new JSONObject(buf.toString());
+            jsonUsersReply = jsonObject.getJSONArray("usersReply");
+
+            jsonReplyList = new ArrayList<ReplyData>();
+            int jsonArrSize = jsonUsersReply.length();
+            for(int i = 0 ; i < jsonArrSize ; i++) {
+                ReplyData replyData = new ReplyData();
+                JSONObject jData = jsonUsersReply.getJSONObject(i);
+                if(i == 0) {
+                    replyData.totalCount = jData.getInt("totalCount");
+                }
+
+                replyData.replyId = jData.getInt("replyId");
+                replyData.userId = jData.getInt("userId");
+                replyData.username = jData.getString("username");
+                replyData.profileImg = jData.getString("profileImg");
+                replyData.content = jData.getString("content");
+                replyData.date = jData.getString("date");
+                replyData.postId = jData.getInt("postId");
+                replyData.postContent = jData.getString("postContent");
+
+                jsonReplyList.add(replyData);
+            }
+            return jsonReplyList;
+        } catch (JSONException je) {
+            Log.e("GET:PostRequestAllList", "JSON파싱 중 에러발생", je);
+        }
+        return null;
+    }
+
     public static SearchPoiInfo getJSONPoiList(StringBuilder buf) {
 
         // 전체
@@ -125,4 +200,5 @@ public class ParseDataParseHandler {
         }
         return null;
     }
+
 }

@@ -7,11 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class PostingActivity extends BaseActivity {
+public class PostingActivity extends BaseActivity implements SearchPoiDialogFragment.OnSelectListener {
 
     // 툴바 필드
     TextView location, save;
@@ -40,6 +41,14 @@ public class PostingActivity extends BaseActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
         location = (TextView) findViewById(R.id.text_posting_location);
+        location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(new SearchPoiDialogFragment(), "search")
+                        .addToBackStack("search").commit();
+            }
+        });
         save = (TextView) findViewById(R.id.text_save);
 
         // 날씨 선택
@@ -55,6 +64,11 @@ public class PostingActivity extends BaseActivity {
 
         // 카메라
         imgCamera = (ImageView) findViewById(R.id.img_posting_camera);
+    }
+
+    @Override
+    public void onSelect(POIData POIData) {
+        location.setText(POIData.name);
     }
 
     @Override

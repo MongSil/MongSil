@@ -1,14 +1,16 @@
 package kr.co.tacademy.mongsil.mongsil;
 
-import org.json.JSONObject;
-
 /**
  * Created by ccei on 2016-08-01.
  */
 public class ReplyData {
+    int    totalCount;
     int    replyId;
-    int    postId;
     int    userId;
+    String username;
+    String profileImg;
     String content;
     String date;
+    int    postId;
+    String postContent;
 }
