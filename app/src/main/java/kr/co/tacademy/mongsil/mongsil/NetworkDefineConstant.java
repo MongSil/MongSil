@@ -10,13 +10,13 @@ public class NetworkDefineConstant {
     public static final String SERVER_POST
             = "http://" + HOST_URL + PORT_NUMBER + "/post?area1=%s&skip=%s";
     public static final String SERVER_POST_DETAIL
-            = "http://" + HOST_URL + PORT_NUMBER + "/post/%s";
-    public static final String SERVER_POST_REPLY
-            = "http://" + HOST_URL + PORT_NUMBER + "/post/%s/reply";
+            = "http://" + HOST_URL + PORT_NUMBER + "/post/" + "%s";
+    public static final String SERVER_POST_DETAIL_REPLY
+            = "http://" + HOST_URL + PORT_NUMBER + "/post/" +"%s" + "/reply";
     public static final String SERVER_USER_POST
             = "http://" + HOST_URL + PORT_NUMBER + "/post?userId=%s&skip=%s";
     public static final String SERVER_USER_REPLY
-            = "http://" + HOST_URL + PORT_NUMBER + "/users/%s/reply?skip=%s";
+            = "http://" + HOST_URL + PORT_NUMBER + "/users/" + "%s" + "/reply?skip=%s";
     public static final String SERVER_USER
             = "http://" + HOST_URL + PORT_NUMBER + "/user/%d";
     public static final String SK_POI_SEARCH

@@ -28,7 +28,7 @@ public class ProfileMenuTabFragment extends Fragment {
     public static final String TABINFO = "tabinfo";
     public static final String USERID = "userid";
 
-    RecyclerView userPostRecycler;
+    RecyclerView userRecycler;
     PostRecyclerViewAdapter postAdapter;
     ReplyRecyclerViewAdapter replyAdapter;
 
@@ -55,14 +55,14 @@ public class ProfileMenuTabFragment extends Fragment {
         final LinearLayoutManager layoutManager = new LinearLayoutManager(
                 MongSilApplication.getMongSilContext());
 
-        userPostRecycler = (RecyclerView) view.findViewById(R.id.post_recycler);
-        userPostRecycler.setLayoutManager(layoutManager);
-        userPostRecycler.setPadding(16, 0, 16, 0);
-        postAdapter = new PostRecyclerViewAdapter(getActivity().getSupportFragmentManager());
+        userRecycler = (RecyclerView) view.findViewById(R.id.post_recycler);
+        userRecycler.setLayoutManager(layoutManager);
 
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
-            userPostRecycler.setOnScrollListener(
+            postAdapter = new PostRecyclerViewAdapter(
+                    getActivity().getSupportFragmentManager());
+            userRecycler.setOnScrollListener(
                     new EndlessRecyclerOnScrollListener(layoutManager) {
                         @Override
                         public void onLoadMore(int current_page) {
@@ -73,11 +73,11 @@ public class ProfileMenuTabFragment extends Fragment {
                             }
                         }
                     });
-            init(userId);
+            initPost(userId);
         } else {
             // 내가 쓴 댓글 탭
-
-            userPostRecycler.setOnScrollListener(
+            replyAdapter = new ReplyRecyclerViewAdapter();
+            userRecycler.setOnScrollListener(
                     new EndlessRecyclerOnScrollListener(layoutManager) {
                         @Override
                         public void onLoadMore(int current_page) {
@@ -88,7 +88,7 @@ public class ProfileMenuTabFragment extends Fragment {
                             }
                         }
                     });
-            init(userId);
+            initReply(userId);
         }
 
         return view;
@@ -101,8 +101,11 @@ public class ProfileMenuTabFragment extends Fragment {
         new AsyncUserReplyJSONList().execute(userId, String.valueOf(loadOnResult));
     }
 
-    private void init(String userId) {
+    private void initPost(String userId) {
         new AsyncUserPostJSONList().execute(userId, "");
+    }
+
+    private void initReply(String userId) {
         new AsyncUserReplyJSONList().execute(userId, "");
     }
 
@@ -164,7 +167,7 @@ public class ProfileMenuTabFragment extends Fragment {
                     }
                 }
                 postAdapter.add(result.post);
-                userPostRecycler.setAdapter(postAdapter);
+                userRecycler.setAdapter(postAdapter);
             }
         }
     }
@@ -189,6 +192,7 @@ public class ProfileMenuTabFragment extends Fragment {
                 Response response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 boolean flag = response.isSuccessful();
+
                 int responseCode = response.code();
                 if (responseCode >= 400) return null;
                 if (flag) {
@@ -214,7 +218,7 @@ public class ProfileMenuTabFragment extends Fragment {
                 maxLoadSize = result.get(0).totalCount;
 
                 replyAdapter.add(result);
-                userPostRecycler.setAdapter(replyAdapter);
+                userRecycler.setAdapter(replyAdapter);
             }
         }
     }

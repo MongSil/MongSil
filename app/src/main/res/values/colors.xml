@@ -17,7 +17,7 @@
     <color name="menu_background">#42515c</color>
     <color name="dark_transparent_background">#99000000</color>
     <color name="post_background">#33000000</color>
-    <color name="comment_gray">#bbbbbb</color>
+    <color name="reply_gray">#bbbbbb</color>
     <color name="selected_blue">#7700ddff</color>
     <drawable name="translucent_background">#e0000000</drawable>
     <drawable name="transparent_background">#00000000</drawable>

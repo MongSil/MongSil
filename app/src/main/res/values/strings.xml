@@ -56,7 +56,7 @@
     <string name="time">AM 07:00</string>
     <string name="comment_count">23</string>
     <string name="share">공유하기</string>
-    <string name="none_coment">첫 댓글을 남겨주세요.</string>
+    <string name="none_reply">첫 댓글을 남겨주세요.</string>
     <string name="comment">몽실몽실한 한마디를 남겨보세요.</string>
     <string name="comment_send">보내기</string>
     <string name="comment_content">댓글ㅇㅇㅇㅇㅇㅇ</string>

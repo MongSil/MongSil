@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,8 +30,13 @@ public class SignUpActivity extends BaseActivity
         editName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 underlineName.setBackgroundColor(getResources().getColor(R.color.gray));
+                if(!editName.isFocused()) {
+                    underlineName.setBackgroundColor(getResources().getColor(R.color.light_gray));
+                    InputMethodManager imm = (InputMethodManager)
+                            getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
             }
         });
 
@@ -43,6 +49,9 @@ public class SignUpActivity extends BaseActivity
                 getSupportFragmentManager().beginTransaction()
                         .add(new SignupSelectLocationDialogFragment(), "selectlocation")
                         .addToBackStack("selectlocation").commit();
+                if(!editName.isFocused()) {
+                    underlineName.setBackgroundColor(getResources().getColor(R.color.light_gray));
+                }
             }
         });
 

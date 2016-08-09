@@ -22,84 +22,77 @@
         android:paddingBottom="9dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/img_splash_title"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="120dp" />
     <ImageView
         android:id="@+id/img_splash_title"
         android:src="@drawable/splash_title_mongsil"
-        android:layout_marginBottom="130dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/signup_name_container"
-        android:layout_alignLeft="@+id/img_splash_title_text"
-        android:layout_alignStart="@+id/img_splash_title_text" />
+        android:layout_below="@+id/img_splash_title_text"
+        android:layout_centerHorizontal="true" />
 
-    <FrameLayout
-        android:id="@+id/signup_name_container"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
+    <EditText
+        android:id="@+id/edit_name"
+        android:textSize="15sp"
+        android:hint="@string/name"
+        android:textColorHint="@android:color/white"
+        android:textColor="@android:color/white"
+        android:paddingLeft="20dp"
+        android:paddingBottom="8dp"
+        android:layout_gravity="bottom"
+        android:background="@null"
+        android:imeOptions="actionNext"
+        android:inputType="text"
+        android:singleLine="true"
+        android:maxLength="8"
         android:layout_marginLeft="115dp"
         android:layout_marginRight="115dp"
-        android:layout_marginBottom="50dp"
-        android:layout_centerInParent="true"
         android:layout_width="match_parent"
-        android:layout_height="36dp">
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true" />
 
-        <EditText
-            android:id="@+id/edit_name"
-            android:textSize="15sp"
-            android:hint="@string/name"
-            android:textColorHint="@android:color/white"
-            android:textColor="@android:color/white"
-            android:paddingLeft="20dp"
-            android:paddingBottom="8dp"
-            android:layout_gravity="bottom"
-            android:background="@null"
-            android:imeOptions="actionNext"
-            android:inputType="text"
-            android:singleLine="true"
-            android:maxLength="8"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <View
-            android:id="@+id/underline_name"
-            android:background="@color/light_gray"
-            android:layout_gravity="bottom"
-            android:layout_width="match_parent"
-            android:layout_height="1dp" />
-    </FrameLayout>
-
-    <FrameLayout
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:layout_below="@+id/signup_name_container"
-        android:layout_alignLeft="@+id/signup_name_container"
-        android:layout_alignStart="@+id/signup_name_container"
-        android:layout_alignRight="@+id/signup_name_container"
-        android:layout_alignEnd="@+id/signup_name_container"
+    <View
+        android:id="@+id/underline_name"
+        android:background="@color/light_gray"
+        android:layout_gravity="bottom"
         android:layout_width="match_parent"
-        android:layout_height="36dp">
+        android:layout_height="1dp"
+        android:layout_alignLeft="@+id/img_signup_done"
+        android:layout_alignStart="@+id/img_signup_done"
+        android:layout_below="@+id/edit_name"
+        android:layout_alignRight="@+id/img_signup_done"
+        android:layout_alignEnd="@+id/img_signup_done" />
+    <TextView
+        android:id="@+id/text_location"
+        android:text="@string/location"
+        android:textSize="15sp"
+        android:textColorHint="@android:color/white"
+        android:textColor="@android:color/white"
+        android:paddingLeft="20dp"
+        android:paddingBottom="8dp"
+        android:layout_marginTop="51dp"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_name"
+        android:layout_alignLeft="@+id/underline_name"
+        android:layout_alignStart="@+id/underline_name"
+        android:layout_alignRight="@+id/underline_name"
+        android:layout_alignEnd="@+id/underline_name" />
 
-        <TextView
-            android:id="@+id/text_location"
-            android:text="@string/location"
-            android:textSize="15sp"
-            android:textColorHint="@android:color/white"
-            android:textColor="@android:color/white"
-            android:paddingLeft="20dp"
-            android:paddingBottom="8dp"
-            android:layout_gravity="bottom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <View
-            android:id="@+id/underline_location"
-            android:background="@color/light_gray"
-            android:layout_gravity="bottom"
-            android:layout_width="match_parent"
-            android:layout_height="1dp" />
-    </FrameLayout>
+    <View
+        android:id="@+id/underline_location"
+        android:background="@color/light_gray"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignRight="@+id/edit_name"
+        android:layout_alignEnd="@+id/edit_name"
+        android:layout_below="@+id/text_location"
+        android:layout_alignLeft="@+id/edit_name"
+        android:layout_alignStart="@+id/edit_name" />
 
     <ImageView
         android:id="@+id/img_signup_done"

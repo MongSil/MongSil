@@ -2,7 +2,7 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cardview_my_comment_item"
+    android:id="@+id/cardview_reply_item"
     android:layout_marginTop="8dp"
     android:layout_marginBottom="1dp"
     android:layout_width="match_parent"

@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -82,6 +83,7 @@ public class PostRecyclerViewAdapter
     public class PostViewHolder extends RecyclerView.ViewHolder {
         final View view;
         CircleImageView imgPostProfile;
+        ImageView imgPostProfileIcon;
         final TextView postName, postContent, postTime;
         final RelativeLayout postContainer;
         final Button btnNext;
@@ -90,6 +92,7 @@ public class PostRecyclerViewAdapter
             super(view);
             this.view = view;
             imgPostProfile = (CircleImageView) view.findViewById(R.id.img_post_profile);
+            imgPostProfileIcon = (ImageView) view.findViewById(R.id.img_post_profile_icon);
             postName = (TextView) view.findViewById(R.id.text_post_name);
             postContainer = (RelativeLayout) view.findViewById(R.id.post_content_container);
             postContent = (TextView) view.findViewById(R.id.text_post_content);
@@ -99,7 +102,14 @@ public class PostRecyclerViewAdapter
 
         public void setData(final Post post) {
             // TODO: 서버에서 전송한 게시글 목록 삽입
-            //imgPostProfile.setImageResource(post.);
+            if(!post.profileImg.equals("null")) {
+                Glide.with(MongSilApplication.getMongSilContext())
+                        .load(post.profileImg).into(imgPostProfile);
+                imgPostProfileIcon.setVisibility(View.GONE);
+            } else {
+                imgPostProfile.setImageResource(R.color.little_dark_gray);
+                imgPostProfileIcon.setVisibility(View.VISIBLE);
+            }
             postName.setText(post.username);
             postContent.setText(post.content);
 
@@ -136,8 +146,7 @@ public class PostRecyclerViewAdapter
         }
 
         public void setData(final Post post) {
-            // TODO : 서버에서 내 작성글 목록 삽입
-            if(!post.bgImg.isEmpty()) {
+            if(!post.bgImg.equals("null")) {
                 Glide.with(MongSilApplication.getMongSilContext()
                                 ).load(post.bgImg).into(imgMyPostBackGround);
                 myPostContent.setTextColor(

@@ -105,7 +105,7 @@ public class ParseDataParseHandler {
                 ReplyData replyData = new ReplyData();
                 JSONObject jData = jsonUsersReply.getJSONObject(i);
                 if(i == 0) {
-                    replyData.totalCount = jData.getInt("totalCount");
+                    replyData.totalCount = jsonObject.getInt("totalCount");
                 }
 
                 replyData.replyId = jData.getInt("replyId");
@@ -121,7 +121,45 @@ public class ParseDataParseHandler {
             }
             return jsonReplyList;
         } catch (JSONException je) {
-            Log.e("GET:PostRequestAllList", "JSON파싱 중 에러발생", je);
+            Log.e("GET:UsersReplyRequest", "JSON파싱 중 에러발생", je);
+        }
+        return null;
+    }
+
+    public static ArrayList<ReplyData> getJSONReplyRequestList(
+            StringBuilder buf) {
+
+        // data
+        JSONObject jsonObject = null;
+        JSONArray jsonUsersReply = null;
+        ArrayList<ReplyData> jsonReplyList;
+
+        try {
+            jsonObject = new JSONObject(buf.toString());
+            jsonUsersReply = jsonObject.getJSONArray("reply");
+
+            jsonReplyList = new ArrayList<ReplyData>();
+            int jsonArrSize = jsonUsersReply.length();
+            for(int i = 0 ; i < jsonArrSize ; i++) {
+                ReplyData replyData = new ReplyData();
+                JSONObject jData = jsonUsersReply.getJSONObject(i);
+                if(i == 0) {
+                    replyData.totalCount = jsonObject.getInt("totalCount");
+                }
+
+                replyData.replyId = jData.getInt("replyId");
+                replyData.userId = jData.getInt("userId");
+                replyData.username = jData.getString("username");
+                replyData.profileImg = jData.getString("profileImg");
+                replyData.content = jData.getString("content");
+                replyData.date = jData.getString("date");
+                replyData.postId = jData.getInt("postId");
+
+                jsonReplyList.add(replyData);
+            }
+            return jsonReplyList;
+        } catch (JSONException je) {
+            Log.e("GET:ReplyRequestList", "JSON파싱 중 에러발생", je);
         }
         return null;
     }

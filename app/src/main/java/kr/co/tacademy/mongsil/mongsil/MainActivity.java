@@ -192,9 +192,9 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
                     new MenuViewPagerAdapter(getSupportFragmentManager());
             String[] tabTitle = MongSilApplication.getMongSilContext()
                     .getResources().getStringArray(R.array.menu_tab_title);
-            // 자신의 USERID를 newInstance(0, "여기")에 넣는다 테스트로 7이라 가정
-            adapter.appendFragment(ProfileMenuTabFragment.newInstance(0, "7"), tabTitle[0]);
-            adapter.appendFragment(ProfileMenuTabFragment.newInstance(1, "7"), tabTitle[1]);
+            // 자신의 USERID를 newInstance(0, "여기")에 넣는다 테스트로 8이라 가정
+            adapter.appendFragment(ProfileMenuTabFragment.newInstance(0, "8"), tabTitle[0]);
+            adapter.appendFragment(ProfileMenuTabFragment.newInstance(1, "8"), tabTitle[1]);
             viewPager.setAdapter(adapter);
         }
 
