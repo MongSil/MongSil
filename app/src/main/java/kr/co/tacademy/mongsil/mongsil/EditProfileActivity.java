@@ -93,7 +93,7 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // TODO : 계정을 삭제하시겠습니까?~~ 다이어로그 떠야함
                 getSupportFragmentManager().beginTransaction()
-                        .add(BottomDialogFragment.newInstance(0), "bottom")
+                        .add(MiddleDialogFragment.newInstance(0), "bottom")
                         .addToBackStack("bottom").commit();
             }
         });

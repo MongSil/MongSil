@@ -80,4 +80,15 @@
     <string name="alarm_content"><b>끼미니</b>님이 게시물에 댓글을 달았습니다</string>
     <string name="alarm_time">오전 12:50</string>
     <string name="map">현재날씨</string>
+    <string name="incheon">인천</string>
+    <string name="seoul">서울</string>
+    <string name="gangwon">강원</string>
+    <string name="chungchong">충청</string>
+    <string name="daejeon">대전</string>
+    <string name="daegu">대구</string>
+    <string name="gwangju">광주</string>
+    <string name="junra">전라</string>
+    <string name="ulsan">울산</string>
+    <string name="busan">부산</string>
+    <string name="jeju">제주</string>
 </resources>

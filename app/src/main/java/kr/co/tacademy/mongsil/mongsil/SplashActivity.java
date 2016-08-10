@@ -11,7 +11,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
@@ -71,8 +70,14 @@ public class SplashActivity extends BaseActivity {
         imgSplashShadow.startAnimation(shadowAnimation);
 
         handler = new Handler();
-        handler.postDelayed(new ConnectThread(), 4500);
+        handler.postDelayed(new ConnectThread(), 1000); //4500
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
     private class ConnectThread extends Thread {
         //private boolean threadFlag;
 
@@ -99,6 +104,7 @@ public class SplashActivity extends BaseActivity {
             }*/
         }
     }
+
     /*private String getDevicesUUID(){
         UUID deviceUUID = null;
         String deviceId = PropertyManager.getInstance().getDeviceId();

@@ -32,8 +32,6 @@ public class PostRecyclerViewAdapter
     private static final int LAYOUT_POST = 2000;
     private static final int LAYOUT_MY_POST = 3000;
     private static final int LAYOUT_MORE = 9999;
-    // TODO : PostDetailActivity를 열 때 인텐트에 PostId정보를 서버로 보내서 받아와야함
-    // TODO : 시간과 글 내용을 나눌 방법을 찾아야함
 
     List<Post> items;
     FragmentManager fm;
@@ -69,13 +67,10 @@ public class PostRecyclerViewAdapter
         }
 
         public void setData(Post post) {
-            // TODO: 서버에서 전송한 '날짜'데이터 삽입, 오늘이면 Today, 어제면 어제..
             postDate.setText(TimeData.dateCalculate(post.date));
             if(post.typeCode == 2) {
                 postDate.setTextColor(0xEBEBEB);
-                postDate.setPadding(0, 9, 0, 0);
             }
-            // TODO: 프로필이랑 글목록 크기 다르게하기( 프로필은 위에 14dp)
         }
     }
 
@@ -101,7 +96,6 @@ public class PostRecyclerViewAdapter
         }
 
         public void setData(final Post post) {
-            // TODO: 서버에서 전송한 게시글 목록 삽입
             if(!post.profileImg.equals("null")) {
                 Glide.with(MongSilApplication.getMongSilContext())
                         .load(post.profileImg).into(imgPostProfile);

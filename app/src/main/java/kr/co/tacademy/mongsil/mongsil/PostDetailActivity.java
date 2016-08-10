@@ -11,6 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,13 +36,20 @@ import static android.util.Log.e;
 
 public class PostDetailActivity extends BaseActivity {
     private static final String POST_ID= "postid";
+    // 툴바 필드
+    Toolbar toolbar;
+    TextView tbTitle;
 
+    // 글 필드
     ImageView imgBackground, imgThreeDot, imgWeatherIcon;
     TextView postContent, postLocation, postTime, postName, postReplyCount;
-
     Post post;
-    // 댓글
-    RelativeLayout commentBottomSheet;
+
+    RelativeLayout replyEditContainer;
+    boolean isReplyContainer;
+
+    // 댓글 필드
+    LinearLayout commentBottomSheet;
     BottomSheetBehavior commentBehavior;
     RecyclerView replyRecycler;
     ReplyRecyclerViewAdapter replyAdapter;
@@ -56,9 +65,14 @@ public class PostDetailActivity extends BaseActivity {
         Intent intent = getIntent();
         String postId = intent.getStringExtra(POST_ID);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //toolbar.setContentInsetsRelative(0, 16);
+        tbTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+
         imgBackground = (ImageView) findViewById(R.id.img_post_detail_background);
         imgThreeDot = (ImageView) findViewById(R.id.img_threeDot);
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
+
         postContent = (TextView) findViewById(R.id.text_post_content);
         postLocation = (TextView) findViewById(R.id.text_post_location);
         postTime = (TextView) findViewById(R.id.text_post_time);
@@ -70,10 +84,14 @@ public class PostDetailActivity extends BaseActivity {
         replyRecycler = (RecyclerView) findViewById(R.id.reply_recycler);
         imgNoneReply = (ImageView) findViewById(R.id.img_none_reply_icon);
         noneReply = (TextView) findViewById(R.id.text_none_reply);
+
+        replyEditContainer = (RelativeLayout) findViewById(R.id.reply_edit_container);
+        replyEditContainer.setVisibility(View.GONE);
         commentBottomSheet =
-                (RelativeLayout) findViewById(R.id.comment_bottom_sheet);
-        commentBehavior = BottomSheetBehavior.from(commentBottomSheet);
-        commentBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                (LinearLayout) findViewById(R.id.comment_bottom_sheet);
+        commentBottomSheet.setVisibility(View.GONE);
+        //commentBehavior = BottomSheetBehavior.from(commentBottomSheet);
+        //commentBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         new AsyncPostDetailReplyJSONList().execute(postId);
         new AsyncPostDetailJSONList().execute(postId);
@@ -81,7 +99,6 @@ public class PostDetailActivity extends BaseActivity {
 
     private void init() {
         // 툴바
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -89,6 +106,7 @@ public class PostDetailActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
         }
+        tbTitle.setText(String.valueOf(post.area1 + ", " + post.area2));
 
         // background 이미지
         if(!post.bgImg.isEmpty()) {
@@ -128,13 +146,45 @@ public class PostDetailActivity extends BaseActivity {
         postReplyCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!isReplyContainer) {
+                    Animation upAnim = AnimationUtils.loadAnimation(
+                            getApplicationContext(), R.anim.anim_slide_in_bottom);
+                    upAnim.setFillAfter(true);
+                    replyEditContainer.startAnimation(upAnim);
+                    replyEditContainer.setVisibility(View.VISIBLE);
+                    commentBottomSheet.setVisibility(View.VISIBLE);
+                    isReplyContainer = true;
+                } else {
+                    Animation downAnim = AnimationUtils.loadAnimation(
+                            getApplicationContext(), R.anim.anim_slide_out_bottom);
+                    downAnim.setFillAfter(true);
+                    downAnim.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
+                        }
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            replyEditContainer.setVisibility(View.GONE);
+                            commentBottomSheet.setVisibility(View.GONE);
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
+                        }
+                    });
+                    replyEditContainer.startAnimation(downAnim);
+                    isReplyContainer = false;
+                }
+            }
+        });
+        /*postReplyCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 commentBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 // TODO : 댓글 수에 따라 창의 최대 위치가 변경됨
-                /*if(commentCount > 3) {
-
-                } else if(commentCount > 0) {
-
-                }*/
+                if(post.replyCount > 3) {
+                    commentBottomSheet.setWeightSum(1);
+                } else if(post.replyCount > 0) {
+                }
                 commentBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                     @Override
                     public void onStateChanged(View bottomSheet, int newState) {
@@ -147,7 +197,7 @@ public class PostDetailActivity extends BaseActivity {
                 });
                 showCommentSheet();
             }
-        });
+        });*/
     }
 
     // TODO : 댓글창 만들기
@@ -172,7 +222,7 @@ public class PostDetailActivity extends BaseActivity {
         }*/
     }
 
-    // 글 상세내용, 댓글목록 가져오기
+    // 글 상세내용 가져오기
     public class AsyncPostDetailJSONList extends AsyncTask<String, Integer, Post> {
         @Override
         protected Post doInBackground(String... args) {
@@ -215,6 +265,7 @@ public class PostDetailActivity extends BaseActivity {
         }
     }
 
+    // 댓글목록 가져오기
     public class AsyncPostDetailReplyJSONList extends AsyncTask<String, Integer, ArrayList<ReplyData>> {
         @Override
         protected ArrayList<ReplyData> doInBackground(String... args) {
@@ -265,7 +316,7 @@ public class PostDetailActivity extends BaseActivity {
     }
 
     private void closePostDetail() {
-        commentBehavior.setPeekHeight(0);
+        //commentBehavior.setPeekHeight(0);
         finish();
     }
 

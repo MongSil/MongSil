@@ -217,6 +217,10 @@ public class ProfileMenuTabFragment extends Fragment {
                 loadOnResult += maxResultSize;
                 maxLoadSize = result.get(0).totalCount;
 
+                for(int i = 0 ; i < result.size() ; i++) {
+                    result.get(i).typeCode = 1;
+                }
+
                 replyAdapter.add(result);
                 userRecycler.setAdapter(replyAdapter);
             }

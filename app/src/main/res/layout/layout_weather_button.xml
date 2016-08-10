@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/text_location_name"
+        android:text="@string/location"
+        android:textSize="16dp"
+        android:layout_marginBottom="5dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/img_location_weather_background"
+        android:background="@drawable/shape_weather_button"
+        android:layout_below="@id/text_location_name"
+        android:layout_width="82dp"
+        android:layout_height="82dp" />
+    <ImageView
+        android:id="@+id/img_location_weather_icon"
+        android:src="@drawable/anim_list_icon_mongsil_bolt"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignTop="@+id/img_location_weather_background"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
