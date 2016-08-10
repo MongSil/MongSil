@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-
 public class PropertyManager {
     private static PropertyManager instance;
     public static PropertyManager getInstance() {
@@ -14,63 +13,115 @@ public class PropertyManager {
         return instance;
     }
 
-    SharedPreferences mPrefs;
-    SharedPreferences.Editor mEditor;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
 
     private PropertyManager() {
         Context context = MongSilApplication.getMongSilContext();
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        mEditor = mPrefs.edit();
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        editor = preferences.edit();
     }
 
     public static final String KEY_DEVICE_ID = "deviceid";
     public static final String KEY_USERID = "userid";
+    public static final String KEY_USER_PROFILE_IMG = "userprofileimg";
     public static final String KEY_NICKNAME = "nickname";
     public static final String KEY_LOCATION = "location";
+    public static final String KEY_LAT_LOCATION = "latlocation";
+    public static final String KEY_LON_LOCATION = "lonlocation";
+
+    public static final String KEY_ALARM = "alarm";
+    public static final String KEY_SAVE_GALLERY = "savegallery";
     public static final String KEY_USE_GPS = "usegps";
 
     public String getDeviceId() {
-        return mPrefs.getString(KEY_DEVICE_ID, "");
+        return preferences.getString(KEY_DEVICE_ID, "");
     }
 
     public void setDeviceId(String UUID) {
-        mEditor.putString(KEY_DEVICE_ID, UUID);
-        mEditor.commit();
+        editor.putString(KEY_DEVICE_ID, UUID);
+        editor.commit();
     }
 
     public String getUserId() {
-        return mPrefs.getString(KEY_USERID, "");
+        return preferences.getString(KEY_USERID, "7"); // 임시 7
     }
 
     public void setUserId(String userId) {
-        mEditor.putString(KEY_USERID, userId);
-        mEditor.commit();
+        editor.putString(KEY_USERID, userId);
+        editor.commit();
+    }
+
+    public String getUserProfileImg() {
+        return preferences.getString(KEY_USER_PROFILE_IMG, "null"); // 임시 읎음
+    }
+
+    public void setUserProfileImg(String userProfileImg) {
+        editor.putString(KEY_USER_PROFILE_IMG, userProfileImg);
+        editor.commit();
     }
 
     public String getNickname() {
-        return mPrefs.getString(KEY_NICKNAME, "");
+        return preferences.getString(KEY_NICKNAME, "부산남1"); // 임시 부산남1
     }
 
     public void setNickname(String nickname) {
-        mEditor.putString(KEY_NICKNAME, nickname);
-        mEditor.commit();
+        editor.putString(KEY_NICKNAME, nickname);
+        editor.commit();
     }
 
     public String getLocation() {
-        return mPrefs.getString(KEY_LOCATION, "");
+        return preferences.getString(KEY_LOCATION, "부산"); // 임시 부산
     }
 
     public void setLocation(String location) {
-        mEditor.putString(KEY_LOCATION, location);
-        mEditor.commit();
-    }
-    public String getUseGPS() {
-        return mPrefs.getString(KEY_USE_GPS, "");
+        editor.putString(KEY_LOCATION, location);
+        editor.commit();
     }
 
-    public void setUseGps(String usegps) {
-        mEditor.putString(KEY_USE_GPS, usegps);
-        mEditor.commit();
+    public String getLatLocation() {
+        return preferences.getString(KEY_LAT_LOCATION, "35.1788483"); // 임시 부산의 위도 경도
+    }
+
+    public void setLatLocation(String latLocation) {
+        editor.putString(KEY_LAT_LOCATION, latLocation);
+        editor.commit();
+    }
+
+    public String getLonLocation() {
+        return preferences.getString(KEY_LAT_LOCATION, "129.0758175"); // 임시 부산의 위도 경도
+    }
+
+    public void setLonLocation(String lonLocation) {
+        editor.putString(KEY_LON_LOCATION, lonLocation);
+        editor.commit();
+    }
+
+    public Boolean getAlarm() {
+        return preferences.getBoolean(KEY_ALARM, true);
+    }
+
+    public void setAlarm(Boolean alarm) {
+        editor.putBoolean(KEY_ALARM, alarm);
+        editor.commit();
+    }
+
+    public Boolean getUseGPS() {
+        return preferences.getBoolean(KEY_USE_GPS, true);
+    }
+
+    public void setUseGps(Boolean usegps) {
+        editor.putBoolean(KEY_USE_GPS, usegps);
+        editor.commit();
+    }
+
+    public Boolean getSaveGallery() {
+        return preferences.getBoolean(KEY_SAVE_GALLERY, true);
+    }
+
+    public void setSaveGallery(Boolean saveGallery) {
+        editor.putBoolean(KEY_USE_GPS, saveGallery);
+        editor.commit();
     }
 
 

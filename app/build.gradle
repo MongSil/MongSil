@@ -36,4 +36,5 @@ dependencies {
     compile 'com.tsengvn:typekit:1.0.1'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'jp.wasabeef:glide-transformations:1.0.6'
 }

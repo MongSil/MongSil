@@ -200,7 +200,6 @@ public class PostDetailActivity extends BaseActivity {
         });*/
     }
 
-    // TODO : 댓글창 만들기
     private void showCommentSheet() {
         TextView share = (TextView) findViewById(R.id.text_share);
         // 공유하기를 눌렀을 때
@@ -308,7 +307,6 @@ public class PostDetailActivity extends BaseActivity {
                 imgNoneReply.setVisibility(View.GONE);
                 noneReply.setVisibility(View.GONE);
 
-                // TODO : 만들어야함
                 replyAdapter.add(result);
                 replyRecycler.setAdapter(replyAdapter);
             }

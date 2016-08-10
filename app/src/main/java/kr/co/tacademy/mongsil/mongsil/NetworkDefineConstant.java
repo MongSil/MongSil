@@ -17,8 +17,8 @@ public class NetworkDefineConstant {
             = "http://" + HOST_URL + PORT_NUMBER + "/post?userId=%s&skip=%s";
     public static final String SERVER_USER_REPLY
             = "http://" + HOST_URL + PORT_NUMBER + "/users/" + "%s" + "/reply?skip=%s";
-    public static final String SERVER_USER
-            = "http://" + HOST_URL + PORT_NUMBER + "/user/%d";
+    public static final String SERVER_USER_INFO
+            = "http://" + HOST_URL + PORT_NUMBER + "/users/%s";
     public static final String SK_POI_SEARCH
             = "https://apis.skplanetx.com/tmap/pois?searchKeyword=%s&resCoordType=WGS84GEO&version=1";
     public static final String SK_WEATHER_LAT_LON

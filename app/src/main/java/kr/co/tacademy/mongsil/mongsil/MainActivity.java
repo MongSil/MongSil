@@ -24,14 +24,18 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import jp.wasabeef.glide.transformations.BlurTransformation;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -55,18 +59,20 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
     SlidingMenu slidingMenu;
     TabLayout tabLayout;
 
-    // 사진찍어 글쓰기 버튼
+    // 글쓰기 버튼
     FloatingActionButton btnCapturePost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Intent intent = getIntent();
         // 글 작성 프레그먼트와 슬라이딩메뉴 프레그먼트를 선언
         // TODO : GPS가 켜져 있을 경우 - GPS 지역
         // TODO : 안켜짐 - 가입시 선택한 지역 반환
         if ( savedInstanceState == null ) {
-            mainPostFragment = MainPostFragment.newInstance(""); // 임시 - 전국 보여줌
+            mainPostFragment = MainPostFragment.newInstance(
+                    PropertyManager.getInstance().getLocation());
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.main_post_fragment_container, mainPostFragment)
                     .commit();
@@ -81,6 +87,12 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
             actionBar.setDisplayShowTitleEnabled(false);
         }
         tbTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        tbTitle.setText(PropertyManager.getInstance().getLocation());
+        new AsyncLatLonWeatherJSONList().execute(
+                PropertyManager.getInstance().getLatLocation(),
+                PropertyManager.getInstance().getLonLocation()
+        );
+        // TODO : 11개 지역 위도경도 추가해야함
         tbTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,8 +113,7 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
             }
         });
 
-        // 슬라이딩 메뉴(프로필 메뉴 추가)
-        slidingMenu = new SlidingMenu(this);
+        slidingMenu = new SlidingMenu(getApplicationContext());
         slidingMenu.setMode(SlidingMenu.LEFT);
         slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
         slidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
@@ -143,14 +154,42 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         return animation;
     }
 
+    // 날씨를 검색해서 지역 정보를 받아옴
+    @Override
+    public void onSelect(POIData POIData) {
+        if(POIData != null) {
+            String location = POIData.upperAddrName;
+            tbTitle.setText(location);
+            new AsyncLatLonWeatherJSONList().execute(POIData.noorLat, POIData.noorLon);
+            mainPostFragment = MainPostFragment.newInstance(location);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_post_fragment_container, mainPostFragment)
+                    .commit();
+        }
+    }
+
     // 슬라이딩메뉴 뷰
     public View loadSlidingMenu() {
         View menu = getLayoutInflater().inflate(R.layout.layout_profile_menu, null);
 
         TextView textMyName, textMyLocation;
+        ImageView imgProfileBackground =
+                (ImageView) menu.findViewById(R.id.img_profile_background);
 
         CircleImageView imgProfile =
                 (CircleImageView) menu.findViewById(R.id.img_profile);
+        if(!PropertyManager.getInstance().getUserProfileImg().equals("null")) {
+            Glide.with(MongSilApplication.getMongSilContext())
+                    .load(PropertyManager.getInstance().getUserProfileImg())
+                    .into(imgProfile);
+            Glide.with(getApplicationContext())
+                    .load(PropertyManager.getInstance().getUserProfileImg())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .bitmapTransform(new BlurTransformation(getApplicationContext(), null))
+                    .into(imgProfileBackground);
+        } else {
+            imgProfile.setImageResource(R.drawable.none_my_profile);
+        }
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -159,15 +198,15 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         });
         textMyName = (TextView) menu.findViewById(R.id.text_my_name);
         textMyLocation = (TextView) menu.findViewById(R.id.text_my_location);
-        textMyName.setText("몽실이");
-        textMyLocation.setText("대전");
+        textMyName.setText(PropertyManager.getInstance().getNickname());
+        textMyLocation.setText(PropertyManager.getInstance().getLocation());
 
         ImageView imgSetting, imgAlarm, imgClose;
         imgSetting = (ImageView) menu.findViewById(R.id.img_setting);
         imgSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, SettingActivity.class));
+                 startActivity(new Intent(MainActivity.this, SettingActivity.class));
             }
         });
         imgAlarm = (ImageView) menu.findViewById(R.id.img_alarm);
@@ -191,12 +230,16 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
                     new MenuViewPagerAdapter(getSupportFragmentManager());
             String[] tabTitle = MongSilApplication.getMongSilContext()
                     .getResources().getStringArray(R.array.menu_tab_title);
-            // 자신의 USERID를 newInstance(0, "여기")에 넣는다 테스트로 8이라 가정
-            adapter.appendFragment(ProfileMenuTabFragment.newInstance(0, "8"), tabTitle[0]);
-            adapter.appendFragment(ProfileMenuTabFragment.newInstance(1, "8"), tabTitle[1]);
+            adapter.appendFragment(
+                    ProfileMenuTabFragment
+                            .newInstance(0, PropertyManager.getInstance().getUserId()), tabTitle[0]);
+            adapter.appendFragment(
+                    ProfileMenuTabFragment
+                            .newInstance(1, PropertyManager.getInstance().getUserId()), tabTitle[1]);
             viewPager.setAdapter(adapter);
         }
 
+        // 탭 레이아웃 설정
         tabLayout = (TabLayout) menu.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
@@ -204,7 +247,7 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
             TabLayout.Tab tab = tabLayout.getTabAt(i);
             if (tab != null) {
 
-                TextView tabTextView = new TextView(this);
+                TextView tabTextView = new TextView(MainActivity.this);
                 tab.setCustomView(tabTextView);
 
                 tabTextView.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -271,20 +314,6 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         }
     }
 
-    // 날씨를 검색해서 지역 정보를 받아옴
-    @Override
-    public void onSelect(POIData POIData) {
-        if(POIData != null) {
-            String location = POIData.upperAddrName;
-            tbTitle.setText(location);
-            new AsyncWeatherJSONList().execute(POIData.noorLat, POIData.noorLon);
-            mainPostFragment = MainPostFragment.newInstance(location);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_post_fragment_container, mainPostFragment)
-                    .commit();
-        }
-    }
-
     // 툴바 메뉴 선택
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -306,8 +335,8 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         super.onBackPressed();
     }
 
-    // 날씨 AsyncTask
-    public class AsyncWeatherJSONList extends AsyncTask<String, Integer, WeatherData> {
+    // 위도, 경도 날씨 AsyncTask
+    public class AsyncLatLonWeatherJSONList extends AsyncTask<String, Integer, WeatherData> {
         @Override
         protected WeatherData doInBackground(String... args) {
             try{
@@ -346,8 +375,55 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
 
         @Override
         protected void onPostExecute(WeatherData result) {
-            imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.code, 0));
-            // TODO : animBackgroundWeather.setBackground(WeatherData.imgFromWeatherCode(result.code, 1));
+            if(result != null) {
+                imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.code, 0));
+                // TODO : animBackgroundWeather.setBackground(WeatherData.imgFromWeatherCode(result.code, 1));
+            }
         }
     }
+
+    // 쓸일이 있겠지
+    /*public class AsyncUserInfoJSONList extends AsyncTask<String, Integer, UserData> {
+        @Override
+        protected UserData doInBackground(String... args) {
+            try{
+                OkHttpClient toServer = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url(String.format(
+                                NetworkDefineConstant.SERVER_USER_INFO,
+                                args[0]))
+                        .build();
+                Response response = toServer.newCall(request).execute();
+                ResponseBody responseBody = response.body();
+
+                boolean flag = response.isSuccessful();
+                int responseCode = response.code();
+                if (responseCode >= 400) return null;
+                if (flag) {
+                    return ParseDataParseHandler.getJSONUserList(
+                            new StringBuilder(responseBody.string()));
+                }
+                responseBody.close();
+            }catch (UnknownHostException une) {
+                e("connectionFail", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                e("connectionFail", uee.toString());
+            } catch (Exception e) {
+                e("connectionFail", e.toString());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(UserData result) {
+            if(result != null) {
+                data = result;
+
+            }
+        }
+    }*/
 }

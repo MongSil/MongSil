@@ -126,8 +126,6 @@ public class MainPostFragment extends Fragment {
 
         @Override
         protected void onPostExecute(PostData result) {
-
-            // TODO : 리사이클러뷰에 새로 추가를 하는 로직이 필요함
             if(result != null && result.post.size() > 0){
                 int maxResultSize = result.post.size();
                 loadOnResult += maxResultSize;

@@ -32,7 +32,6 @@
         android:layout_height="1dp" />
     <!-- 댓글알림 -->
     <RelativeLayout
-        android:id="@+id/comment_container"
         android:layout_width="match_parent"
         android:layout_height="40dp">
         <TextView
@@ -46,6 +45,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
         <Switch
+            android:id="@+id/switch_comment"
             android:checked="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
@@ -74,11 +74,10 @@
 
     <!-- 카메라롤에 사진 저장 -->
     <RelativeLayout
-        android:id="@+id/save_gallery_container"
         android:layout_width="match_parent"
         android:layout_height="40dp">
         <TextView
-            android:text="@string/push_setting"
+            android:text="@string/save_gallery_setting"
             android:textSize="15sp"
             android:layout_marginLeft="16dp"
             android:layout_gravity="center"
@@ -88,6 +87,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
         <Switch
+            android:id="@+id/save_gallery_switch"
             android:checked="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
@@ -107,7 +107,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp">
         <TextView
-            android:text="@string/push_setting"
+            android:text="@string/program_info_setting"
             android:textSize="15sp"
             android:layout_marginLeft="16dp"
             android:layout_gravity="center"
@@ -132,11 +132,11 @@
 
     <!-- 위치 정보 사용 -->
     <RelativeLayout
-        android:id="@+id/push_setting_container"
+        android:id="@+id/gps_setting_container"
         android:layout_width="match_parent"
         android:layout_height="40dp">
         <TextView
-            android:text="@string/push_setting"
+            android:text="@string/gps_setting"
             android:textSize="15sp"
             android:layout_marginLeft="16dp"
             android:layout_gravity="center"
@@ -146,6 +146,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
         <ToggleButton
+            android:id="@+id/toggle_gps"
             android:textOn="@string/on"
             android:textOff="@string/off"
             android:textSize="15sp"
@@ -153,9 +154,9 @@
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/imageView"
-            android:layout_toStartOf="@+id/imageView" />
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
         <ImageView
             android:src="@drawable/right_arrow"
             android:layout_alignParentRight="true"

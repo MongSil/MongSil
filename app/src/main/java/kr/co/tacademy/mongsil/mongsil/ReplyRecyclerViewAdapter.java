@@ -26,7 +26,10 @@ public class ReplyRecyclerViewAdapter
     public static final int USERS_REPLY = 5000;
 
     List<ReplyData> items;
-    ReplyRecyclerViewAdapter() { items = new ArrayList<ReplyData>(); }
+
+    ReplyRecyclerViewAdapter() {
+        items = new ArrayList<ReplyData>();
+    }
 
     public void add(ArrayList<ReplyData> replyItems) {
         for(int i = 0 ; i < replyItems.size() ; i++) {
@@ -56,18 +59,18 @@ public class ReplyRecyclerViewAdapter
             if(!data.profileImg.equals("null")) {
                 Glide.with(MongSilApplication.getMongSilContext())
                         .load(data.profileImg).into(imgProfile);
-                imgProfile.setVisibility(View.GONE);
+                imgProfileIcon.setVisibility(View.GONE);
             } else {
                 imgProfile.setImageResource(R.color.little_dark_gray);
                 imgProfileIcon.setVisibility(View.VISIBLE);
             }
+
             imgProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // TODO : 다른 사람 프로필이 열려야함
+                    // TODO : 다른사람 프로필로 가야함
                 }
             });
-
             textName.setText(data.username);
             textCommentContent.setText(data.content);
         }

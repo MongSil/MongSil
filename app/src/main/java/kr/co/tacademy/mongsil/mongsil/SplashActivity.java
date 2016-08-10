@@ -83,10 +83,12 @@ public class SplashActivity extends BaseActivity {
 
         public void run() {
             // Socket socket = new Socket("localhost", 80);
+            // TODO: POST로 서버에 정보를 보내야함
             // TODO: 서버에서 5초안에 응답을 하지 않으면 다이어로그를 띄움(네트워크 연결이 노원할)
             // TODO: if - UUID가 서버에 존재하는지 여부 검사
             // TODO: UUID가 서버에 존재하면 바로 메인으로
             // TODO: UUID가 서버에 없다면 텍스트를 띄움(테스트는 텍스트를 띄움)
+
             /*if (!getDevicesUUID().equals("")) {
                 String userId = PropertyManager.getInstance().getUserId();
             }*/

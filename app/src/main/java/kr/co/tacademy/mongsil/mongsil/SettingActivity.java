@@ -1,16 +1,57 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.RelativeLayout;
+import android.widget.Switch;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 public class SettingActivity extends BaseActivity {
+
+    Switch commentAlarm, saveGallery;
+    RelativeLayout programInfoContainer;
+    ToggleButton toggleGPS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+
+        commentAlarm = (Switch) findViewById(R.id.switch_comment);
+        commentAlarm.setChecked(PropertyManager.getInstance().getAlarm());
+        commentAlarm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                PropertyManager.getInstance().setAlarm(b);
+            }
+        });
+        saveGallery = (Switch) findViewById(R.id.save_gallery_switch);
+        saveGallery.setChecked(PropertyManager.getInstance().getSaveGallery());
+        saveGallery.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                PropertyManager.getInstance().setSaveGallery(b);
+            }
+        });
+        programInfoContainer = (RelativeLayout) findViewById(R.id.program_info_container);
+        programInfoContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO : 누르면 프로그램 정보로 이동 또는 다이어로그를 열게 한다
+            }
+        });
+        toggleGPS = (ToggleButton) findViewById(R.id.toggle_gps);
+        toggleGPS.setChecked(PropertyManager.getInstance().getUseGPS());
+        toggleGPS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                PropertyManager.getInstance().setSaveGallery(b);
+            }
+        });
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

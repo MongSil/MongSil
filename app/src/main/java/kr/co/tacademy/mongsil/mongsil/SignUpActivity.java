@@ -59,7 +59,9 @@ public class SignUpActivity extends BaseActivity
         imgDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                // TODO : 서버에 회원가입 전송 후 PropertyManager.getInstance().setUserId( ~~ );
+                startActivity(intent);
                 SignUpActivity.this.finish();
             }
         });

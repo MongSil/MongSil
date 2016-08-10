@@ -213,12 +213,8 @@ public class ParseDataParseHandler {
     public static WeatherData getJSONWeatherList(
             StringBuilder buf) {
 
-        // 전체
+        // 전체 - weather - minutely(array) - (0)sky
         JSONObject jsonObject = null;
-
-        // weather - minutely
-        JSONArray jsonMinutely = null;
-        JSONObject jsonrain = null;
 
         // weather
         WeatherData data;
@@ -239,4 +235,30 @@ public class ParseDataParseHandler {
         return null;
     }
 
+    public static UserData getJSONUserList(StringBuilder buf) {
+
+        // 전체 - data
+        JSONObject jsonObject = null;
+
+        // UserData
+        UserData data;
+
+        try {
+            jsonObject = new JSONObject(buf.toString())
+                    .getJSONObject("data");
+            data = new UserData();
+
+            data.userId = jsonObject.getInt("userId");
+            data.username = jsonObject.getString("username");
+            data.profileImg = jsonObject.getString("profileImg");
+            data.area = jsonObject.getString("area");
+            data.replyAlarm = jsonObject.getInt("replyAlarm");
+            data.date = jsonObject.getString("date");
+
+            return data;
+        } catch (JSONException je) {
+            Log.e("GET:UserDataList", "JSON파싱 중 에러발생", je);
+        }
+        return null;
+    }
 }

@@ -10,6 +10,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+import jp.wasabeef.glide.transformations.BlurTransformation;
+
 /**
  * Created by ccei on 2016-08-04.
  */
@@ -20,6 +26,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     // 프로필 사진
     LinearLayout imgProfileContainer;
+    CircleImageView imgProfile;
 
     // 기본정보
     LinearLayout editNameContainer, editLocationContainer;
@@ -51,13 +58,21 @@ public class EditProfileActivity extends AppCompatActivity {
         tbDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // 서버에 프로필 편집한 내용을 저장하고 액티비티를 종료한다.
+                // TODO : 서버에 프로필 편집한 내용을 저장하고 액티비티를 종료한다.
                 finish();
             }
         });
 
         imgProfileContainer =
                 (LinearLayout) findViewById(R.id.img_profile_container);
+        imgProfile = (CircleImageView) findViewById(R.id.img_profile);
+        if(!PropertyManager.getInstance().getUserProfileImg().equals("null")) {
+            Glide.with(MongSilApplication.getMongSilContext())
+                    .load(PropertyManager.getInstance().getUserProfileImg())
+                    .into(imgProfile);
+        } else {
+            imgProfile.setImageResource(R.drawable.none_my_profile);
+        }
         imgProfileContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,6 +85,7 @@ public class EditProfileActivity extends AppCompatActivity {
         editNameContainer =
                 (LinearLayout) findViewById(R.id.edit_name_container);
         editName = (EditText) findViewById(R.id.edit_name);
+        editName.setText(PropertyManager.getInstance().getNickname());
         editNameContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,6 +95,7 @@ public class EditProfileActivity extends AppCompatActivity {
         editLocationContainer =
                 (LinearLayout) findViewById(R.id.edit_location_container);
         editLocation = (EditText) findViewById(R.id.edit_location);
+        editLocation.setText(PropertyManager.getInstance().getLocation());
         editLocationContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,6 +109,7 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // TODO : 계정을 삭제하시겠습니까?~~ 다이어로그 떠야함
+                // TODO : 서버에 계정 삭제 요청 보내야함
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleDialogFragment.newInstance(0), "bottom")
                         .addToBackStack("bottom").commit();
