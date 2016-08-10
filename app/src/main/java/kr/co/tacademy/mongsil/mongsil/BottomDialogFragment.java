@@ -56,6 +56,7 @@ public class BottomDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(View view) {
                         // TODO: 카메라 불러옴
+                        dismiss();
                         cameraIntent.putExtra("selector", 0);
                         startActivity(cameraIntent);
                     }
@@ -66,6 +67,7 @@ public class BottomDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(View view) {
                         // TODO: 갤러리 불러옴
+                        dismiss();
                         cameraIntent.putExtra("selector", 1);
                         startActivity(cameraIntent);
                     }
@@ -82,6 +84,7 @@ public class BottomDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(View view) {
                         // TODO: 글 수정 불러옴
+                        dismiss();
                     }
                 });
 
@@ -93,13 +96,18 @@ public class BottomDialogFragment extends DialogFragment {
                         // TODO: 글을 삭제하시겠습니까? 요청
                         dismiss();
                         getActivity().getSupportFragmentManager().beginTransaction()
-                                .add(MiddleDialogFragment.newInstance(0), "middle")
-                                .addToBackStack("middle").commit();
+                                .add(MiddleDialogFragment.newInstance(0), "middle").commit();
                     }
                 });
                 return view;
         }
         return null;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        dismiss();
     }
 
     @Override

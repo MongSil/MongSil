@@ -77,8 +77,7 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(BottomDialogFragment.newInstance(0), "bottom")
-                        .addToBackStack("bottom").commit();
+                        .add(BottomDialogFragment.newInstance(0), "bottom").commit();
             }
         });
 
@@ -111,8 +110,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 // TODO : 계정을 삭제하시겠습니까?~~ 다이어로그 떠야함
                 // TODO : 서버에 계정 삭제 요청 보내야함
                 getSupportFragmentManager().beginTransaction()
-                        .add(MiddleDialogFragment.newInstance(0), "bottom")
-                        .addToBackStack("bottom").commit();
+                        .add(MiddleDialogFragment.newInstance(0), "middle").commit();
             }
         });
     }

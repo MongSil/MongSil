@@ -4,4 +4,30 @@
         <item>나의 이야기</item>
         <item>내가 쓴 댓글</item>
     </string-array>
+    <string-array name="lat_list">
+        <item>37.4548790</item><!--인천-->
+        <item>37.5670652</item><!--서울-->
+        <item>37.8846254</item><!--강원-->
+        <item>36.6355987</item><!--충청-->
+        <item>36.3512682</item><!--대전-->
+        <item>35.8713449</item><!--대구-->
+        <item>35.1626730</item><!--광주-->
+        <item>35.8190741</item><!--전라-->
+        <item>35.5391178</item><!--울산-->
+        <item>35.1788483</item><!--부산-->
+        <item>33.4999915</item><!--제주-->
+    </string-array>
+    <string-array name="lon_list">
+        <item>126.7050769</item><!--인천-->
+        <item>126.9772433</item><!--서울-->
+        <item>127.7295267</item><!--강원-->
+        <item>127.4904730</item><!--충청-->
+        <item>127.3845458</item><!--대전-->
+        <item>128.6006733</item><!--대구-->
+        <item>126.9152019</item><!--광주-->
+        <item>127.1059460</item><!--전라-->
+        <item>129.3125368</item><!--울산-->
+        <item>129.0758175</item><!--부산-->
+        <item>126.5309697</item><!--제주-->
+    </string-array>
 </resources>

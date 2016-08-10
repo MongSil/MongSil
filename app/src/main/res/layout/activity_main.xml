@@ -31,7 +31,6 @@
 
                 <ImageView
                     android:id="@+id/img_weather_icon"
-                    android:src="@drawable/anim_list_icon_mongsil_smallrain"
                     android:layout_marginTop="10dp"
                     android:layout_width="123dp"
                     android:layout_height="123dp"/>
@@ -47,7 +46,6 @@
                         android:layout_height="match_parent">
                         <TextView
                             android:id="@+id/text_day"
-                            android:text="26"
                             android:textSize="25sp"
                             android:textStyle="bold"
                             android:singleLine="true"
@@ -55,7 +53,6 @@
                             android:layout_height="wrap_content"/>
                         <TextView
                             android:id="@+id/text_week"
-                            android:text="Monday"
                             android:textSize="10sp"
                             android:singleLine="true"
                             android:layout_marginLeft="10dp"
@@ -64,7 +61,6 @@
                     </LinearLayout>
                     <TextView
                         android:id="@+id/text_month"
-                        android:text="December"
                         android:textSize="20sp"
                         android:layout_marginTop="3dp"
                         android:layout_width="match_parent"
@@ -91,7 +87,6 @@
         app:titleTextAppearance="@style/ToolBar.TitleText">
         <TextView
             android:id="@+id/toolbar_title"
-            android:text="@string/location"
             android:textSize="16dp"
             android:textColor="@android:color/white"
             android:drawableLeft="@drawable/icon_nevi"

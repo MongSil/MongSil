@@ -8,10 +8,11 @@
     android:layout_marginRight="58dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <TextView
-        android:id="@+id/text_dialog"
+    <Button
+        android:id="@+id/btn_dialog"
         android:text="@string/dialog"
         android:textSize="17sp"
+        android:background="@color/invisible"
         android:gravity="center"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
@@ -31,11 +32,12 @@
         android:layout_marginRight="8dp"
         android:layout_width="match_parent"
         android:layout_height="41dp">
-        <TextView
-            android:id="@+id/text_negative"
+        <Button
+            android:id="@+id/btn_negative"
             android:text="@string/cancel"
             android:textSize="16sp"
             android:textStyle="italic"
+            android:background="@color/invisible"
             android:gravity="center"
             android:visibility="gone"
             android:layout_width="0dp"
@@ -48,10 +50,11 @@
             android:layout_width="1dp"
             android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/text_positive"
+        <Button
+            android:id="@+id/btn_positive"
             android:text="@string/confirm"
             android:textSize="16sp"
+            android:background="@color/invisible"
             android:gravity="center"
             android:layout_width="41dp"
             android:layout_height="match_parent"

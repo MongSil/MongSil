@@ -31,11 +31,12 @@
                 android:layout_height="90dp" />
             <TextView
                 android:id="@+id/text_my_name"
-                android:text="@string/name"
                 android:textSize="31sp"
                 android:textColor="@android:color/white"
                 android:gravity="left"
-                android:layout_width="wrap_content"
+                android:singleLine="true"
+                android:layout_marginRight="130dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/img_setting"
                 android:layout_alignLeft="@+id/text_my_location"
@@ -43,7 +44,6 @@
 
             <TextView
                 android:id="@+id/text_my_location"
-                android:text="@string/location"
                 android:textSize="13sp"
                 android:textColor="@android:color/white"
                 android:gravity="left"

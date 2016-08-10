@@ -46,9 +46,7 @@ public class SignUpActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 underlineLocation.setBackgroundColor(getResources().getColor(R.color.gray));
-                getSupportFragmentManager().beginTransaction()
-                        .add(new SignupSelectLocationDialogFragment(), "selectlocation")
-                        .addToBackStack("selectlocation").commit();
+                new SignupSelectLocationDialogFragment().show(getSupportFragmentManager(), "select");
                 if(!editName.isFocused()) {
                     underlineName.setBackgroundColor(getResources().getColor(R.color.light_gray));
                 }
@@ -59,6 +57,15 @@ public class SignUpActivity extends BaseActivity
         imgDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(editName.getText().toString().trim().isEmpty()) {
+                    // 이름을 입력하지 않았을 때
+                    // TODO : 텍스트 아래에 나올건지 다이어로그로 나올건지 논의
+                }
+                if(location.getText().toString().trim().isEmpty() ||
+                        location.getText().toString().equals("지역")) {
+                    // 지역을 입력하지 않았을 때
+                }
+
                 Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                 // TODO : 서버에 회원가입 전송 후 PropertyManager.getInstance().setUserId( ~~ );
                 startActivity(intent);

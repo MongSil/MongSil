@@ -313,22 +313,40 @@ public class PostDetailActivity extends BaseActivity {
         }
     }
 
-    private void closePostDetail() {
-        //commentBehavior.setPeekHeight(0);
-        finish();
-    }
-
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        closePostDetail();
+        if (isReplyContainer) {
+            Animation downAnim = AnimationUtils.loadAnimation(
+                    getApplicationContext(), R.anim.anim_slide_out_bottom);
+            downAnim.setFillAfter(true);
+            downAnim.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    replyEditContainer.setVisibility(View.GONE);
+                    commentBottomSheet.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
+            replyEditContainer.startAnimation(downAnim);
+            isReplyContainer = false;
+        } else {
+            super.onBackPressed();
+            finish();
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                closePostDetail();
+                finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);

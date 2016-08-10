@@ -122,9 +122,13 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
 
         // 날씨
         animBackgroundWeather = (ImageView) findViewById(R.id.anim_background_weather);
-        ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
+        if(animBackgroundWeather.isShown()) {
+            ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
+        }
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
-        ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        if(imgWeatherIcon.isShown()) {
+            ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        }
         imgWeatherIcon.setAnimation(
                 AnimationApplyInterpolater(
                         R.anim.bounce_interpolator, new LinearInterpolator()));
