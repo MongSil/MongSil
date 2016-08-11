@@ -1,7 +1,9 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,19 +11,33 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Created by ccei on 2016-08-09.
  */
 public class MiddleDialogFragment extends DialogFragment {
     private static final String SELECTOR = "selector";
+    private static final String POSTID = "postid";
 
     public MiddleDialogFragment() { }
-    public static MiddleDialogFragment newInstance(int selector) {
+    public static MiddleDialogFragment newInstance(int selector, String postId) {
         MiddleDialogFragment f = new MiddleDialogFragment();
-        Bundle b = new Bundle();
-        b.putInt(SELECTOR, selector);
-        f.setArguments(b);
+        Bundle bundle = new Bundle();
+        bundle.putInt(SELECTOR, selector);
+        bundle.putString(POSTID, postId);
+        f.setArguments(bundle);
         return f;
     }
 
@@ -36,7 +52,7 @@ public class MiddleDialogFragment extends DialogFragment {
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_middle, container, false);
 
-        Button dialog = (Button) view.findViewById(R.id.btn_dialog);
+        final TextView dialog = (TextView) view.findViewById(R.id.text_dialog);
         View line = view.findViewById(R.id.middle_dialog_line);
         Button negative = (Button) view.findViewById(R.id.btn_negative);
         Button positive = (Button) view.findViewById(R.id.btn_positive);
@@ -60,10 +76,11 @@ public class MiddleDialogFragment extends DialogFragment {
                 positive.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        // TODO : 글 삭제하는 요청을 서버에 보내야함
                         dismiss();
-                        getActivity().getSupportFragmentManager().beginTransaction()
-                                .show(MiddleDialogFragment.newInstance(1)).commit();
+                        if(dialog.getText()
+                                == getResources().getText(R.string.post_remove_question)) {
+                            new AsyncPostRemoveResponse().execute(getArguments().getString(POSTID));
+                        }
                     }
                 });
                 return view;
@@ -81,13 +98,62 @@ public class MiddleDialogFragment extends DialogFragment {
                 });
                 return view;
         }
-        return null;
+        return view;
     }
 
     @Override
     public void onStop() {
         super.onStop();
         dismiss();
+    }
+
+    public class AsyncPostRemoveResponse extends AsyncTask<String, String, String> {
+
+        int responseCode = 0;
+
+        @Override
+        protected String doInBackground(String... args) {
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(15, TimeUnit.SECONDS)
+                    .build();
+
+            RequestBody formBody = new FormBody.Builder().build();
+
+            Request request = new Request.Builder()
+                    .url(String.format(NetworkDefineConstant.POST_SERVER_POST_REMOVE,
+                            args[0]))
+                    .delete(formBody) //반드시 post로
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.e("요청오류", "요청을 보내는 데 실패했습니다.");
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    boolean flag = response.isSuccessful();
+                    responseCode = response.code();
+                    if (flag) {
+                        Log.e("response결과", response.message()); //읃답에 대한 메세지(OK)
+                        Log.e("response응답바디", response.body().string()); //json으로 변신
+                    }
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if(responseCode >= 200 && responseCode < 400) {
+                getActivity().finish();
+                MiddleDialogFragment.newInstance(1, getArguments().getString(POSTID))
+                        .show(getActivity().getSupportFragmentManager(), "middle");
+            }
+        }
     }
 
     @Override

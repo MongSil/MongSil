@@ -1,24 +1,42 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
+import android.os.AsyncTask;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public class PostingActivity extends BaseActivity implements SearchPoiDialogFragment.OnSelectListener {
+    private static final int WEATHER_COUNT = 13;
 
     // 툴바 필드
     TextView location, save;
 
     // 날씨
     ImageView imgPreview, leftWeather, rightWeather;
+    ViewPager selectWeatherPager;
+    int pagerPos;
 
     // 포스팅
     EditText editPosting;
@@ -26,10 +44,18 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
     // 카메라
     ImageView imgCamera;
 
+    private String uploadCode = "0";
+    private String area1 = "";
+    private String area2 = "";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posting);
+
+        Intent intent = getIntent();
+
 
         // 툴바
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -41,40 +67,216 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
             actionBar.setDisplayShowTitleEnabled(false);
         }
         location = (TextView) findViewById(R.id.text_posting_location);
+        location.setText(PropertyManager.getInstance().getLocation());
         location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(new SearchPoiDialogFragment(), "search")
-                        .addToBackStack("search").commit();
+                        .add(new SearchPoiDialogFragment(), "search_posting").commit();
             }
         });
         save = (TextView) findViewById(R.id.text_save);
+        area1 = PropertyManager.getInstance().getLocation();
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 아이콘 코드 임시 "0"
+                // 백그라운드 이미지 임시 ""
+                new AsyncPostingResponse().execute(
+                        uploadCode,    // 이미지 업로드 코드
+                        area1,  // 지역1
+                        area2,  // 지역2
+                        PropertyManager.getInstance().getUserId(), // 아이디
+                        String.valueOf(selectWeatherPager.getCurrentItem()), // 날씨 테마 코드
+                        "0",    // 아이콘 코드
+                        "",     // 백그라운드 이미지
+                        editPosting.getText().toString()    // 글 내용
+                );
+            }
+        });
+
+        // 미리보기
+        imgPreview = (ImageView) findViewById(R.id.img_preview);
+        imgPreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(PostPreviewFragment.newInstance(
+                                location.getText().toString(),
+                                editPosting.getText().toString(),
+                                0), "preview").commit();
+            }
+        });
 
         // 날씨 선택
-        imgPreview = (ImageView) findViewById(R.id.img_preview);
-        ViewPager selectWeather =
+        selectWeatherPager =
                 (ViewPager) findViewById(R.id.viewpager_posting_select_weather);
-        //selectWeather.setAdapter();
+        selectWeatherPager.setAdapter(new WeatherPagerAdapter());
         leftWeather = (ImageView) findViewById(R.id.img_left_weather);
+        leftWeather.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pagerPos = selectWeatherPager.getCurrentItem();
+                if (pagerPos < WEATHER_COUNT && pagerPos >= 0) {
+                    selectWeatherPager.setCurrentItem(pagerPos++);
+                } else if (pagerPos == 0) {
+                    pagerPos = WEATHER_COUNT - 1;
+                    selectWeatherPager.setCurrentItem(pagerPos);
+                }
+            }
+        });
         rightWeather = (ImageView) findViewById(R.id.img_right_weather);
+        rightWeather.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pagerPos = selectWeatherPager.getCurrentItem();
+                if (pagerPos < WEATHER_COUNT && pagerPos >= 0) {
+                    selectWeatherPager.setCurrentItem(pagerPos++);
+                } else if (pagerPos == WEATHER_COUNT - 1) {
+                    pagerPos = 0;
+                    selectWeatherPager.setCurrentItem(pagerPos);
+                }
+            }
+        });
 
         // 포스팅
         editPosting = (EditText) findViewById(R.id.edit_posting);
-
+        editPosting.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    editPosting.setHint("");
+                } else {
+                    editPosting.setHint(getResources().getText(R.string.posting));
+                }
+            }
+        });
         // 카메라
         imgCamera = (ImageView) findViewById(R.id.img_posting_camera);
+        imgCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO : 사진을 선택한 후 이미지 코드를 설정해야함(1)
+                // uploadCode = "1";
+            }
+        });
+
+
+
+    }
+
+    private class WeatherPagerAdapter extends PagerAdapter {
+        ImageView imgWeatherBackground, imgWeatherIcon;
+
+        WeatherPagerAdapter() {
+        }
+
+        @Override
+        public int getCount() {
+            return WEATHER_COUNT;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            // TODO Auto-generated method stub
+            container.removeView((View) object);
+
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            View view = getLayoutInflater()
+                    .inflate(R.layout.layout_posting_select_weather, container, false);
+            imgWeatherIcon = (ImageView) view.findViewById(R.id.img_weather_icon);
+            imgWeatherIcon.setImageResource(
+                    WeatherData.imgFromWeatherCode(String.valueOf(position+1), 0));
+            if (imgWeatherIcon.isShown()) {
+                ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+            }
+            imgWeatherBackground = (ImageView) view.findViewById(R.id.img_weather_background);
+            /*imgWeatherBackground.setImageResource(
+                    WeatherData.imgFromWeatherCode(String.valueOf(position), 1));*/
+            container.addView(view);
+            return view;
+        }
+    }
+
+    public class AsyncPostingResponse extends AsyncTask<String, String, String> {
+
+        int responseCode = 0;
+
+        @Override
+        protected String doInBackground(String... args) {
+                //업로드는 타임 및 리드타임을 넉넉히 준다.
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(30, TimeUnit.SECONDS)
+                        .build();
+
+                //요청 Body 세팅==> 그전 Query Parameter세팅과 같은 개념
+                RequestBody formBody = new FormBody.Builder()
+                        .add("uploadCode", args[0])
+                        .add("area1", args[1])
+                        .add("area2", args[2])
+                        .add("userId", args[3])
+                        .add("weatherCode", args[4])
+                        .add("iconCode", args[5])
+                        .add("bgImg", args[6])
+                        .add("content", args[7])
+                        .build();
+                //요청 세팅
+                Request request = new Request.Builder()
+                        .url(NetworkDefineConstant.POST_SERVER_POST)
+                        .post(formBody) //반드시 post로
+                        .build();
+
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.e("요청오류", "요청을 보내는 데 실패했습니다.");
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        boolean flag = response.isSuccessful();
+                        responseCode = response.code();
+                        if (flag) {
+                            Log.e("response결과", response.message()); //읃답에 대한 메세지(OK)
+                            Log.e("response응답바디", response.body().string()); //json으로 변신
+                        }
+                    }
+                });
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            // TODO : 액티비티 전환 시 인텐트 전달 후 지역 변경
+            if(responseCode >= 400) {
+                Intent intent = new Intent(PostingActivity.this, MainActivity.class);
+                intent.putExtra("area1", area1);
+                finish();
+            }
+        }
     }
 
     @Override
     public void onSelect(POIData POIData) {
         location.setText(POIData.name);
+        area1 = POIData.upperAddrName;
+        area2 = POIData.middleAddrName;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home :
+            case android.R.id.home:
                 startActivity(new Intent(getApplication(), MainActivity.class));
                 finish();
                 return true;
@@ -84,7 +286,7 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        //startActivity(new Intent(getApplicationContext(), MainActivity.class));
         finish();
         super.onBackPressed();
     }

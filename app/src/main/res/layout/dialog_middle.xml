@@ -3,13 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:background="@drawable/popup"
-    android:layout_marginTop="142dp"
     android:layout_marginLeft="58dp"
     android:layout_marginRight="58dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <Button
-        android:id="@+id/btn_dialog"
+    <TextView
+        android:id="@+id/text_dialog"
         android:text="@string/dialog"
         android:textSize="17sp"
         android:background="@color/invisible"
@@ -39,15 +38,15 @@
             android:textStyle="italic"
             android:background="@color/invisible"
             android:gravity="center"
-            android:visibility="gone"
+            android:visibility="visible"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1.4"
             android:layout_gravity="center" />
         <View
             android:background="@color/line"
-            android:visibility="gone"
-            android:layout_width="1dp"
+            android:visibility="visible"
+            android:layout_width="0.5dp"
             android:layout_height="wrap_content"/>
 
         <Button

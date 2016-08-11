@@ -19,4 +19,6 @@
     <color name="post_background">#33000000</color>
     <color name="reply_gray">#bbbbbb</color>
     <color name="selected_blue">#7700ddff</color>
+    <color name="white_transparent_background">#33000000</color>
+    <color name="color_fail">#A1A1A1</color>
 </resources>

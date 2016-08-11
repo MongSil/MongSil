@@ -122,7 +122,7 @@ public class ProfileMenuTabFragment extends Fragment {
                 // MainPostFragment 참조
                 Request request = new Request.Builder()
                         .url(String.format(
-                                NetworkDefineConstant.SERVER_USER_POST,
+                                NetworkDefineConstant.GET_SERVER_USER_POST,
                                 args[0], args[1]))
                         .build();
                 Response response = toServer.newCall(request).execute();
@@ -186,7 +186,7 @@ public class ProfileMenuTabFragment extends Fragment {
 
                 Request request = new Request.Builder()
                         .url(String.format(
-                                NetworkDefineConstant.SERVER_USER_REPLY,
+                                NetworkDefineConstant.GET_SERVER_USER_REPLY,
                                 args[0], args[1]))
                         .build();
                 Response response = toServer.newCall(request).execute();

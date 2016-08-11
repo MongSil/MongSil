@@ -159,7 +159,8 @@ public class PostRecyclerViewAdapter
                 @Override
                 public void onClick(View view) {
                     fm.beginTransaction()
-                            .add(BottomDialogFragment.newInstance(1), "bottom").commit();
+                            .add(BottomDialogFragment.newInstance(
+                                    1, String.valueOf(post.postId)), "bottom_user_post").commit();
                 }
             });
             myPostCard.setOnClickListener(new View.OnClickListener() {

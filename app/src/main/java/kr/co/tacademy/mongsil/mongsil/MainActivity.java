@@ -1,6 +1,7 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
@@ -25,17 +26,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
+import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.glide.transformations.BlurTransformation;
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -90,15 +94,13 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         tbTitle.setText(PropertyManager.getInstance().getLocation());
         new AsyncLatLonWeatherJSONList().execute(
                 PropertyManager.getInstance().getLatLocation(),
-                PropertyManager.getInstance().getLonLocation()
-        );
+                PropertyManager.getInstance().getLonLocation());
         // TODO : 11개 지역 위도경도 추가해야함
         tbTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(new SearchPoiDialogFragment(), "search")
-                        .addToBackStack("search").commit();
+                        .add(new SearchPoiDialogFragment(), "search_main").commit();
             }
         });
         tbSearch = (ImageView) toolbar.findViewById(R.id.toolbar_search);
@@ -171,26 +173,30 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
                     .commit();
         }
     }
-
     // 슬라이딩메뉴 뷰
     public View loadSlidingMenu() {
         View menu = getLayoutInflater().inflate(R.layout.layout_profile_menu, null);
 
         TextView textMyName, textMyLocation;
-        ImageView imgProfileBackground =
+        final ImageView imgProfileBackground =
                 (ImageView) menu.findViewById(R.id.img_profile_background);
 
-        CircleImageView imgProfile =
+        final CircleImageView imgProfile =
                 (CircleImageView) menu.findViewById(R.id.img_profile);
         if(!PropertyManager.getInstance().getUserProfileImg().equals("null")) {
             Glide.with(MongSilApplication.getMongSilContext())
                     .load(PropertyManager.getInstance().getUserProfileImg())
-                    .into(imgProfile);
-            Glide.with(getApplicationContext())
-                    .load(PropertyManager.getInstance().getUserProfileImg())
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .bitmapTransform(new BlurTransformation(getApplicationContext(), null))
-                    .into(imgProfileBackground);
+                    .asBitmap()
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap resource,
+                                                    GlideAnimation<? super Bitmap> glideAnimation) {
+                            imgProfile.setImageBitmap(resource);
+                            imgProfileBackground.setImageBitmap(
+                                    BlurBuilder.blur(resource, 5));
+                        }
+                    });
+
         } else {
             imgProfile.setImageResource(R.drawable.none_my_profile);
         }
@@ -286,6 +292,7 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
 
         return menu;
     }
+
 
     // 메뉴 뷰페이저 어답터
     private static class MenuViewPagerAdapter extends FragmentPagerAdapter {
@@ -398,7 +405,7 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
 
                 Request request = new Request.Builder()
                         .url(String.format(
-                                NetworkDefineConstant.SERVER_USER_INFO,
+                                NetworkDefineConstant.GET_SERVER_USER_INFO,
                                 args[0]))
                         .build();
                 Response response = toServer.newCall(request).execute();

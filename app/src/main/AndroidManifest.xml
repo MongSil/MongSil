@@ -48,17 +48,17 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PostDetailActivity"
-            android:windowSoftInputMode="stateUnspecified"/>
+            android:windowSoftInputMode="adjustUnspecified"/>
         <activity
             android:name=".PostingActivity"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
+            android:windowSoftInputMode="stateAlwaysVisible|adjustUnspecified" />
         <activity android:name=".CameraGalleryActivity" />
 
         <meta-data
             android:name="kr.co.tacademy.mongsil.mongsil.MongSilGlideModule"
             android:value="GlideModule" />
 
-        <activity android:name=".MapActivity"></activity>
+        <activity android:name=".MapActivity"/>
     </application>
 
 </manifest>

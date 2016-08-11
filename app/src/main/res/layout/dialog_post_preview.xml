@@ -1,0 +1,115 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="kr.co.tacademy.mongsil.mongsil.PostPreviewFragment">
+
+    <ImageView
+        android:id="@+id/img_preview_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <ImageView
+        android:id="@+id/img_close_x"
+        android:background="@color/invisible"
+        android:src="@drawable/icon_close"
+        android:layout_gravity="end"
+        android:layout_marginRight="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/toolbar_size"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <ImageView
+        android:id="@+id/img_weather_icon"
+        android:layout_width="match_parent"
+        android:layout_height="156dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/toolbar_size"
+        android:scaleType="centerInside" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="156dp"
+        android:layout_gravity="center"
+        android:background="@color/post_background"
+        android:layout_below="@+id/img_weather_icon"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:id="@+id/text_preview_post_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/post_info_container"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="italic" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/text_post_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/post_line" />
+
+        <RelativeLayout
+            android:id="@+id/post_info_container"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:id="@+id/text_preview_post_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:drawableLeft="@drawable/icon_nevi_write_bottom"
+                android:drawablePadding="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/text_preview_post_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="3dp"
+                android:layout_toEndOf="@+id/text_post_location"
+                android:layout_toRightOf="@+id/text_post_location"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/text_preview_post_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:text="@string/reply_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:drawableLeft="@drawable/icon_bubblechat_write_bottom"
+                android:drawablePadding="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:textStyle="italic" />
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>

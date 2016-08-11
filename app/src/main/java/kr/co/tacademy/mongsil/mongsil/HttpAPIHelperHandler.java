@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 
 // okHttp3를 쓰기로 해서 쓰지 않음 - 혹시 몰라서 남겨둠
 public class HttpAPIHelperHandler {
@@ -21,7 +20,7 @@ public class HttpAPIHelperHandler {
         HttpURLConnection connection = null;
         try {
             connection = HttpConnectionManager.getHttpURLConnection(
-                    NetworkDefineConstant.SERVER_POST);
+                    NetworkDefineConstant.GET_SERVER_POST);
 
             int responseCode = connection.getResponseCode();
 

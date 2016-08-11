@@ -26,17 +26,25 @@ public class SignUpActivity extends BaseActivity
         setContentView(R.layout.activity_sign_up);
 
         editName = (EditText) findViewById(R.id.edit_name);
+        editName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(b) {
+                    editName.setHint("");
+                } else {
+                    editName.setHint(getResources().getText(R.string.name));
+                }
+            }
+        });
         underlineName = findViewById(R.id.underline_name);
         editName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 underlineName.setBackgroundColor(getResources().getColor(R.color.gray));
-                if(!editName.isFocused()) {
-                    underlineName.setBackgroundColor(getResources().getColor(R.color.light_gray));
-                    InputMethodManager imm = (InputMethodManager)
-                            getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                }
+                underlineName.setBackgroundColor(getResources().getColor(R.color.light_gray));
+                InputMethodManager imm = (InputMethodManager)
+                        getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         });
 
@@ -45,11 +53,10 @@ public class SignUpActivity extends BaseActivity
         location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                underlineLocation.setBackgroundColor(getResources().getColor(R.color.gray));
-                new SignupSelectLocationDialogFragment().show(getSupportFragmentManager(), "select");
-                if(!editName.isFocused()) {
-                    underlineName.setBackgroundColor(getResources().getColor(R.color.light_gray));
+                if(editName.getText().toString().isEmpty()) {
+                    editName.setHint(getResources().getText(R.string.name));
                 }
+                new SignupSelectLocationDialogFragment().show(getSupportFragmentManager(), "select");
             }
         });
 

@@ -44,7 +44,7 @@ public class PropertyManager {
     }
 
     public String getUserId() {
-        return preferences.getString(KEY_USERID, "7"); // 임시 7
+        return preferences.getString(KEY_USERID, "11"); // 임시 7
     }
 
     public void setUserId(String userId) {
@@ -53,7 +53,9 @@ public class PropertyManager {
     }
 
     public String getUserProfileImg() {
-        return preferences.getString(KEY_USER_PROFILE_IMG, "null"); // 임시 읎음
+        return preferences.getString(KEY_USER_PROFILE_IMG,
+                "https://s3.ap-northeast-2.amazonaws.com/mytproject2016/profile/img_1470648176191.jpg");
+        // 임시 부산녀2
     }
 
     public void setUserProfileImg(String userProfileImg) {
@@ -62,7 +64,7 @@ public class PropertyManager {
     }
 
     public String getNickname() {
-        return preferences.getString(KEY_NICKNAME, "부산남1"); // 임시 부산남1
+        return preferences.getString(KEY_NICKNAME, "부산녀2"); // 임시 부산녀2
     }
 
     public void setNickname(String nickname) {

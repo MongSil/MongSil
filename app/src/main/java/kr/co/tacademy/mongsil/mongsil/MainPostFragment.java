@@ -1,16 +1,13 @@
 package kr.co.tacademy.mongsil.mongsil;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
@@ -100,7 +97,7 @@ public class MainPostFragment extends Fragment {
 
                 Request request = new Request.Builder()
                         .url(String.format(
-                                NetworkDefineConstant.SERVER_POST,
+                                NetworkDefineConstant.GET_SERVER_POST,
                                 args[0], args[1]))
                         .build();
                 Response response = toServer.newCall(request).execute();

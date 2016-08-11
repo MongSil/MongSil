@@ -52,8 +52,8 @@ public class TimeData {
         try {
             Date tempDate = dateFormat.parse(date);
 
-            if (tempDate.getTime() / (1000*60*60*24)
-                    == now.getTime() / (1000*60*60*24) ) {
+            if ((int)(tempDate.getTime() / (1000*60*60*24))
+                    == (int)(now.getTime() / (1000*60*60*24)) ) {
                 return "Today";
             } else if (tempDate.before(now)) {
                 int subDay = (int)((now.getTime() - tempDate.getTime()) / (1000*60*60*24));
@@ -73,8 +73,8 @@ public class TimeData {
         try {
             Date tempDate = dateFormat.parse(date);
 
-            if (tempDate.getTime() / (1000*60*60*24)
-                    == now.getTime() / (1000*60*60*24) ) {
+            if ((int)(tempDate.getTime() / (1000*60*60*24))
+                    == (int)(now.getTime() / (1000*60*60*24)) ) {
                 return "오늘";
             } else if (tempDate.before(now)) {
                 int subDay = (int)((now.getTime() - tempDate.getTime()) / (1000*60*60*24));
@@ -102,12 +102,17 @@ public class TimeData {
         return "error";
     }
 
+    // 글 작성 후 미리보기할 때 시간을 보여주는 메소드
+    public static String PreviewPostTime() {
+        return new SimpleDateFormat("HH:mm a", Locale.ENGLISH).format(now);
+    }
+
     // 현재 시간에서 얼마나 시간이 지났는지 계산하는 메소드
     public static String timeCalculate(String time) {
         try {
             Date tempTime = dateFormat.parse(time);
-            if (tempTime.getTime() / (1000*60*60*24)
-                    == now.getTime() / (1000*60*60*24)) {
+            if ((int)(tempTime.getTime() / (1000*60*60*24))
+                    == (int)(now.getTime() / (1000*60*60*24)) ) {
                 return "지금";
             } else if (tempTime.before(now)) {
                 long subTime = (now.getTime() - tempTime.getTime()) / 1000;
