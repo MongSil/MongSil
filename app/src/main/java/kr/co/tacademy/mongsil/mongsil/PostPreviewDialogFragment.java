@@ -10,7 +10,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class PostPreviewFragment extends DialogFragment {
+public class PostPreviewDialogFragment extends DialogFragment {
     private static final String LOCATION = "location";
     private static final String CONTENT = "content";
     private static final String IMGRES = "imgres";
@@ -20,11 +20,11 @@ public class PostPreviewFragment extends DialogFragment {
     private int imgRes;
 
 
-    public PostPreviewFragment() {
+    public PostPreviewDialogFragment() {
     }
 
-    public static PostPreviewFragment newInstance(String location, String content, int imgRes) {
-        PostPreviewFragment fragment = new PostPreviewFragment();
+    public static PostPreviewDialogFragment newInstance(String location, String content, int imgRes) {
+        PostPreviewDialogFragment fragment = new PostPreviewDialogFragment();
         Bundle args = new Bundle();
         args.putString(LOCATION, location);
         args.putString(CONTENT, content);
@@ -41,10 +41,11 @@ public class PostPreviewFragment extends DialogFragment {
             content = getArguments().getString(CONTENT);
             imgRes = getArguments().getInt(IMGRES);
         }
+        setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
     }
 
     ImageView imgClose, imgBackground;
-    TextView postContent, postLocation, postTime;
+    TextView postContent, postLocation, postName, postTime;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,6 +68,9 @@ public class PostPreviewFragment extends DialogFragment {
 
         postLocation = (TextView) view.findViewById(R.id.text_preview_post_location);
         postLocation.setText(location);
+
+        postName = (TextView) view.findViewById(R.id.text_preview_post_name);
+        postName.setText(PropertyManager.getInstance().getNickname());
 
         postTime = (TextView) view.findViewById(R.id.text_preview_post_time);
         postTime.setText(TimeData.PreviewPostTime());

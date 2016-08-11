@@ -1,8 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="kr.co.tacademy.mongsil.mongsil.PostPreviewFragment">
+    tools:context=".PostPreviewDialogFragment">
 
     <ImageView
         android:id="@+id/img_preview_background"
@@ -21,27 +22,26 @@
         android:layout_alignParentEnd="true" />
 
     <ImageView
-        android:id="@+id/img_weather_icon"
+        android:id="@+id/img_preview_weather_icon"
         android:layout_width="match_parent"
         android:layout_height="156dp"
         android:layout_alignParentTop="true"
         android:layout_marginTop="@dimen/toolbar_size"
         android:scaleType="centerInside" />
-
+    <!-- 글 부분 -->
     <RelativeLayout
+        android:id="@+id/post_content_container"
         android:layout_width="match_parent"
         android:layout_height="156dp"
         android:layout_gravity="center"
         android:background="@color/post_background"
-        android:layout_below="@+id/img_weather_icon"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_centerVertical="true">
 
         <TextView
             android:id="@+id/text_preview_post_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/post_info_container"
+            android:layout_above="@+id/post_preview_info_container"
             android:layout_centerHorizontal="true"
             android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp"
@@ -53,13 +53,13 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_below="@+id/text_post_content"
+            android:layout_below="@+id/text_preview_post_content"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:background="@color/post_line" />
 
         <RelativeLayout
-            android:id="@+id/post_info_container"
+            android:id="@+id/post_preview_info_container"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_alignParentBottom="true"
@@ -85,8 +85,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="3dp"
-                android:layout_toEndOf="@+id/text_post_location"
-                android:layout_toRightOf="@+id/text_post_location"
+                android:layout_toEndOf="@+id/text_preview_post_location"
+                android:layout_toRightOf="@+id/text_preview_post_location"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
 
@@ -100,7 +100,7 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:text="@string/reply_count"
+                android:id="@+id/text_preview_post_comment_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"

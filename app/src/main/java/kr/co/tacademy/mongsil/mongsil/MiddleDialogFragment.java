@@ -31,19 +31,26 @@ public class MiddleDialogFragment extends DialogFragment {
     private static final String SELECTOR = "selector";
     private static final String POSTID = "postid";
 
+    private int selector;
+    private String postId;
+
     public MiddleDialogFragment() { }
     public static MiddleDialogFragment newInstance(int selector, String postId) {
-        MiddleDialogFragment f = new MiddleDialogFragment();
+        MiddleDialogFragment fragment = new MiddleDialogFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(SELECTOR, selector);
         bundle.putString(POSTID, postId);
-        f.setArguments(bundle);
-        return f;
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            selector = getArguments().getInt(SELECTOR);
+            postId = getArguments().getString(POSTID);
+        }
         setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
     }
 
@@ -57,16 +64,40 @@ public class MiddleDialogFragment extends DialogFragment {
         Button negative = (Button) view.findViewById(R.id.btn_negative);
         Button positive = (Button) view.findViewById(R.id.btn_positive);
 
-        // 셀렉터가 0일 경우 positive와 negative, 1일 경우 positive만
-        switch (getArguments().getInt(SELECTOR)) {
-            case 0 :
-                negative.setVisibility(View.VISIBLE);
-                line.setVisibility(View.VISIBLE);
+        negative.setText(getResources().getText(R.string.cancel));
+        positive.setText(getResources().getText(R.string.confirm));
 
+        // 셀렉터가 0일 경우 positive와 negative, 1일 경우 positive만
+        switch (selector) {
+            case 0 : // 삭제하는 경우 [취소 / 확인]
                 dialog.setText(getResources().getText(R.string.post_remove_question));
                 // if( ~~ ) {
-                negative.setText(getResources().getText(R.string.cancel));
-                positive.setText(getResources().getText(R.string.confirm));
+                negative.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                        new AsyncPostRemoveResponse().execute(postId);
+                    }
+                });
+                break;
+            case 1 : // 삭제 완료한 경우 [확인]
+                negative.setVisibility(View.GONE);
+                line.setVisibility(View.GONE);
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                break;
+            case 2 : // 저장하는 경우 [취소 / 확인]
+                dialog.setText(getResources().getText(R.string.save_edit_profile));
                 negative.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -79,24 +110,30 @@ public class MiddleDialogFragment extends DialogFragment {
                         dismiss();
                         if(dialog.getText()
                                 == getResources().getText(R.string.post_remove_question)) {
-                            new AsyncPostRemoveResponse().execute(getArguments().getString(POSTID));
+
                         }
                     }
                 });
-                return view;
-            case 1 :
-                negative.setVisibility(View.GONE);
-                line.setVisibility(View.GONE);
-
-                dialog.setText(getResources().getText(R.string.post_remove_done));
-                positive.setText(getResources().getText(R.string.confirm));
-                positive.setOnClickListener(new View.OnClickListener() {
+                break;
+            case 3 : // 저장 완료한 경우 [확인]
+                dialog.setText(getResources().getText(R.string.save_edit_profile));
+                negative.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         dismiss();
                     }
                 });
-                return view;
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                        if(dialog.getText()
+                                == getResources().getText(R.string.post_remove_question)) {
+                            new AsyncPostRemoveResponse().execute(postId);
+                        }
+                    }
+                });
+                break;
         }
         return view;
     }
@@ -150,7 +187,7 @@ public class MiddleDialogFragment extends DialogFragment {
             super.onPostExecute(s);
             if(responseCode >= 200 && responseCode < 400) {
                 getActivity().finish();
-                MiddleDialogFragment.newInstance(1, getArguments().getString(POSTID))
+                MiddleDialogFragment.newInstance(1, postId)
                         .show(getActivity().getSupportFragmentManager(), "middle");
             }
         }

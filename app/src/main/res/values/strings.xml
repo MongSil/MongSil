@@ -96,4 +96,5 @@
     <string name="gps_setting">위치 정보 사용</string>
     <string name="name_fail">이름을 입력해주세요</string>
     <string name="location_fail">지역을 선택해주세요</string>
+    <string name="save_edit_profile">바꾸신 내용을 저장하시겠어요?</string>
 </resources>

@@ -101,7 +101,7 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(PostPreviewFragment.newInstance(
+                        .add(PostPreviewDialogFragment.newInstance(
                                 location.getText().toString(),
                                 editPosting.getText().toString(),
                                 0), "preview").commit();
@@ -160,9 +160,6 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
                 // uploadCode = "1";
             }
         });
-
-
-
     }
 
     private class WeatherPagerAdapter extends PagerAdapter {
@@ -192,7 +189,7 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
         public Object instantiateItem(ViewGroup container, int position) {
             View view = getLayoutInflater()
                     .inflate(R.layout.layout_posting_select_weather, container, false);
-            imgWeatherIcon = (ImageView) view.findViewById(R.id.img_weather_icon);
+            imgWeatherIcon = (ImageView) view.findViewById(R.id.img_preview_weather_icon);
             imgWeatherIcon.setImageResource(
                     WeatherData.imgFromWeatherCode(String.valueOf(position+1), 0));
             if (imgWeatherIcon.isShown()) {
@@ -277,7 +274,6 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                startActivity(new Intent(getApplication(), MainActivity.class));
                 finish();
                 return true;
         }
@@ -286,7 +282,6 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
 
     @Override
     public void onBackPressed() {
-        //startActivity(new Intent(getApplicationContext(), MainActivity.class));
         finish();
         super.onBackPressed();
     }

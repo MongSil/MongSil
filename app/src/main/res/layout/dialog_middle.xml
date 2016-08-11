@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:background="@drawable/popup"
+    android:layout_marginTop="97dp"
     android:layout_marginLeft="58dp"
     android:layout_marginRight="58dp"
     android:layout_width="match_parent"

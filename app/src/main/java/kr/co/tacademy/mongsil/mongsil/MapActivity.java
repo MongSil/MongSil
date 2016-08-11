@@ -1,12 +1,11 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-public class MapActivity extends AppCompatActivity {
+public class MapActivity extends BaseActivity {
     public static final String LOCATION = "location";
 
     @Override

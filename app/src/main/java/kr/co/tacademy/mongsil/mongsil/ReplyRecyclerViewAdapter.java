@@ -87,7 +87,7 @@ public class ReplyRecyclerViewAdapter
             userReplyCard =
                     (CardView) view.findViewById(R.id.cardview_reply_item);
             textPostContent =
-                    (TextView) view.findViewById(R.id.text_post_content);
+                    (TextView) view.findViewById(R.id.text_preview_post_content);
             textMyCommentContent =
                     (TextView) view.findViewById(R.id.text_my_comment_content);
             textMyCommentTime =

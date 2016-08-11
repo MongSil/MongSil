@@ -5,12 +5,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -27,15 +25,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 public class SignupSelectLocationDialogFragment extends DialogFragment {
 
-    public SignupSelectLocationDialogFragment() { }
+    public SignupSelectLocationDialogFragment() {
+    }
 
     // 툴바
     ImageView tbImgClose;
     TextView tbDone;
 
+    ArrayList<String> locationNames;
+    ArrayList<Integer> locationImgs;
+
+
     RecyclerView selectLocationRecycle;
-    ArrayList<Integer> locationImg;
-    ArrayList<String> locationName;
     private int selectedPos = 0;
 
     public static interface OnSelectLocationListener {
@@ -62,20 +63,17 @@ public class SignupSelectLocationDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
+        locationNames = new ArrayList<String>();
+        locationImgs = new ArrayList<Integer>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_signup_select_location, container, false);
-        String[] location = {
-                "강원", "광주", "대구",
-                "대전", "부산", "서울",
-                "울산", "인천", "전라",
-                "제주", "충청" };
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        ((BaseActivity) getActivity()).setSupportActionBar(toolbar);
+        ActionBar actionBar = ((BaseActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
         }
@@ -90,7 +88,7 @@ public class SignupSelectLocationDialogFragment extends DialogFragment {
         tbDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                selectListener.onSelect(locationName.get(selectedPos));
+                selectListener.onSelect(locationNames.get(selectedPos));
                 dismiss();
             }
         });
@@ -99,11 +97,20 @@ public class SignupSelectLocationDialogFragment extends DialogFragment {
                 (RecyclerView) view.findViewById(R.id.signup_location_recycler);
         selectLocationRecycle.setLayoutManager(
                 new GridLayoutManager(getActivity().getApplicationContext(), 3));
-        locationName = new ArrayList<String>();
-        locationImg = new ArrayList<Integer>();
-        for(String s : location) {
-            locationName.add(s);
+
+        // 지역 자료(arrays)
+        String[] locations = getResources().getStringArray(R.array.locaitons);
+        int[] imgLocations = {
+                R.drawable.incheon, R.drawable.seoul, R.drawable.gangwon,
+                R.drawable.cheonju, 0, R.drawable.deagu,
+                R.drawable.gwangju, R.drawable.jeonju, R.drawable.ulsan,
+                R.drawable.busan, R.drawable.jeju
+        };
+        for (int i = 0; i < locations.length; i++) {
+            locationNames.add(locations[i]);
+            locationImgs.add(imgLocations[i]);
         }
+
         selectLocationRecycle.setAdapter(new SelectLocationViewAdapter());
 
         return view;
@@ -140,8 +147,9 @@ public class SignupSelectLocationDialogFragment extends DialogFragment {
         @Override
         public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
             // TODO : viewHolder.imgLocation.setImageResource();
-            viewHolder.location.setText(locationName.get(position));
+            viewHolder.location.setText(locationNames.get(position));
             viewHolder.imgSelector.setSelected(selectedPos == position);
+            viewHolder.imgLocation.setImageResource(locationImgs.get(position));
             viewHolder.imgLocation.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -154,7 +162,7 @@ public class SignupSelectLocationDialogFragment extends DialogFragment {
 
         @Override
         public int getItemCount() {
-            return locationName.size();
+            return locationNames.size();
         }
     }
 

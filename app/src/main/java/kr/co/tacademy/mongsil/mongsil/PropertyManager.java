@@ -108,6 +108,15 @@ public class PropertyManager {
         editor.commit();
     }
 
+    public Boolean getSaveGallery() {
+        return preferences.getBoolean(KEY_SAVE_GALLERY, true);
+    }
+
+    public void setSaveGallery(Boolean saveGallery) {
+        editor.putBoolean(KEY_SAVE_GALLERY, saveGallery);
+        editor.commit();
+    }
+
     public Boolean getUseGPS() {
         return preferences.getBoolean(KEY_USE_GPS, true);
     }
@@ -116,15 +125,4 @@ public class PropertyManager {
         editor.putBoolean(KEY_USE_GPS, usegps);
         editor.commit();
     }
-
-    public Boolean getSaveGallery() {
-        return preferences.getBoolean(KEY_SAVE_GALLERY, true);
-    }
-
-    public void setSaveGallery(Boolean saveGallery) {
-        editor.putBoolean(KEY_USE_GPS, saveGallery);
-        editor.commit();
-    }
-
-
 }

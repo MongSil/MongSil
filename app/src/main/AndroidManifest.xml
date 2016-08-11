@@ -48,10 +48,10 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PostDetailActivity"
-            android:windowSoftInputMode="adjustUnspecified"/>
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".PostingActivity"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustUnspecified" />
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".CameraGalleryActivity" />
 
         <meta-data

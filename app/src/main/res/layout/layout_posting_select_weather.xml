@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/splash_background"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <ImageView
         android:id="@+id/img_weather_background"
-        android:background="@drawable/splash_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <ImageView
-        android:id="@+id/img_weather_icon"
+        android:id="@+id/img_preview_weather_icon"
         android:src="@drawable/anim_list_icon_mongsil_big_snow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

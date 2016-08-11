@@ -2,7 +2,6 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:focusable="true"
     android:focusableInTouchMode="true"
     android:orientation="vertical"
     android:background="@drawable/sign_up_background"

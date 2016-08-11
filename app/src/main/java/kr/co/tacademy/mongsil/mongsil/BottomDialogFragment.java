@@ -17,6 +17,9 @@ public class BottomDialogFragment extends DialogFragment {
     private static final String DIVIDER = "divider";
     private static final String POSTID = "postid";
 
+    private int divider;
+    private String postId;
+
     public BottomDialogFragment() { }
     public static BottomDialogFragment newInstance(int divider, String postId) {
         BottomDialogFragment f = new BottomDialogFragment();
@@ -30,6 +33,10 @@ public class BottomDialogFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            divider = getArguments().getInt(DIVIDER);
+            postId = getArguments().getString(postId);
+        }
         setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
     }
 
@@ -37,9 +44,6 @@ public class BottomDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_bottom, container, false);
-
-        final Bundle bundle = getArguments();
-
         Button btnFirst = (Button) view.findViewById(R.id.btn_first);
         Button btnSecond = (Button) view.findViewById(R.id.btn_second);
         Button btnClose = (Button) view.findViewById(R.id.btn_close);
@@ -50,7 +54,7 @@ public class BottomDialogFragment extends DialogFragment {
             }
         });
 
-        switch (bundle.getInt(DIVIDER)) {
+        switch (divider) {
             case 0 :
                 final Intent cameraIntent = new Intent(getActivity(), CameraGalleryActivity.class);
 
@@ -88,7 +92,7 @@ public class BottomDialogFragment extends DialogFragment {
                     public void onClick(View view) {
                         // TODO: 글 수정 불러옴
                         Intent intent = new Intent(getContext(), PostingActivity.class);
-                        intent.putExtra("postid", bundle.getString(POSTID));
+                        intent.putExtra("postid", postId);
                         startActivity(intent);
                         dismiss();
                     }
@@ -102,7 +106,7 @@ public class BottomDialogFragment extends DialogFragment {
                         // TODO: 글을 삭제하시겠습니까? 요청
                         dismiss();
                         getActivity().getSupportFragmentManager().beginTransaction()
-                                .add(MiddleDialogFragment.newInstance(0, bundle.getString(POSTID)),
+                                .add(MiddleDialogFragment.newInstance(0, postId),
                                         "middle_post_remove").commit();
                     }
                 });

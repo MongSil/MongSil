@@ -3,7 +3,6 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -11,7 +10,7 @@ import android.support.v7.widget.Toolbar;
 /**
  * Created by Han on 2016-08-05.
  */
-public class AlarmActivity extends AppCompatActivity {
+public class AlarmActivity extends BaseActivity {
 
     RecyclerView alarmRecycler;
     Handler handler;

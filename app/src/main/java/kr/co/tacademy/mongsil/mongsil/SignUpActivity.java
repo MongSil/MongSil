@@ -2,8 +2,10 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,44 +17,39 @@ public class SignUpActivity extends BaseActivity
     // 이름, 지역 부분
     EditText editName;
     TextView location;
-    View underlineName, underlineLocation;
 
     // 완료
     ImageView imgDone;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
         editName = (EditText) findViewById(R.id.edit_name);
+        editName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editName.setHint("");
+            }
+        });
         editName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
                 if(b) {
                     editName.setHint("");
                 } else {
+                    InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(editName.getWindowToken(), 0);
                     editName.setHint(getResources().getText(R.string.name));
                 }
             }
         });
-        underlineName = findViewById(R.id.underline_name);
-        editName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                underlineName.setBackgroundColor(getResources().getColor(R.color.gray));
-                underlineName.setBackgroundColor(getResources().getColor(R.color.light_gray));
-                InputMethodManager imm = (InputMethodManager)
-                        getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-            }
-        });
-
         location = (TextView) findViewById(R.id.text_location);
-        underlineLocation = findViewById(R.id.underline_location);
         location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                location.requestFocus();
                 if(editName.getText().toString().isEmpty()) {
                     editName.setHint(getResources().getText(R.string.name));
                 }
@@ -79,6 +76,11 @@ public class SignUpActivity extends BaseActivity
                 SignUpActivity.this.finish();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     @Override

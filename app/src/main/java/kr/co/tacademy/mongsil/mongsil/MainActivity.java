@@ -26,8 +26,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
-import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -38,8 +36,6 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import jp.wasabeef.glide.transformations.BlurTransformation;
-import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -127,7 +123,7 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         if(animBackgroundWeather.isShown()) {
             ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
         }
-        imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
+        imgWeatherIcon = (ImageView) findViewById(R.id.img_preview_weather_icon);
         if(imgWeatherIcon.isShown()) {
             ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
         }
@@ -147,7 +143,6 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), PostingActivity.class));
-                finish();
             }
         });
     }
