@@ -49,7 +49,7 @@ public class MainPostFragment extends Fragment {
         postRecyclerView =
                 (RecyclerView) inflater.inflate(R.layout.fragment_post, container, false);
 
-        postAdapter = new PostRecyclerViewAdapter();
+        postAdapter = new PostRecyclerViewAdapter(getContext());
         final LinearLayoutManager layoutManager =
                 new LinearLayoutManager(MongSilApplication.getMongSilContext());
         postRecyclerView.setLayoutManager(layoutManager);

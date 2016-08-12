@@ -92,6 +92,6 @@ public class PostPreviewDialogFragment extends DialogFragment {
     @Override
     public void onStop() {
         super.onStop();
-        dismiss();
+        dismissAllowingStateLoss();
     }
 }

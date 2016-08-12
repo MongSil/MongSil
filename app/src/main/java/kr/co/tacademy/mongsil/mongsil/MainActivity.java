@@ -42,7 +42,7 @@ import okhttp3.ResponseBody;
 
 import static android.util.Log.e;
 
-public class MainActivity extends BaseActivity implements SearchPoiDialogFragment.OnSelectListener {
+public class MainActivity extends BaseActivity implements SearchPoiDialogFragment.OnPOISearchListener {
     // 툴바 필드
     TextView tbTitle;
     ImageView tbSearch;
@@ -65,6 +65,10 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
+        if(intent.getBooleanExtra("post_remove", false)) {
+            getSupportFragmentManager().beginTransaction().
+                    add(MiddleAloneDialogFragment.newInstance(0), "middle_done").commit();
+        }
         // 글 작성 프레그먼트와 슬라이딩메뉴 프레그먼트를 선언
         // TODO : GPS가 켜져 있을 경우 - GPS 지역
         // TODO : 안켜짐 - 가입시 선택한 지역 반환
@@ -159,7 +163,7 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
 
     // 날씨를 검색해서 지역 정보를 받아옴
     @Override
-    public void onSelect(POIData POIData) {
+    public void onPOISearch(POIData POIData) {
         if(POIData != null) {
             String location = POIData.upperAddrName;
             tbTitle.setText(location);

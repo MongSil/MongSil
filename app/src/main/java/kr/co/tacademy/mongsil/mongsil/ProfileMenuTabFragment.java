@@ -60,7 +60,7 @@ public class ProfileMenuTabFragment extends Fragment {
 
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
-            postAdapter = new PostRecyclerViewAdapter(
+            postAdapter = new PostRecyclerViewAdapter(MongSilApplication.getMongSilContext(),
                     getActivity().getSupportFragmentManager());
             userRecycler.setOnScrollListener(
                     new EndlessRecyclerOnScrollListener(layoutManager) {

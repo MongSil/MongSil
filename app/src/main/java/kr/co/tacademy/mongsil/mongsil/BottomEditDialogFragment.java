@@ -57,7 +57,6 @@ public class BottomEditDialogFragment extends DialogFragment {
         btnFirst.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 글 수정 불러옴
                 dismiss();
                 onBottomEditDialogListener.onSelectBottomEdit(0);
             }
@@ -68,7 +67,6 @@ public class BottomEditDialogFragment extends DialogFragment {
         btnSecond.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 글을 삭제하시겠습니까? 요청
                 dismiss();
                 onBottomEditDialogListener.onSelectBottomEdit(1);
             }
@@ -87,7 +85,7 @@ public class BottomEditDialogFragment extends DialogFragment {
     @Override
     public void onStop() {
         super.onStop();
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     @Override

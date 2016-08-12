@@ -1,9 +1,12 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +18,16 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.io.UnsupportedEncodingException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by Han on 2016-07-29.
@@ -26,20 +35,25 @@ import de.hdodenhof.circleimageview.CircleImageView;
 // 포스트 리스트 어답터
 public class PostRecyclerViewAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-        implements BottomEditDialogFragment.OnBottomEditDialogListener {
+        implements BottomEditDialogFragment.OnBottomEditDialogListener,
+                MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
     private static final int LAYOUT_DATE = 1000;
     private static final int LAYOUT_POST = 2000;
     private static final int LAYOUT_MY_POST = 3000;
     private static final int LAYOUT_MORE = 9999;
 
     List<Post> items;
+    Context context;
     FragmentManager fm;
 
-    PostRecyclerViewAdapter() {
+    Post postData;
+
+    PostRecyclerViewAdapter(Context context) {
+        this.context = context;
         items = new ArrayList<Post>();
     }
-    PostRecyclerViewAdapter(FragmentManager fm) {
-        this();
+    PostRecyclerViewAdapter(Context context, FragmentManager fm) {
+        this(context);
         this.fm = fm;
     }
 
@@ -110,9 +124,10 @@ public class PostRecyclerViewAdapter
             postContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
+                    Intent intent = new Intent(context, PostDetailActivity.class);
                     intent.putExtra("postid", String.valueOf(post.postId));
-                    view.getContext().startActivity(intent);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
                 }
             });
         }
@@ -157,17 +172,21 @@ public class PostRecyclerViewAdapter
             imgThreeDot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    fm.beginTransaction()
-                            .add(BottomEditDialogFragment.newInstance(),
-                                    "bottom_user_post").commit();
+                    postData = post;
+                    if(fm != null) {
+                        fm.beginTransaction()
+                                .add(BottomEditDialogFragment.newInstance(),
+                                        "bottom_user_post").commit();
+                    }
                 }
             });
             myPostCard.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
+                    Intent intent = new Intent(context, PostDetailActivity.class);
                     intent.putExtra("postid", String.valueOf(post.postId));
-                    view.getContext().startActivity(intent);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
                 }
             });
         }
@@ -245,22 +264,92 @@ public class PostRecyclerViewAdapter
         return items.size();
     }
 
+    // 글 삭제
+    public class AsyncPostRemoveResponse extends AsyncTask<String, String, String> {
+
+        Response response;
+
+        @Override
+        protected String doInBackground(String... args) {
+            try {
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url(String.format(NetworkDefineConstant.DELETE_SERVER_POST_REMOVE,
+                                args[0]))
+                        .delete()
+                        .build();
+
+                response = client.newCall(request).execute();
+                boolean flag = response.isSuccessful();
+                //응답 코드 200등등
+                int responseCode = response.code();
+                if (flag) {
+                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
+                    Log.e("response응답바디", response.body().string()); //json으로 변신
+                    return "success";
+                }
+            } catch (UnknownHostException une) {
+                Log.e("aa", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                Log.e("bb", uee.toString());
+            } catch (Exception e) {
+                Log.e("cc", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+
+            return "fail";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (s.equals("success")) {
+                Intent intent = new Intent(context, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("post_remove", true);
+                context.startActivity(intent);
+            } else if(s.equals("fail")) {
+                if (fm != null ) {
+                    fm.beginTransaction().
+                            add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();
+                }
+            }
+        }
+    }
+
+    // 글 수정과 글 삭제 하단 다이어로그
     @Override
     public void onSelectBottomEdit(int select) {
-        // TODO : PostDetailActivity랑 같이 해야함
+        switch (select) {
+            case 0:
+                Intent intent = new Intent(context, PostingActivity.class);
+                intent.putExtra("postdata", postData);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+                break;
+            case 1:
+                if(fm != null) {
+                    fm.beginTransaction()
+                            .add(MiddleSelectDialogFragment.newInstance(0),
+                                    "middle_post_remove").commit();
+                }
+                break;
+        }
+    }
+
+    // 글 삭제 다이어로그
+    @Override
+    public void onMiddleSelect(int select) {
         switch (select) {
             case 0 :
-                // TODO : 글 수정
-                Intent intent = new Intent(getContext(), PostingActivity.class);
-                intent.putExtra("postid", postId);
-                startActivity(intent);
-                break;
-            case 1 :
-                // TODO : 글 삭제
-                getSupportFragmentManager().beginTransaction()
-                        .add(MiddleSelectDialogFragment.newInstance(0),
-                                "middle_post_remove").commit();
-                break;
+                new AsyncPostRemoveResponse().execute(String.valueOf(postData.postId));
         }
     }
 }

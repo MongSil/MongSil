@@ -60,8 +60,6 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                 });
                 break;
             case 1 : // 삭제 실패한 경우 [확인]
-                negative.setVisibility(View.GONE);
-                line.setVisibility(View.GONE);
                 dialog.setText(getResources().getText(R.string.post_remove_fail));
                 positive.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -71,8 +69,6 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                 });
                 break;
             case 2 : // 저장 완료한 경우 [확인]
-                negative.setVisibility(View.GONE);
-                line.setVisibility(View.GONE);
                 dialog.setText(getResources().getText(R.string.save_edit_profile_done));
                 positive.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -81,6 +77,16 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                     }
                 });
                 break;
+            case 3 : // 저장 실패한 경우 [확인]
+                dialog.setText(getResources().getText(R.string.save_edit_profile_fail));
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                break;
+
         }
         return view;
     }
@@ -88,7 +94,7 @@ public class MiddleAloneDialogFragment extends DialogFragment {
     @Override
     public void onStop() {
         super.onStop();
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     @Override

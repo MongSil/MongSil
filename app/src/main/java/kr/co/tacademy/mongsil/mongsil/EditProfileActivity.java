@@ -43,6 +43,7 @@ import okhttp3.Response;
  */
 public class EditProfileActivity extends BaseActivity
         implements BottomPicDialogFragment.OnBottomPicDialogListener,
+                MiddleSelectDialogFragment.OnMiddleSelectDialogListener,
                 SelectLocationDialogFragment.OnSelectLocationListener {
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
@@ -350,6 +351,72 @@ public class EditProfileActivity extends BaseActivity
         editLocation.setText(selectLocation);
     }
 
+    // 계정 삭제 다이어로그 셀렉터 인터페이스에서 받음
+    @Override
+    public void onMiddleSelect(int select) {
+        switch (select) {
+            case 99 :
+                new AsyncUserRemoveResponse().execute();
+        }
+    }
+
+    // 계정 삭제
+    public class AsyncUserRemoveResponse extends AsyncTask<String, String, String> {
+
+        Response response;
+
+        @Override
+        protected String doInBackground(String... args) {
+            try {
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url(String.format(NetworkDefineConstant.DELETE_SERVER_USER_REMOVE,
+                                PropertyManager.getInstance().getUserId()))
+                        .delete()
+                        .build();
+
+                response = client.newCall(request).execute();
+                boolean flag = response.isSuccessful();
+                //응답 코드 200등등
+                int responseCode = response.code();
+                if (flag) {
+                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
+                    Log.e("response응답바디", response.body().string()); //json으로 변신
+                    return "success";
+                }
+            } catch (UnknownHostException une) {
+                Log.e("aa", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                Log.e("bb", uee.toString());
+            } catch (Exception e) {
+                Log.e("cc", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+
+            return "fail";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (s.equals("success")) {
+                Intent intent = new Intent(EditProfileActivity.this, SplashActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+            } else if(s.equals("fail")) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(MiddleAloneDialogFragment.newInstance(1), "middle_dialog").commit();
+            }
+        }
+    }
+
     // 이미지 업로드
     private class FileUpLoadAsyncTask extends AsyncTask<UpLoadValueObject, Void, String> {
         private String username; //보낼쿼리
@@ -409,7 +476,7 @@ public class EditProfileActivity extends BaseActivity
 
                 //요청 세팅
                 Request request = new Request.Builder()
-                        .url(String.format(NetworkDefineConstant.POST_SERVER_USER_EDIT,
+                        .url(String.format(NetworkDefineConstant.PUT_SERVER_USER_EDIT,
                                 PropertyManager.getInstance().getUserId()))
                         .put(fileUploadBody)
                         .build();

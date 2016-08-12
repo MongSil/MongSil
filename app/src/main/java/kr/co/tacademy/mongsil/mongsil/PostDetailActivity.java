@@ -20,14 +20,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -38,17 +35,18 @@ import okhttp3.ResponseBody;
 import static android.util.Log.e;
 
 public class PostDetailActivity extends BaseActivity
-        implements BottomEditDialogFragment.OnBottomEditDialogListener{
+        implements BottomEditDialogFragment.OnBottomEditDialogListener,
+                MiddleSelectDialogFragment.OnMiddleSelectDialogListener{
     private static final String POST_ID = "postid";
 
     String postId;
     // 툴바 필드
     Toolbar toolbar;
     TextView tbTitle;
-    ImageView imgThreeDot;
+    ImageView tbThreeDot;
 
     // 글 필드
-    ImageView imgBackground, tbThreeDot, imgWeatherIcon;
+    ImageView imgBackground, imgWeatherIcon;
     TextView postContent, postLocation, postTime, postName, postReplyCount;
     Post post;
 
@@ -435,7 +433,7 @@ public class PostDetailActivity extends BaseActivity
                         .build();
 
                 Request request = new Request.Builder()
-                        .url(String.format(NetworkDefineConstant.POST_SERVER_POST_REMOVE,
+                        .url(String.format(NetworkDefineConstant.DELETE_SERVER_POST_REMOVE,
                                 args[0]))
                         .delete()
                         .build();
@@ -468,36 +466,41 @@ public class PostDetailActivity extends BaseActivity
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             if (s.equals("success")) {
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("post_remove", true);
                 startActivity(intent);
-                getActivity().finish();
-                dismiss();
-                getFragmentManager().beginTransaction().
-                        add(MiddleAloneDialogFragment.newInstance(1, postId), "middle_select").commit();
+                finish();
             } else if(s.equals("fail")) {
-                dismiss();
-                getFragmentManager().beginTransaction().
-                        add(MiddleAloneDialogFragment.newInstance(2, postId), "middle_fail").commit();
+                getSupportFragmentManager().beginTransaction().
+                        add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();
             }
         }
     }
 
+    // 글 수정과 글 삭제 하단 다이어로그
     @Override
     public void onSelectBottomEdit(int select) {
         switch (select) {
-            case 0 :
-                // TODO : 글 수정
-                Intent intent = new Intent(getContext(), PostingActivity.class);
-                intent.putExtra("postid", postId);
+            case 0:
+                Intent intent = new Intent(getApplicationContext(), PostingActivity.class);
+                intent.putExtra("postdata", post);
                 startActivity(intent);
                 break;
-            case 1 :
-                // TODO : 글 삭제
+            case 1:
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleSelectDialogFragment.newInstance(0),
                                 "middle_post_remove").commit();
                 break;
+        }
+    }
+
+    // 글 삭제 다이어로그
+    @Override
+    public void onMiddleSelect(int select) {
+        switch (select) {
+            case 0 :
+                new AsyncPostRemoveResponse().execute(postId);
         }
     }
 

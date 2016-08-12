@@ -151,7 +151,7 @@ public class BottomPicDialogFragment extends DialogFragment {
     @Override
     public void onStop() {
         super.onStop();
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     @Override
@@ -161,7 +161,7 @@ public class BottomPicDialogFragment extends DialogFragment {
         WindowManager.LayoutParams wlp = window.getAttributes();
         wlp.windowAnimations = R.style.BottomDialogAnimation;
         wlp.gravity = Gravity.BOTTOM;
-        wlp.height = getResources().getDimensionPixelSize(R.dimen.dialog_pic_vertical);
+        wlp.height = getResources().getDimensionPixelSize(R.dimen.dialog_pic_vertical)*2;
         window.setAttributes(wlp);
     }
 }

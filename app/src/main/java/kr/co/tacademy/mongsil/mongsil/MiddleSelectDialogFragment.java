@@ -60,13 +60,11 @@ public class MiddleSelectDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.dialog_middle, container, false);
 
         final TextView dialog = (TextView) view.findViewById(R.id.text_dialog);
-        View line = view.findViewById(R.id.middle_dialog_line);
         Button negative = (Button) view.findViewById(R.id.btn_negative);
         Button positive = (Button) view.findViewById(R.id.btn_positive);
 
-        // 셀렉터가 0일 경우 positive와 negative, 1일 경우 positive만
         switch (selector) {
-            case 0: // 삭제하는 경우 [취소 / 확인]
+            case 0: // 글 삭제하는 경우 [취소 / 확인]
                 dialog.setText(getResources().getText(R.string.post_remove_question));
                 // if( ~~ ) {
                 negative.setOnClickListener(new View.OnClickListener() {
@@ -79,12 +77,12 @@ public class MiddleSelectDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(View view) {
                         dismiss();
-
+                        onMiddleSelectDialogListener.onMiddleSelect(0);
                     }
                 });
                 break;
-            case 2: // 저장하는 경우 [취소 / 확인]
-                dialog.setText(getResources().getText(R.string.save_edit_profile));
+            case 1: // 글 저장하는 경우 [취소 / 확인]
+                dialog.setText(getResources().getText(R.string.save_post));
                 negative.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -95,6 +93,23 @@ public class MiddleSelectDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(View view) {
                         dismiss();
+                        onMiddleSelectDialogListener.onMiddleSelect(1);
+                    }
+                });
+                break;
+            case 2: // 글 수정하는 경우 [취소 / 확인]
+                dialog.setText(getResources().getText(R.string.save_modify_profile));
+                negative.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                        onMiddleSelectDialogListener.onMiddleSelect(2);
                     }
                 });
                 break;
@@ -110,6 +125,7 @@ public class MiddleSelectDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(View view) {
                         dismiss();
+                        onMiddleSelectDialogListener.onMiddleSelect(99);
                     }
                 });
                 break;
@@ -120,7 +136,7 @@ public class MiddleSelectDialogFragment extends DialogFragment {
     @Override
     public void onStop() {
         super.onStop();
-        dismiss();
+        dismissAllowingStateLoss();
     }
 
     @Override

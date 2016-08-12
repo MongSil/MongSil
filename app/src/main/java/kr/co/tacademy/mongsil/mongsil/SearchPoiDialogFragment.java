@@ -49,17 +49,17 @@ public class SearchPoiDialogFragment extends DialogFragment {
 
     public SearchPoiDialogFragment() { }
 
-    public static interface OnSelectListener {
-        public abstract void onSelect(POIData POIData);
+    public static interface OnPOISearchListener {
+        public abstract void onPOISearch(POIData POIData);
     }
 
-    private OnSelectListener selectListener;
+    private OnPOISearchListener searchListener;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnSelectListener) {
-            selectListener = (OnSelectListener) context;
+        if (context instanceof OnPOISearchListener) {
+            searchListener = (OnPOISearchListener) context;
         }
     }
 
@@ -174,7 +174,7 @@ public class SearchPoiDialogFragment extends DialogFragment {
             holder.locationItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    selectListener.onSelect(POIData.get(position));
+                    searchListener.onPOISearch(POIData.get(position));
                     cancelSearch();
                     dismiss();
                 }
