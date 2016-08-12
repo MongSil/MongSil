@@ -17,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -82,6 +84,7 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
             public void onClick(View view) {
                 // 아이콘 코드 임시 "0"
                 // 백그라운드 이미지 임시 ""
+
                 new AsyncPostingResponse().execute(
                         uploadCode,    // 이미지 업로드 코드
                         area1,  // 지역1
@@ -102,7 +105,7 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
                         .add(PostPreviewDialogFragment.newInstance(
-                                location.getText().toString(),
+                                area1,
                                 editPosting.getText().toString(),
                                 0), "preview").commit();
             }
@@ -191,7 +194,7 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
                     .inflate(R.layout.layout_posting_select_weather, container, false);
             imgWeatherIcon = (ImageView) view.findViewById(R.id.img_preview_weather_icon);
             imgWeatherIcon.setImageResource(
-                    WeatherData.imgFromWeatherCode(String.valueOf(position+1), 0));
+                    WeatherData.imgFromWeatherCode(String.valueOf(position + 1), 0));
             if (imgWeatherIcon.isShown()) {
                 ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
             }
@@ -205,76 +208,98 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
 
     public class AsyncPostingResponse extends AsyncTask<String, String, String> {
 
-        int responseCode = 0;
+        Response response;
 
         @Override
         protected String doInBackground(String... args) {
-                //업로드는 타임 및 리드타임을 넉넉히 준다.
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .connectTimeout(30, TimeUnit.SECONDS)
-                        .readTimeout(30, TimeUnit.SECONDS)
-                        .build();
+            //업로드는 타임 및 리드타임을 넉넉히 준다.
+            try {
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .build();
 
-                //요청 Body 세팅==> 그전 Query Parameter세팅과 같은 개념
-                RequestBody formBody = new FormBody.Builder()
-                        .add("uploadCode", args[0])
-                        .add("area1", args[1])
-                        .add("area2", args[2])
-                        .add("userId", args[3])
-                        .add("weatherCode", args[4])
-                        .add("iconCode", args[5])
-                        .add("bgImg", args[6])
-                        .add("content", args[7])
-                        .build();
-                //요청 세팅
-                Request request = new Request.Builder()
-                        .url(NetworkDefineConstant.POST_SERVER_POST)
-                        .post(formBody) //반드시 post로
-                        .build();
+            //요청 Body 세팅==> 그전 Query Parameter세팅과 같은 개념
+            RequestBody formBody = new FormBody.Builder()
+                    .add("uploadCode", args[0])
+                    .add("area1", args[1])
+                    .add("area2", args[2])
+                    .add("userId", args[3])
+                    .add("weatherCode", args[4])
+                    .add("iconCode", args[5])
+                    .add("bgImg", args[6])
+                    .add("content", args[7])
+                    .add("date", TimeData.getNow())
+                    .build();
+            //요청 세팅
+            Request request = new Request.Builder()
+                    .url(NetworkDefineConstant.POST_SERVER_POST)
+                    .post(formBody) //반드시 post로
+                    .build();
 
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        Log.e("요청오류", "요청을 보내는 데 실패했습니다.");
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        boolean flag = response.isSuccessful();
-                        responseCode = response.code();
-                        if (flag) {
-                            Log.e("response결과", response.message()); //읃답에 대한 메세지(OK)
-                            Log.e("response응답바디", response.body().string()); //json으로 변신
-                        }
-                    }
-                });
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            // TODO : 액티비티 전환 시 인텐트 전달 후 지역 변경
-            if(responseCode >= 400) {
-                Intent intent = new Intent(PostingActivity.this, MainActivity.class);
-                intent.putExtra("area1", area1);
-                finish();
+            response = client.newCall(request).execute();
+            boolean flag = response.isSuccessful();
+            //응답 코드 200등등
+            int responseCode = response.code();
+            if (flag) {
+                Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
+                Log.e("response응답바디", response.body().string()); //json으로 변신
+                return "success";
+            }
+        } catch(UnknownHostException une) {
+            Log.e("aa", une.toString());
+        } catch(UnsupportedEncodingException uee) {
+            Log.e("bb", uee.toString());
+        } catch(Exception e) {
+            Log.e("cc", e.toString());
+        } finally {
+            if (response != null) {
+                response.close();
             }
         }
+
+        return "fail";
     }
 
     @Override
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+        if (s.equals("success")) {
+            Intent intent = new Intent(PostingActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtra("area1", area1);
+            startActivity(intent);
+            finish();
+        } else if(s.equals("fail")) {
+            // 실패
+        }
+    }
+
+}
+
+    @Override
     public void onSelect(POIData POIData) {
-        location.setText(POIData.name);
         area1 = POIData.upperAddrName;
         area2 = POIData.middleAddrName;
+        if (!area2.isEmpty()) {
+            location.setText(String.valueOf(area1 + ", " + area2));
+        } else {
+            location.setText(area1);
+        }
+    }
+
+    private void toMainActivityFromthis() {
+        Intent intent = new Intent(PostingActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                toMainActivityFromthis();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -282,7 +307,7 @@ public class PostingActivity extends BaseActivity implements SearchPoiDialogFrag
 
     @Override
     public void onBackPressed() {
-        finish();
+        toMainActivityFromthis();
         super.onBackPressed();
     }
 }

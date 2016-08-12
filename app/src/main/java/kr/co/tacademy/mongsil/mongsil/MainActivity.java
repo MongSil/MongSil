@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -61,7 +60,6 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
 
     // 글쓰기 버튼
     FloatingActionButton btnCapturePost;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,9 +86,16 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         }
         tbTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         tbTitle.setText(PropertyManager.getInstance().getLocation());
-        new AsyncLatLonWeatherJSONList().execute(
-                PropertyManager.getInstance().getLatLocation(),
-                PropertyManager.getInstance().getLonLocation());
+        if(!getIntent().hasExtra("area1")) {
+            new AsyncLatLonWeatherJSONList().execute(
+                    PropertyManager.getInstance().getLatLocation(),
+                    PropertyManager.getInstance().getLonLocation());
+        } else {
+            String[] latLon =
+                    LocationData.ChangeToLatLon(getIntent().getStringExtra("area1"));
+            new AsyncLatLonWeatherJSONList().execute(latLon[0], latLon[1]);
+
+        }
         // TODO : 11개 지역 위도경도 추가해야함
         tbTitle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,9 +109,6 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, MapActivity.class);
-                if(Build.VERSION_CODES.LOLLIPOP <= Build.VERSION.SDK_INT){
-                    intent.addFlags(Intent.FLAG_ACTIVITY_RETAIN_IN_RECENTS);
-                }
                 startActivity(intent);
             }
         });
@@ -343,6 +345,9 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
 
     // 위도, 경도 날씨 AsyncTask
     public class AsyncLatLonWeatherJSONList extends AsyncTask<String, Integer, WeatherData> {
+
+        Response response;
+
         @Override
         protected WeatherData doInBackground(String... args) {
             try{
@@ -358,7 +363,8 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
                                 NetworkDefineConstant.SK_WEATHER_LAT_LON,
                                 args[0], args[1]))
                         .build();
-                Response response = toServer.newCall(request).execute();
+
+                response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
 
                 boolean flag = response.isSuccessful();
@@ -375,6 +381,10 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
                 e("connectionFail", uee.toString());
             } catch (Exception e) {
                 e("connectionFail", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
             return null;
         }

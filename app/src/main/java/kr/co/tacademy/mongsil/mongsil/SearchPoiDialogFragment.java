@@ -189,6 +189,9 @@ public class SearchPoiDialogFragment extends DialogFragment {
 
     // 지역검색 AsyncTask
     public class AsyncPoiJSONList extends AsyncTask<String, Integer, SearchPoiInfo> {
+
+        Response response;
+
         @Override
         protected SearchPoiInfo doInBackground(String... args) {
             try{
@@ -221,6 +224,10 @@ public class SearchPoiDialogFragment extends DialogFragment {
                 e("connectionFail", uee.toString());
             } catch (Exception e) {
                 e("connectionFail", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
             return null;
         }

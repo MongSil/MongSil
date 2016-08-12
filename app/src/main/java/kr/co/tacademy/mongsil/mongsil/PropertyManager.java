@@ -44,7 +44,7 @@ public class PropertyManager {
     }
 
     public String getUserId() {
-        return preferences.getString(KEY_USERID, "11"); // 임시 7
+        return preferences.getString(KEY_USERID, "11"); // 임시 11
     }
 
     public void setUserId(String userId) {
@@ -54,7 +54,7 @@ public class PropertyManager {
 
     public String getUserProfileImg() {
         return preferences.getString(KEY_USER_PROFILE_IMG,
-                "https://s3.ap-northeast-2.amazonaws.com/mytproject2016/profile/img_1470648176191.jpg");
+                "https://s3.ap-northeast-2.amazonaws.com/mytproject2016/profile/img_1470648145888.jpg");
         // 임시 부산녀2
     }
 
@@ -82,7 +82,7 @@ public class PropertyManager {
     }
 
     public String getLatLocation() {
-        return preferences.getString(KEY_LAT_LOCATION, "35.1788483"); // 임시 부산의 위도 경도
+        return preferences.getString(KEY_LAT_LOCATION, LocationData.ChangeToLatLon(getLocation())[0]);
     }
 
     public void setLatLocation(String latLocation) {
@@ -91,7 +91,7 @@ public class PropertyManager {
     }
 
     public String getLonLocation() {
-        return preferences.getString(KEY_LAT_LOCATION, "129.0758175"); // 임시 부산의 위도 경도
+        return preferences.getString(KEY_LAT_LOCATION, LocationData.ChangeToLatLon(getLocation())[1]);
     }
 
     public void setLonLocation(String lonLocation) {
@@ -121,8 +121,8 @@ public class PropertyManager {
         return preferences.getBoolean(KEY_USE_GPS, true);
     }
 
-    public void setUseGps(Boolean usegps) {
-        editor.putBoolean(KEY_USE_GPS, usegps);
+    public void setUseGps(Boolean useGPS) {
+        editor.putBoolean(KEY_USE_GPS, useGPS);
         editor.commit();
     }
 }

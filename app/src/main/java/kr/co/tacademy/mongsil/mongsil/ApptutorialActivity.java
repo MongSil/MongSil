@@ -96,12 +96,15 @@ public class AppTutorialActivity extends BaseActivity {
     private void endTutorial() {
         Intent intent = new Intent(AppTutorialActivity.this, SignUpActivity.class);
         startActivity(intent);
-        AppTutorialActivity.this.finish();
+        finish();
     }
     @Override
     public void onBackPressed() {
         if (pager.getCurrentItem() == 0) {
             super.onBackPressed();
+            Intent intent = new Intent(AppTutorialActivity.this, SplashActivity.class);
+            startActivity(intent);
+            finish();
         } else {
             pager.setCurrentItem(pager.getCurrentItem() - 1);
         }

@@ -1,5 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -27,10 +28,22 @@ public class MapActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home :
-                finish();
+                toMainActivityFromthis();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void toMainActivityFromthis() {
+        Intent intent = new Intent(MapActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        toMainActivityFromthis();
+    }
 }

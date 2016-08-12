@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:background="@drawable/popup"
-    android:layout_marginTop="97dp"
     android:layout_marginLeft="58dp"
     android:layout_marginRight="58dp"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content">
+    <ImageView
+        android:src="@drawable/popup"
+        android:layout_marginTop="@dimen/dialog_middle_vertical_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/text_dialog"
         android:text="@string/dialog"
         android:textSize="17sp"
+        android:textColor="@android:color/black"
         android:background="@color/invisible"
         android:gravity="center"
+        android:layout_marginTop="@dimen/dialog_middle_vertical_margin"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_width="match_parent"
@@ -21,28 +25,31 @@
     <View
         android:id="@+id/middle_dialog_line"
         android:background="@color/line"
+        android:layout_below="@id/text_dialog"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp"
         android:layout_width="match_parent"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_height="1dp"/>
+        android:layout_height="1dp" />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_gravity="center"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_below="@id/middle_dialog_line"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp"
         android:layout_width="match_parent"
         android:layout_height="41dp">
         <Button
             android:id="@+id/btn_negative"
             android:text="@string/cancel"
             android:textSize="16sp"
+            android:textColor="@android:color/black"
             android:textStyle="italic"
             android:background="@color/invisible"
             android:gravity="center"
             android:visibility="visible"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.4"
+            android:layout_weight="1"
             android:layout_gravity="center" />
         <View
             android:background="@color/line"
@@ -54,12 +61,13 @@
             android:id="@+id/btn_positive"
             android:text="@string/confirm"
             android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:textStyle="italic"
             android:background="@color/invisible"
             android:gravity="center"
-            android:layout_width="41dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_gravity="center" />
-
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

@@ -97,4 +97,8 @@
     <string name="name_fail">이름을 입력해주세요</string>
     <string name="location_fail">지역을 선택해주세요</string>
     <string name="save_edit_profile">바꾸신 내용을 저장하시겠어요?</string>
+    <string name="post_remove_fail">삭제에 실패했어요..</string>
+    <string name="save_edit_profile_done">저장 완료됐어요!</string>
+    <string name="select_remove">기본 이미지</string>
+    <string name="account_leave">계정을 삭제하시겠어요?</string>
 </resources>

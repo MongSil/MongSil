@@ -112,6 +112,8 @@ public class ProfileMenuTabFragment extends Fragment {
     // 나의 이야기
     public class AsyncUserPostJSONList extends AsyncTask<String, Integer, PostData> {
 
+        Response response;
+
         @Override
         protected PostData doInBackground(String... args) {
             try{
@@ -125,7 +127,7 @@ public class ProfileMenuTabFragment extends Fragment {
                                 NetworkDefineConstant.GET_SERVER_USER_POST,
                                 args[0], args[1]))
                         .build();
-                Response response = toServer.newCall(request).execute();
+                response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 boolean flag = response.isSuccessful();
                 int responseCode = response.code();
@@ -134,13 +136,16 @@ public class ProfileMenuTabFragment extends Fragment {
                     return ParseDataParseHandler.getJSONPostRequestAllList(
                             new StringBuilder(responseBody.string()));
                 }
-                responseBody.close();
             }catch (UnknownHostException une) {
                 e("fileUpLoad", une.toString());
             } catch (UnsupportedEncodingException uee) {
                 e("fileUpLoad", uee.toString());
             } catch (Exception e) {
                 e("fileUpLoad", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
             return null;
         }
@@ -176,6 +181,8 @@ public class ProfileMenuTabFragment extends Fragment {
     public class AsyncUserReplyJSONList
             extends AsyncTask<String, Integer, ArrayList<ReplyData>> {
 
+        Response response;
+
         @Override
         protected ArrayList<ReplyData> doInBackground(String... args) {
             try{
@@ -189,7 +196,7 @@ public class ProfileMenuTabFragment extends Fragment {
                                 NetworkDefineConstant.GET_SERVER_USER_REPLY,
                                 args[0], args[1]))
                         .build();
-                Response response = toServer.newCall(request).execute();
+                response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 boolean flag = response.isSuccessful();
 
@@ -206,6 +213,10 @@ public class ProfileMenuTabFragment extends Fragment {
                 e("fileUpLoad", uee.toString());
             } catch (Exception e) {
                 e("fileUpLoad", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
             return null;
         }

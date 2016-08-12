@@ -37,8 +37,11 @@ import okhttp3.ResponseBody;
 
 import static android.util.Log.e;
 
-public class PostDetailActivity extends BaseActivity {
-    private static final String POST_ID= "postid";
+public class PostDetailActivity extends BaseActivity
+        implements BottomEditDialogFragment.OnBottomEditDialogListener{
+    private static final String POST_ID = "postid";
+
+    String postId;
     // 툴바 필드
     Toolbar toolbar;
     TextView tbTitle;
@@ -66,7 +69,7 @@ public class PostDetailActivity extends BaseActivity {
         setContentView(R.layout.activity_post_detail);
         post = new Post();
         Intent intent = getIntent();
-        String postId = intent.getStringExtra(POST_ID);
+        postId = intent.getStringExtra(POST_ID);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         //toolbar.setContentInsetsRelative(0, 16);
@@ -109,7 +112,7 @@ public class PostDetailActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
         }
-        if(!post.area2.isEmpty()) {
+        if (!post.area2.isEmpty()) {
             tbTitle.setText(String.valueOf(post.area1 + ", " + post.area2));
         } else {
             tbTitle.setText(String.valueOf(post.area1));
@@ -118,13 +121,12 @@ public class PostDetailActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction().add(
-                BottomDialogFragment.newInstance(
-                        1, getIntent().getStringExtra(POST_ID)), "bottom_post_detail").commit();
+                        BottomEditDialogFragment.newInstance(), "bottom_post_detail").commit();
             }
         });
 
         // background 이미지
-        if(!post.bgImg.isEmpty()) {
+        if (!post.bgImg.isEmpty()) {
             Glide.with(this).load(post.bgImg).into(imgBackground);
         } else {
 
@@ -177,11 +179,13 @@ public class PostDetailActivity extends BaseActivity {
                         @Override
                         public void onAnimationStart(Animation animation) {
                         }
+
                         @Override
                         public void onAnimationEnd(Animation animation) {
                             replyEditContainer.setVisibility(View.GONE);
                             replyContainer.setVisibility(View.GONE);
                         }
+
                         @Override
                         public void onAnimationRepeat(Animation animation) {
                         }
@@ -213,7 +217,7 @@ public class PostDetailActivity extends BaseActivity {
         replySend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!editReply.getText().toString().isEmpty()) {
+                if (!editReply.getText().toString().isEmpty()) {
                     new AsyncReplingResponse().execute(
                             PropertyManager.getInstance().getUserId(),
                             editReply.getText().toString()
@@ -250,9 +254,12 @@ public class PostDetailActivity extends BaseActivity {
 
     // 글 상세내용 가져오기
     public class AsyncPostDetailJSONList extends AsyncTask<String, Integer, Post> {
+
+        Response response;
+
         @Override
         protected Post doInBackground(String... args) {
-            try{
+            try {
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
@@ -274,12 +281,16 @@ public class PostDetailActivity extends BaseActivity {
                             new StringBuilder(responseBody.string()));
                 }
                 responseBody.close();
-            }catch (UnknownHostException une) {
+            } catch (UnknownHostException une) {
                 e("connectionFail", une.toString());
             } catch (UnsupportedEncodingException uee) {
                 e("connectionFail", uee.toString());
             } catch (Exception e) {
                 e("connectionFail", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
             return null;
         }
@@ -293,9 +304,12 @@ public class PostDetailActivity extends BaseActivity {
 
     // 댓글목록 가져오기
     public class AsyncPostDetailReplyJSONList extends AsyncTask<String, Integer, ArrayList<ReplyData>> {
+
+        Response response;
+
         @Override
         protected ArrayList<ReplyData> doInBackground(String... args) {
-            try{
+            try {
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
@@ -306,7 +320,7 @@ public class PostDetailActivity extends BaseActivity {
                                 NetworkDefineConstant.GET_SERVER_POST_DETAIL_REPLY,
                                 args[0]))
                         .build();
-                Response response = toServer.newCall(request).execute();
+                response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 boolean flag = response.isSuccessful();
 
@@ -317,19 +331,23 @@ public class PostDetailActivity extends BaseActivity {
                             new StringBuilder(responseBody.string()));
                 }
                 responseBody.close();
-            }catch (UnknownHostException une) {
+            } catch (UnknownHostException une) {
                 e("connectionFail", une.toString());
             } catch (UnsupportedEncodingException uee) {
                 e("connectionFail", uee.toString());
             } catch (Exception e) {
                 e("connectionFail", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(ArrayList<ReplyData> result) {
-            if(result != null && result.size() > 0) {
+            if (result != null && result.size() > 0) {
                 replyRecycler.setVisibility(View.VISIBLE);
                 imgNoneReply.setVisibility(View.GONE);
                 noneReply.setVisibility(View.GONE);
@@ -343,57 +361,145 @@ public class PostDetailActivity extends BaseActivity {
     // 댓글달기
     public class AsyncReplingResponse extends AsyncTask<String, String, String> {
 
-        int responseCode = 0;
+        Response response;
 
         @Override
         protected String doInBackground(String... args) {
-            //업로드는 타임 및 리드타임을 넉넉히 준다.
-            OkHttpClient client = new OkHttpClient.Builder()
-                    .connectTimeout(15, TimeUnit.SECONDS)
-                    .readTimeout(15, TimeUnit.SECONDS)
-                    .build();
 
-            //요청 Body 세팅==> 그전 Query Parameter세팅과 같은 개념
-            RequestBody formBody = new FormBody.Builder()
-                    .add("userId", args[0])
-                    .add("content", args[1])
-                    .build();
-            //요청 세팅
-            Request request = new Request.Builder()
-                    .url(String.format(NetworkDefineConstant.POST_SERVER_POST_REPLY,
-                            getIntent().getStringExtra(POST_ID)))
-                    .post(formBody) //반드시 post로
-                    .build();
+            try {
+                //업로드는 타임 및 리드타임을 넉넉히 준다.
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
 
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.e("요청오류", "요청을 보내는 데 실패했습니다.");
+                //요청 Body 세팅==> 그전 Query Parameter세팅과 같은 개념
+                RequestBody formBody = new FormBody.Builder()
+                        .add("userId", args[0])
+                        .add("content", args[1])
+                        .add("date", TimeData.getNow())
+                        .build();
+                //요청 세팅
+                Request request = new Request.Builder()
+                        .url(String.format(NetworkDefineConstant.POST_SERVER_POST_REPLY,
+                                postId))
+                        .post(formBody) //반드시 post로
+                        .build();
+                response = client.newCall(request).execute();
+                boolean flag = response.isSuccessful();
+                //응답 코드 200등등
+                int responseCode = response.code();
+                if (flag) {
+                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
+                    Log.e("response응답바디", response.body().string()); //json으로 변신
+                    return "success";
                 }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    boolean flag = response.isSuccessful();
-                    responseCode = response.code();
-                    if (flag) {
-                        Log.e("response결과", response.message()); //읃답에 대한 메세지(OK)
-                        Log.e("response응답바디", response.body().string()); //json으로 변신
-                    }
+            } catch (UnknownHostException une) {
+                Log.e("aa", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                Log.e("bb", uee.toString());
+            } catch (Exception e) {
+                Log.e("cc", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
                 }
-            });
-            return null;
+            }
+
+            return "fail";
         }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if(responseCode >= 200 && responseCode < 400) {
+            if (s.equals("success")) {
                 new AsyncPostDetailReplyJSONList().execute(
-                        getIntent().getStringExtra(POST_ID));
+                        postId);
+            } else if (s.equals("fail")) {
+                // 실패
             }
         }
     }
 
+    // 글 삭제
+    public class AsyncPostRemoveResponse extends AsyncTask<String, String, String> {
+
+        Response response;
+
+        @Override
+        protected String doInBackground(String... args) {
+            try {
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url(String.format(NetworkDefineConstant.POST_SERVER_POST_REMOVE,
+                                args[0]))
+                        .delete()
+                        .build();
+
+                response = client.newCall(request).execute();
+                boolean flag = response.isSuccessful();
+                //응답 코드 200등등
+                int responseCode = response.code();
+                if (flag) {
+                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
+                    Log.e("response응답바디", response.body().string()); //json으로 변신
+                    return "success";
+                }
+            } catch (UnknownHostException une) {
+                Log.e("aa", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                Log.e("bb", uee.toString());
+            } catch (Exception e) {
+                Log.e("cc", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+
+            return "fail";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (s.equals("success")) {
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                getActivity().finish();
+                dismiss();
+                getFragmentManager().beginTransaction().
+                        add(MiddleAloneDialogFragment.newInstance(1, postId), "middle_select").commit();
+            } else if(s.equals("fail")) {
+                dismiss();
+                getFragmentManager().beginTransaction().
+                        add(MiddleAloneDialogFragment.newInstance(2, postId), "middle_fail").commit();
+            }
+        }
+    }
+
+    @Override
+    public void onSelectBottomEdit(int select) {
+        switch (select) {
+            case 0 :
+                // TODO : 글 수정
+                Intent intent = new Intent(getContext(), PostingActivity.class);
+                intent.putExtra("postid", postId);
+                startActivity(intent);
+                break;
+            case 1 :
+                // TODO : 글 삭제
+                getSupportFragmentManager().beginTransaction()
+                        .add(MiddleSelectDialogFragment.newInstance(0),
+                                "middle_post_remove").commit();
+                break;
+        }
+    }
 
     @Override
     public void onBackPressed() {
@@ -420,15 +526,22 @@ public class PostDetailActivity extends BaseActivity {
             isReplyContainer = false;
         } else {
             super.onBackPressed();
-            finish();
+            toMainActivityFromthis();
         }
+    }
+
+    private void toMainActivityFromthis() {
+        Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                toMainActivityFromthis();
                 return true;
         }
         return super.onOptionsItemSelected(item);

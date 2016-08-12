@@ -36,6 +36,8 @@ public class NetworkDefineConstant {
             = "http://" + HOST_URL + PORT_NUMBER + "/post/%s";
     public static final String POST_SERVER_POST_REPLY
             = "http://" + HOST_URL + PORT_NUMBER + "/post/%s/reply";
+    public static final String POST_SERVER_USER_EDIT
+            = "http://" + HOST_URL + PORT_NUMBER + "/users/%s";
 
     public static final int POST_OK = 1;
     public static final int POST_FAIL = 2;

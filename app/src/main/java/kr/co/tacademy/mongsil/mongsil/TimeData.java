@@ -12,8 +12,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class TimeData {
     // 현재 시간
-    private static long currentTime = System.currentTimeMillis();
-    private static Date now = new Date(currentTime);
+    private static Date now = new Date(getCurrentTime());
+
+    private static long getCurrentTime() {
+        return System.currentTimeMillis();
+    }
+
 
     // day formats
     public static String dayFormat =
@@ -28,6 +32,8 @@ public class TimeData {
           new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
     private static SimpleDateFormat dateCompareFormat =
             new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+    private static SimpleDateFormat timeCompareFormat =
+            new SimpleDateFormat("HH:mm", Locale.KOREA);
 
 
     // Calendar 객체 생성
@@ -47,13 +53,18 @@ public class TimeData {
         return false;
     }
 
+    public static String getNow() {
+        return dateFormat.format(now);
+    }
+
+
     // 현재 날짜에서 얼마나 날짜가 지났는지 계산하는 메소드
     public static String dateCalculate(String date) {
         try {
             Date tempDate = dateFormat.parse(date);
 
-            if ((int)(tempDate.getTime() / (1000*60*60*24))
-                    == (int)(now.getTime() / (1000*60*60*24)) ) {
+            if (dateCompareFormat.format(tempDate).equals(
+                    dateCompareFormat.format(now))) {
                 return "Today";
             } else if (tempDate.before(now)) {
                 int subDay = (int)((now.getTime() - tempDate.getTime()) / (1000*60*60*24));
@@ -73,8 +84,8 @@ public class TimeData {
         try {
             Date tempDate = dateFormat.parse(date);
 
-            if ((int)(tempDate.getTime() / (1000*60*60*24))
-                    == (int)(now.getTime() / (1000*60*60*24)) ) {
+            if (dateCompareFormat.format(tempDate).equals(
+                    dateCompareFormat.format(now))) {
                 return "오늘";
             } else if (tempDate.before(now)) {
                 int subDay = (int)((now.getTime() - tempDate.getTime()) / (1000*60*60*24));
@@ -111,8 +122,8 @@ public class TimeData {
     public static String timeCalculate(String time) {
         try {
             Date tempTime = dateFormat.parse(time);
-            if ((int)(tempTime.getTime() / (1000*60*60*24))
-                    == (int)(now.getTime() / (1000*60*60*24)) ) {
+            if (timeCompareFormat.format(tempTime).equals(
+                    timeCompareFormat.format(now))) {
                 return "지금";
             } else if (tempTime.before(now)) {
                 long subTime = (now.getTime() - tempTime.getTime()) / 1000;

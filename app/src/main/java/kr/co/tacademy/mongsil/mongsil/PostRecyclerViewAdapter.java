@@ -25,7 +25,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 // 포스트 리스트 어답터
 public class PostRecyclerViewAdapter
-        extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements BottomEditDialogFragment.OnBottomEditDialogListener {
     private static final int LAYOUT_DATE = 1000;
     private static final int LAYOUT_POST = 2000;
     private static final int LAYOUT_MY_POST = 3000;
@@ -157,8 +158,8 @@ public class PostRecyclerViewAdapter
                 @Override
                 public void onClick(View view) {
                     fm.beginTransaction()
-                            .add(BottomDialogFragment.newInstance(
-                                    1, String.valueOf(post.postId)), "bottom_user_post").commit();
+                            .add(BottomEditDialogFragment.newInstance(),
+                                    "bottom_user_post").commit();
                 }
             });
             myPostCard.setOnClickListener(new View.OnClickListener() {
@@ -242,5 +243,24 @@ public class PostRecyclerViewAdapter
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    @Override
+    public void onSelectBottomEdit(int select) {
+        // TODO : PostDetailActivity랑 같이 해야함
+        switch (select) {
+            case 0 :
+                // TODO : 글 수정
+                Intent intent = new Intent(getContext(), PostingActivity.class);
+                intent.putExtra("postid", postId);
+                startActivity(intent);
+                break;
+            case 1 :
+                // TODO : 글 삭제
+                getSupportFragmentManager().beginTransaction()
+                        .add(MiddleSelectDialogFragment.newInstance(0),
+                                "middle_post_remove").commit();
+                break;
+        }
     }
 }

@@ -23,9 +23,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by ccei on 2016-08-09.
  */
-public class SignupSelectLocationDialogFragment extends DialogFragment {
+public class SelectLocationDialogFragment extends DialogFragment {
 
-    public SignupSelectLocationDialogFragment() {
+    public SelectLocationDialogFragment() {
     }
 
     // 툴바
@@ -53,9 +53,9 @@ public class SignupSelectLocationDialogFragment extends DialogFragment {
         }
     }
 
-    public static SignupSelectLocationDialogFragment newInstance() {
-        SignupSelectLocationDialogFragment fragment =
-                new SignupSelectLocationDialogFragment();
+    public static SelectLocationDialogFragment newInstance() {
+        SelectLocationDialogFragment fragment =
+                new SelectLocationDialogFragment();
         return fragment;
     }
 
@@ -85,13 +85,6 @@ public class SignupSelectLocationDialogFragment extends DialogFragment {
             }
         });
         tbDone = (TextView) view.findViewById(R.id.text_done);
-        tbDone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectListener.onSelect(locationNames.get(selectedPos));
-                dismiss();
-            }
-        });
 
         selectLocationRecycle =
                 (RecyclerView) view.findViewById(R.id.signup_location_recycler);
@@ -99,7 +92,7 @@ public class SignupSelectLocationDialogFragment extends DialogFragment {
                 new GridLayoutManager(getActivity().getApplicationContext(), 3));
 
         // 지역 자료(arrays)
-        String[] locations = getResources().getStringArray(R.array.locaitons);
+        String[] locations = LocationData.locationName;
         int[] imgLocations = {
                 R.drawable.incheon, R.drawable.seoul, R.drawable.gangwon,
                 R.drawable.cheonju, 0, R.drawable.deagu,
@@ -113,6 +106,13 @@ public class SignupSelectLocationDialogFragment extends DialogFragment {
 
         selectLocationRecycle.setAdapter(new SelectLocationViewAdapter());
 
+        tbDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectListener.onSelect(locationNames.get(selectedPos));
+                dismiss();
+            }
+        });
         return view;
     }
 
@@ -140,7 +140,7 @@ public class SignupSelectLocationDialogFragment extends DialogFragment {
         public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
             View view = inflater.inflate(
-                    R.layout.layout_signup_select_location_item, viewGroup, false);
+                    R.layout.layout_select_location_item, viewGroup, false);
             return new ViewHolder(view);
         }
 

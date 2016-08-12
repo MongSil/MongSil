@@ -27,7 +27,7 @@
             android:layout_height="wrap_content" />
     </android.support.v7.widget.Toolbar>
 
-    <!-- layout_signup_select_location_item -->
+    <!-- layout_select_location_item -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/signup_location_recycler"
         android:paddingLeft="4dp"

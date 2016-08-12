@@ -2,17 +2,14 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class SignUpActivity extends BaseActivity
-        implements SignupSelectLocationDialogFragment.OnSelectLocationListener{
+        implements SelectLocationDialogFragment.OnSelectLocationListener{
 
     // 이름, 지역 부분
     EditText editName;
@@ -53,7 +50,9 @@ public class SignUpActivity extends BaseActivity
                 if(editName.getText().toString().isEmpty()) {
                     editName.setHint(getResources().getText(R.string.name));
                 }
-                new SignupSelectLocationDialogFragment().show(getSupportFragmentManager(), "select");
+                getSupportFragmentManager().beginTransaction()
+                        .add(SelectLocationDialogFragment.newInstance(),
+                                "select_location").commit();
             }
         });
 
@@ -73,7 +72,7 @@ public class SignUpActivity extends BaseActivity
                 Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                 // TODO : 서버에 회원가입 전송 후 PropertyManager.getInstance().setUserId( ~~ );
                 startActivity(intent);
-                SignUpActivity.this.finish();
+                finish();
             }
         });
     }
@@ -81,6 +80,9 @@ public class SignUpActivity extends BaseActivity
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        Intent intent = new Intent(SignUpActivity.this, SplashActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
