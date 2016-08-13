@@ -33,6 +33,10 @@ public class NetworkDefineConstant {
             = "http://" + HOST_URL + PORT_NUMBER + "/users/%s";
 
     // POST
+    public static final String POST_SERVER_USER_LOGIN
+            = "http://" + HOST_URL + PORT_NUMBER + "/users/login";
+    public static final String POST_SERVER_USER_SIGN_UP
+            = "http://" + HOST_URL + PORT_NUMBER + "/users";
     public static final String POST_SERVER_POST
             = "http://" + HOST_URL + PORT_NUMBER + "/post";
     public static final String POST_SERVER_POST_REPLY

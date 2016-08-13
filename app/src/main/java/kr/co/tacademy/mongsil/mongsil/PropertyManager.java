@@ -34,6 +34,7 @@ public class PropertyManager {
     public static final String KEY_SAVE_GALLERY = "savegallery";
     public static final String KEY_USE_GPS = "usegps";
 
+    // UUID(장치 아이디)
     public String getDeviceId() {
         return preferences.getString(KEY_DEVICE_ID, "");
     }
@@ -43,8 +44,9 @@ public class PropertyManager {
         editor.commit();
     }
 
+    // UserId(유저 아이디)
     public String getUserId() {
-        return preferences.getString(KEY_USERID, "11"); // 임시 11
+        return preferences.getString(KEY_USERID, "");
     }
 
     public void setUserId(String userId) {
@@ -52,10 +54,9 @@ public class PropertyManager {
         editor.commit();
     }
 
+    // 프로필 이미지
     public String getUserProfileImg() {
-        return preferences.getString(KEY_USER_PROFILE_IMG,
-                "https://s3.ap-northeast-2.amazonaws.com/mytproject2016/profile/img_1470648145888.jpg");
-        // 임시 부산녀2
+        return preferences.getString(KEY_USER_PROFILE_IMG, "");
     }
 
     public void setUserProfileImg(String userProfileImg) {
@@ -63,8 +64,9 @@ public class PropertyManager {
         editor.commit();
     }
 
+    // 닉네임(이름)
     public String getNickname() {
-        return preferences.getString(KEY_NICKNAME, "부산녀2"); // 임시 부산녀2
+        return preferences.getString(KEY_NICKNAME, "");
     }
 
     public void setNickname(String nickname) {
@@ -72,8 +74,9 @@ public class PropertyManager {
         editor.commit();
     }
 
+    // 지역
     public String getLocation() {
-        return preferences.getString(KEY_LOCATION, "부산"); // 임시 부산
+        return preferences.getString(KEY_LOCATION, "");
     }
 
     public void setLocation(String location) {
@@ -81,6 +84,7 @@ public class PropertyManager {
         editor.commit();
     }
 
+    // 지역 - 위도
     public String getLatLocation() {
         return preferences.getString(KEY_LAT_LOCATION, LocationData.ChangeToLatLon(getLocation())[0]);
     }
@@ -90,6 +94,7 @@ public class PropertyManager {
         editor.commit();
     }
 
+    // 지역 - 경도
     public String getLonLocation() {
         return preferences.getString(KEY_LAT_LOCATION, LocationData.ChangeToLatLon(getLocation())[1]);
     }
@@ -99,6 +104,7 @@ public class PropertyManager {
         editor.commit();
     }
 
+    // 알람설정
     public Boolean getAlarm() {
         return preferences.getBoolean(KEY_ALARM, true);
     }
@@ -108,6 +114,7 @@ public class PropertyManager {
         editor.commit();
     }
 
+    // 이미지 저장설정
     public Boolean getSaveGallery() {
         return preferences.getBoolean(KEY_SAVE_GALLERY, true);
     }
@@ -117,6 +124,7 @@ public class PropertyManager {
         editor.commit();
     }
 
+    // GPS 사용설정
     public Boolean getUseGPS() {
         return preferences.getBoolean(KEY_USE_GPS, true);
     }

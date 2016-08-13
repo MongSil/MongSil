@@ -113,6 +113,7 @@
     <ImageView
         android:id="@+id/img_signup_done"
         android:src="@drawable/btn_done"
+        android:visibility="gone"
         android:gravity="center"
         android:layout_gravity="center"
         android:layout_width="wrap_content"

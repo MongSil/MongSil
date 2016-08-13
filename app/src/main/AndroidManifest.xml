@@ -46,11 +46,17 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PostDetailActivity"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="stateVisible|adjustPan"/>
         <activity
             android:name=".PostingActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="stateVisible|adjustPan" />
         <activity android:name=".CameraGalleryActivity" />
+
+        <receiver android:name = ".CheckNetwork">
+            <intent-filter>
+                <action android:name="android.net.conn.BACKGROUND_DATA_SETTING_CHANGED"/>
+            </intent-filter>
+        </receiver>
 
         <meta-data
             android:name="kr.co.tacademy.mongsil.mongsil.MongSilGlideModule"

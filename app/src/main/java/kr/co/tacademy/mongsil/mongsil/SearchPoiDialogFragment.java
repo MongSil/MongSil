@@ -35,8 +35,8 @@ import static android.util.Log.e;
 
 /**
  * Created by ccei on 2016-08-02.
+ * POI 검색 -> 지역 선택 -> 위도경도 불러옴 -> 날씨 API
  */
-// TODO : POI 검색 -> 지역 선택 -> 위도경도 불러옴 -> 날씨 API
 public class SearchPoiDialogFragment extends DialogFragment {
     TextView emptySearch;
     EditText editSearch;

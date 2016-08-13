@@ -196,7 +196,6 @@ public class PostingActivity extends BaseActivity
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            // TODO Auto-generated method stub
             container.removeView((View) object);
 
         }
@@ -220,7 +219,7 @@ public class PostingActivity extends BaseActivity
     }
 
     // 포스팅 요청
-    public class AsyncPostingResponse extends AsyncTask<String, String, String> {
+    public class AsyncPostingRequest extends AsyncTask<String, String, String> {
 
         Response response;
 
@@ -276,9 +275,9 @@ public class PostingActivity extends BaseActivity
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (s.equals("success")) {
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result.equals("success")) {
                 Intent intent = new Intent(PostingActivity.this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("area1", area1);
@@ -286,7 +285,7 @@ public class PostingActivity extends BaseActivity
                 finish();
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(2), "middle_post_done").commit();
-            } else if (s.equals("fail")) {
+            } else if (result.equals("fail")) {
                 // 실패
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(3), "middle_post_fail").commit();
@@ -295,7 +294,7 @@ public class PostingActivity extends BaseActivity
     }
 
     // 포스팅 수정 요청
-    public class AsyncModifyPostingResponse extends AsyncTask<String, String, String> {
+    public class AsyncModifyPostingRequest extends AsyncTask<String, String, String> {
 
         Response response;
 
@@ -364,9 +363,9 @@ public class PostingActivity extends BaseActivity
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (s.equals("success")) {
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result.equals("success")) {
                 Intent intent = new Intent(PostingActivity.this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("area1", area1);
@@ -374,7 +373,7 @@ public class PostingActivity extends BaseActivity
                 finish();
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(2), "middle_post_done").commit();
-            } else if (s.equals("fail")) {
+            } else if (result.equals("fail")) {
                 // 실패
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(3), "middle_post_fail").commit();
@@ -399,7 +398,7 @@ public class PostingActivity extends BaseActivity
     public void onMiddleSelect(int select) {
         switch (select) {
             case 1 :
-                new AsyncPostingResponse().execute(
+                new AsyncPostingRequest().execute(
                         area1,  // 지역1
                         area2,  // 지역2
                         PropertyManager.getInstance().getUserId(), // 아이디
@@ -410,7 +409,7 @@ public class PostingActivity extends BaseActivity
                 );
                 break;
             case 2 :
-                new AsyncModifyPostingResponse().execute(
+                new AsyncModifyPostingRequest().execute(
 //                        area1,  // 지역1
 //                        area2,  // 지역2
                         PropertyManager.getInstance().getUserId(), // 아이디

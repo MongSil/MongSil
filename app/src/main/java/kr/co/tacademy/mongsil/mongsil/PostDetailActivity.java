@@ -137,8 +137,6 @@ public class PostDetailActivity extends BaseActivity
                 WeatherData.imgFromWeatherCode(
                         String.valueOf(post.weatherCode), 0));
 
-        // TODO : 아이콘 코드 추가해야함
-
         // 포스트 내용
         postContent.setText(post.content);
 
@@ -216,7 +214,7 @@ public class PostDetailActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 if (!editReply.getText().toString().isEmpty()) {
-                    new AsyncReplingResponse().execute(
+                    new AsyncReplingRequest().execute(
                             PropertyManager.getInstance().getUserId(),
                             editReply.getText().toString()
                     );
@@ -357,7 +355,7 @@ public class PostDetailActivity extends BaseActivity
     }
 
     // 댓글달기
-    public class AsyncReplingResponse extends AsyncTask<String, String, String> {
+    public class AsyncReplingRequest extends AsyncTask<String, String, String> {
 
         Response response;
 
@@ -408,19 +406,19 @@ public class PostDetailActivity extends BaseActivity
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (s.equals("success")) {
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result.equals("success")) {
                 new AsyncPostDetailReplyJSONList().execute(
                         postId);
-            } else if (s.equals("fail")) {
+            } else if (result.equals("fail")) {
                 // 실패
             }
         }
     }
 
     // 글 삭제
-    public class AsyncPostRemoveResponse extends AsyncTask<String, String, String> {
+    public class AsyncPostRemoveRequest extends AsyncTask<String, String, String> {
 
         Response response;
 
@@ -463,15 +461,15 @@ public class PostDetailActivity extends BaseActivity
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (s.equals("success")) {
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result.equals("success")) {
                 Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("post_remove", true);
                 startActivity(intent);
                 finish();
-            } else if(s.equals("fail")) {
+            } else if(result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction().
                         add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();
             }
@@ -500,7 +498,7 @@ public class PostDetailActivity extends BaseActivity
     public void onMiddleSelect(int select) {
         switch (select) {
             case 0 :
-                new AsyncPostRemoveResponse().execute(postId);
+                new AsyncPostRemoveRequest().execute(postId);
         }
     }
 

@@ -265,7 +265,7 @@ public class PostRecyclerViewAdapter
     }
 
     // 글 삭제
-    public class AsyncPostRemoveResponse extends AsyncTask<String, String, String> {
+    public class AsyncPostRemoveRequest extends AsyncTask<String, String, String> {
 
         Response response;
 
@@ -349,7 +349,7 @@ public class PostRecyclerViewAdapter
     public void onMiddleSelect(int select) {
         switch (select) {
             case 0 :
-                new AsyncPostRemoveResponse().execute(String.valueOf(postData.postId));
+                new AsyncPostRemoveRequest().execute(String.valueOf(postData.postId));
         }
     }
 }

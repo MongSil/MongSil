@@ -176,7 +176,6 @@ public class EditProfileActivity extends BaseActivity
         leaveProfileContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO : 서버에 계정 삭제 요청 보내야함
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleSelectDialogFragment.newInstance(99),
                                 "middle_leave").commit();
@@ -356,12 +355,12 @@ public class EditProfileActivity extends BaseActivity
     public void onMiddleSelect(int select) {
         switch (select) {
             case 99 :
-                new AsyncUserRemoveResponse().execute();
+                new AsyncUserRemoveRequest().execute();
         }
     }
 
     // 계정 삭제
-    public class AsyncUserRemoveResponse extends AsyncTask<String, String, String> {
+    public class AsyncUserRemoveRequest extends AsyncTask<String, String, String> {
 
         Response response;
 
@@ -404,13 +403,13 @@ public class EditProfileActivity extends BaseActivity
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (s.equals("success")) {
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result.equals("success")) {
                 Intent intent = new Intent(EditProfileActivity.this, SplashActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
-            } else if(s.equals("fail")) {
+            } else if(result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(1), "middle_dialog").commit();
             }
@@ -505,19 +504,20 @@ public class EditProfileActivity extends BaseActivity
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (s.equalsIgnoreCase("success")) {
-                Toast.makeText(EditProfileActivity.this, "파일업로드에 성공했습니다", Toast.LENGTH_LONG).show();
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result.equalsIgnoreCase("success")) {
                 UpLoadValueObject fileValue = upLoadFile;
                 if (fileValue.tempFiles) {
                     fileValue.file.deleteOnExit(); //임시파일을 삭제한다
                 }
-            } else {
-                Toast.makeText(EditProfileActivity.this, "파일업로드에 실패했습니다", Toast.LENGTH_LONG).show();
+                toMainActivityFromthis();
+            } else if(result.equals("fail")){
+                getSupportFragmentManager().beginTransaction()
+                        .add(MiddleAloneDialogFragment.newInstance(3),
+                                "middle_edit_profile_fail").commit();
             }
             tbDone.setEnabled(true);
-            toMainActivityFromthis();
         }
     }
 

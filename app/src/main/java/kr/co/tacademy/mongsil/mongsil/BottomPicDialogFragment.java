@@ -73,7 +73,6 @@ public class BottomPicDialogFragment extends DialogFragment {
         btnFirst.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 카메라 불러옴
                 dismiss();
                 onBottomPicDialogListener.onSelectBottomPic(0);
 
@@ -84,7 +83,6 @@ public class BottomPicDialogFragment extends DialogFragment {
         btnSecond.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 갤러리 불러옴
                 dismiss();
                 onBottomPicDialogListener.onSelectBottomPic(1);
             }
@@ -103,28 +101,10 @@ public class BottomPicDialogFragment extends DialogFragment {
                     != PackageManager.PERMISSION_GRANTED) {
 
                 if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    // Explain to the user why we need to write the permission.
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-                    dialog.setTitle("권한이 필요합니다!")
-                            .setMessage("갤러리를 사용하시려면 \"파일 목록\"" +
-                                    "접근 권한이 필요합니다. 계속하시겠습니까?")
-                            .setPositiveButton("예", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        requestPermissions(
-                                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                                                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                                MY_PERMISSION_REQUEST_STORAGE);
-                                    }
-                                }
-                            })
-                            .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dismiss();
-                                }
-                            }).create().show();
+                    requestPermissions(
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            MY_PERMISSION_REQUEST_STORAGE);
                 }
             } else {
                 //사용자가 언제나 허락
@@ -141,7 +121,7 @@ public class BottomPicDialogFragment extends DialogFragment {
                     //사용자가 퍼미션을 OK했을 경우
 
                 } else {
-
+                    dismissAllowingStateLoss();
                     //사용자가 퍼미션을 거절했을 경우
                 }
                 break;
