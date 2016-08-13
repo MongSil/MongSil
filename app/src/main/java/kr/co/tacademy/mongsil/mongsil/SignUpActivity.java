@@ -145,6 +145,7 @@ public class SignUpActivity extends BaseActivity
                         .add("deviceId", PropertyManager.getInstance().getDeviceId())
                         .add("username", args[0])
                         .add("area", args[1])
+                        .add("date", TimeData.getNow())
                         .build();
                 //요청 세팅
                 Request request = new Request.Builder()
