@@ -49,7 +49,7 @@
             android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".PostingActivity"
-            android:windowSoftInputMode="stateVisible|adjustPan" />
+            android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity android:name=".CameraGalleryActivity" />
 
         <receiver android:name = ".CheckNetwork">

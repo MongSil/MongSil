@@ -1,5 +1,7 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -76,7 +78,8 @@ public class TimeData {
         } catch (ParseException pe) {
             pe.printStackTrace();
         }
-        return "error";
+        Log.e("dateCalculate :", date + "오류");
+        return " ";
     }
 
     // 내 댓글 보기 // 현재 날짜에서 얼마나 날짜가 지났는지 계산하는 메소드
@@ -97,7 +100,8 @@ public class TimeData {
         } catch (ParseException pe) {
             pe.printStackTrace();
         }
-        return "error";
+        Log.e("replyDateCalculate :", date + "오류");
+        return " ";
     }
 
     // 글 작성 시간을 보여주는 메소드
@@ -106,16 +110,17 @@ public class TimeData {
                 new SimpleDateFormat("HH:mm:ss", Locale.KOREA);
         try {
             Date tempTime = timeFormat.parse(time);
-            return new SimpleDateFormat("HH:mm a", Locale.ENGLISH).format(tempTime);
+            return new SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(tempTime);
         } catch (ParseException pe) {
             pe.printStackTrace();
         }
-        return "error";
+        Log.e("PostTime :", time + "오류");
+        return " ";
     }
 
     // 글 작성 후 미리보기할 때 시간을 보여주는 메소드
     public static String PreviewPostTime() {
-        return new SimpleDateFormat("HH:mm a", Locale.ENGLISH).format(now);
+        return new SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(now);
     }
 
     // 현재 시간에서 얼마나 시간이 지났는지 계산하는 메소드
@@ -139,20 +144,16 @@ public class TimeData {
 
                 if (hourSubTime > 23) {
                     return String.valueOf(daySubTime) + "일 전";
-                }
-
-                for (int i = 22; i > 0; i--) {
-                    if (hourSubTime > i) {
-                        return String.valueOf(hourSubTime) + "시간 전";
-                    }
-                }
-                if (hourSubTime < 1) {
+                } else if (hourSubTime > 1) {
+                    return String.valueOf(hourSubTime) + "시간 전";
+                } else if (hourSubTime < 1) {
                     return String.valueOf(minuteSubTime) + "분 전";
                 }
             }
         } catch (ParseException pe) {
             pe.printStackTrace();
         }
-        return "error";
+        Log.e("timeCalculate :", time + "오류");
+        return " ";
     }
 }

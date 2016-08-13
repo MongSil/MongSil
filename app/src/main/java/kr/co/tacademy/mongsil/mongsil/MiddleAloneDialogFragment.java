@@ -68,16 +68,7 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                     }
                 });
                 break;
-            case 2 : // 저장 완료한 경우 [확인]
-                dialog.setText(getResources().getText(R.string.save_edit_profile_done));
-                positive.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dismiss();
-                    }
-                });
-                break;
-            case 3 : // 저장 실패한 경우 [확인]
+            case 2 : // 저장 실패한 경우 [확인]
                 dialog.setText(getResources().getText(R.string.save_edit_profile_fail));
                 positive.setOnClickListener(new View.OnClickListener() {
                     @Override

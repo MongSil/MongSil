@@ -32,6 +32,7 @@ public class ReplyRecyclerViewAdapter
     }
 
     public void add(ArrayList<ReplyData> replyItems) {
+        items.clear();
         for(int i = 0 ; i < replyItems.size() ; i++) {
             items.add(replyItems.get(i));
         }

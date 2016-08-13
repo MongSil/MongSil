@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -24,11 +25,14 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -72,8 +76,38 @@ public class EditProfileActivity extends BaseActivity
         boolean tempFiles; //임시파일 유무
 
         public UpLoadValueObject(File file, boolean tempFiles) {
-            this.file = file;
+            this.file = resizingFile(file);
             this.tempFiles = tempFiles;
+        }
+
+        private File resizingFile(final File file) {
+            new AsyncTask<Void, Void, Void>(){
+                Bitmap resizedBitmap = null;
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    Looper.prepare();
+                    try {
+                        resizedBitmap = Glide.with(getApplicationContext()).
+                                load(file).asBitmap().into(100, 100).get();
+                    } catch (InterruptedException ie) {
+                        ie.printStackTrace();
+                    } catch (ExecutionException ee) {
+                        ee.printStackTrace();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    if(resizedBitmap != null) {
+                        Log.d("resizingFile", "Image resizing Done!");
+                        tempSavedBitmapFile(resizedBitmap);
+                    }
+                    Log.d("resizingFile", "Image resizing fail...");
+                }
+            };
+            return file;
         }
     }
 
@@ -103,8 +137,10 @@ public class EditProfileActivity extends BaseActivity
                 PropertyManager.getInstance().setNickname(editName.getText().toString());
                 PropertyManager.getInstance().setLocation(editLocation.getText().toString());
                 if(upLoadFile != null) {
-                    new FileUpLoadAsyncTask(PropertyManager.getInstance().getNickname(),
-                            PropertyManager.getInstance().getLocation()).execute(upLoadFile);
+                    new FileUpLoadAsyncTask(
+                            PropertyManager.getInstance().getNickname(),
+                            PropertyManager.getInstance().getLocation())
+                            .execute(upLoadFile);
                 }
             }
         });
@@ -113,10 +149,7 @@ public class EditProfileActivity extends BaseActivity
         imgProfileContainer =
                 (LinearLayout) findViewById(R.id.img_profile_container);
         imgProfile = (CircleImageView) findViewById(R.id.img_profile);
-        //TODO : 로그가 왜 안뜨지
-        Log.e("UserProfile : ", PropertyManager.getInstance().getUserProfileImg());
-        if(!PropertyManager.getInstance().getUserProfileImg().equals("null")
-                || !PropertyManager.getInstance().getUserProfileImg().equals("")) {
+        if(!PropertyManager.getInstance().getUserProfileImg().isEmpty()) {
             Glide.with(MongSilApplication.getMongSilContext())
                     .load(PropertyManager.getInstance().getUserProfileImg())
                     .into(imgProfile);
@@ -131,7 +164,7 @@ public class EditProfileActivity extends BaseActivity
                     return;
                 }
                 String currentAppPackage = getPackageName();
-                myImageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), currentAppPackage);
+                imageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), currentAppPackage);
 
                 getSupportFragmentManager().beginTransaction()
                         .add(BottomPicDialogFragment.newInstance(), "bottom_pic").commit();
@@ -191,14 +224,14 @@ public class EditProfileActivity extends BaseActivity
      * 카메라에서 이미지 가져오기
      */
     Uri currentSelectedUri; //업로드할 현재 이미지에 대한 Uri
-    File myImageDir; //카메라로 찍은 사진을 저장할 디렉토리
+    File imageDir; //카메라로 찍은 사진을 저장할 디렉토리
     String currentFileName;  //파일이름
 
     private void doTakePhotoAction() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         //업로드할 파일의 이름
-        currentFileName = "upload_" + String.valueOf(System.currentTimeMillis() / 1000) + ".png";
-        currentSelectedUri = Uri.fromFile(new File(myImageDir, currentFileName));
+        currentFileName = "upload_" + String.valueOf(System.currentTimeMillis() / 1000) + ".jpg";
+        currentSelectedUri = Uri.fromFile(new File(imageDir, currentFileName));
         cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, currentSelectedUri);
         startActivityForResult(cameraIntent, PICK_FROM_CAMERA);
     }
@@ -221,10 +254,8 @@ public class EditProfileActivity extends BaseActivity
 
         switch (requestCode) {
             case CROP_FROM_CAMERA: {
-
                 // 크롭된 이미지를 세팅
                 final Bundle extras = data.getExtras();
-
                 if (extras != null) {
                     Bitmap photo = extras.getParcelable("data");
                     imgProfile.setImageBitmap(photo);
@@ -232,13 +263,11 @@ public class EditProfileActivity extends BaseActivity
                 break;
             }
             case PICK_FROM_ALBUM: {
-
                 currentSelectedUri = data.getData();
                 if (currentSelectedUri != null) {
                     //실제 Image의 full path name을 얻어온다.
                     if (findImageFileNameFromUri(currentSelectedUri)) {
-                        //ArrayList에 업로드할  객체를 추가한다.
-                        upLoadFile = new UpLoadValueObject(new File(currentFileName), false);
+                        upLoadFile = new UpLoadValueObject(new File(currentFileName), true);
                     }
                 } else {
                     Bundle extras = data.getExtras();
@@ -253,16 +282,23 @@ public class EditProfileActivity extends BaseActivity
                 break;
 
             }
-
             case PICK_FROM_CAMERA: {
-
                 //카메라캡쳐를 이용해 가져온 이미지
-                upLoadFile = new UpLoadValueObject(new File(myImageDir, currentFileName), false);
+
+                upLoadFile = new UpLoadValueObject(new File(imageDir, currentFileName), true);
                 cropIntent(currentSelectedUri);
                 break;
             }
         }
     }
+
+    /*public Uri getImageUri(Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(getContentResolver(), inImage, currentFileName, null);
+        return Uri.parse(path);
+    }*/
+
     private  void  cropIntent(Uri cropUri){
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(cropUri, "image/*");
@@ -285,13 +321,10 @@ public class EditProfileActivity extends BaseActivity
             File tempFile = File.createTempFile(
                     currentFileName,            // prefix
                     fileSuffix,                   // suffix
-                    myImageDir                   // directory
+                    imageDir                   // directory
             );
             final FileOutputStream bitmapStream = new FileOutputStream(tempFile);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 4;
-            Bitmap resized = Bitmap.createScaledBitmap( tempBitmap, 300, 300, true );
-            resized.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
+            tempBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bitmapStream);
             upLoadFile = new UpLoadValueObject(tempFile, true);
             if (bitmapStream != null) {
                 bitmapStream.close();
@@ -351,6 +384,7 @@ public class EditProfileActivity extends BaseActivity
             case 2 :
                 PropertyManager.getInstance().setUserProfileImg("");
                 imgProfile.setImageResource(R.drawable.none_my_profile);
+                break;
         }
     }
 
@@ -366,6 +400,106 @@ public class EditProfileActivity extends BaseActivity
         switch (select) {
             case 99 :
                 new AsyncUserRemoveRequest().execute();
+        }
+    }
+
+    // 프로필 업로드
+    private class FileUpLoadAsyncTask extends AsyncTask<UpLoadValueObject, Void, String> {
+        private String username;
+        private String area;
+        private String uploadCode;
+        //업로드할 Mime Type 설정
+        private final MediaType IMAGE_MIME_TYPE = MediaType.parse("image/*");
+
+
+        public FileUpLoadAsyncTask() {
+        }
+
+        public FileUpLoadAsyncTask(String username, String area) {
+            this.username = username;
+            this.area = area;
+        }
+
+        @Override
+        protected String doInBackground(UpLoadValueObject... objects) {
+            Response response = null;
+
+            try {
+                //업로드는 타임 및 리드타임을 넉넉히 준다.
+                OkHttpClient toServer = new OkHttpClient.Builder()
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                // 이미지 업로드 코드 설정
+                if(!PropertyManager.getInstance().getUserProfileImg().isEmpty()) {
+                    uploadCode = "2";
+                    if(objects == null) {
+                        uploadCode = "3";
+                    }
+                } else {
+                    uploadCode = "1";
+                    if(objects == null) {
+                        uploadCode = "0";
+                    }
+                }
+                Log.e("업로드코드", uploadCode);
+                MultipartBody.Builder builder = new MultipartBody.Builder();
+                builder.setType(MultipartBody.FORM);
+                builder.addFormDataPart("uploadCode", uploadCode);
+                builder.addFormDataPart("username", username);
+                builder.addFormDataPart("area", area);
+                if(objects != null) {
+                    File file = objects[0].file;
+                    builder.addFormDataPart("profileImg", file.getName(), RequestBody.create(IMAGE_MIME_TYPE, file));
+                }
+
+                RequestBody fileUploadBody = builder.build();
+
+                //요청 세팅
+                Request request = new Request.Builder()
+                        .url(String.format(NetworkDefineConstant.PUT_SERVER_USER_EDIT,
+                                PropertyManager.getInstance().getUserId()))
+                        .put(fileUploadBody)
+                        .build();
+                response = toServer.newCall(request).execute();
+                boolean flag = response.isSuccessful();
+                //응답 코드 200등등
+                int responseCode = response.code();
+                if (flag) {
+                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
+                    Log.e("response응답바디", response.body().string()); //json으로 변신
+                    return "success";
+                }
+            } catch (UnknownHostException une) {
+                Log.e("une", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                Log.e("uee", uee.toString());
+            } catch (Exception e) {
+                Log.e("e", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+            return "fail";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result.equalsIgnoreCase("success")) {
+                UpLoadValueObject fileValue = upLoadFile;
+                if (fileValue.tempFiles) {
+                    fileValue.file.deleteOnExit(); //임시파일을 삭제한다
+                }
+                toMainActivityFromthis();
+            } else if(result.equals("fail")){
+                getSupportFragmentManager().beginTransaction()
+                        .add(MiddleAloneDialogFragment.newInstance(3),
+                                "middle_edit_profile_fail").commit();
+            }
+            tbDone.setEnabled(true);
         }
     }
 
@@ -421,113 +555,8 @@ public class EditProfileActivity extends BaseActivity
                 startActivity(intent);
             } else if(result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(MiddleAloneDialogFragment.newInstance(1), "middle_dialog").commit();
+                        .add(MiddleAloneDialogFragment.newInstance(2), "middle_dialog").commit();
             }
-        }
-    }
-
-    // 프로필 업로드
-    private class FileUpLoadAsyncTask extends AsyncTask<UpLoadValueObject, Void, String> {
-        private String username;
-        private String area;
-        private String uploadCode;
-        //업로드할 Mime Type 설정
-        private final MediaType IMAGE_MIME_TYPE = MediaType.parse("image/*");
-
-
-        public FileUpLoadAsyncTask() {
-        }
-
-        public FileUpLoadAsyncTask(String username, String area) {
-            this.username = username;
-            this.area = area;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(UpLoadValueObject... objects) {
-            Response response = null;
-
-            try {
-                //업로드는 타임 및 리드타임을 넉넉히 준다.
-                OkHttpClient toServer = new OkHttpClient.Builder()
-                        .connectTimeout(30, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
-
-                if(!PropertyManager.getInstance().getUserProfileImg().isEmpty()) {
-                    uploadCode = "2";
-                    if(objects == null) {
-                        uploadCode = "3";
-                    }
-                } else {
-                    uploadCode = "1";
-                    if(objects == null) {
-                        uploadCode = "0";
-                    }
-                }
-                Log.e("업로드코드", uploadCode);
-                MultipartBody.Builder builder = new MultipartBody.Builder();
-                builder.setType(MultipartBody.FORM);
-                builder.addFormDataPart("uploadCode", uploadCode);
-                builder.addFormDataPart("username", username);
-                builder.addFormDataPart("area", area);
-                if(objects != null) {
-                    File file = objects[0].file;
-                    builder.addFormDataPart("profileImg", file.getName(), RequestBody.create(IMAGE_MIME_TYPE, file));
-                }
-
-                RequestBody fileUploadBody = builder.build();
-
-                //요청 세팅
-                Request request = new Request.Builder()
-                        .url(String.format(NetworkDefineConstant.PUT_SERVER_USER_EDIT,
-                                PropertyManager.getInstance().getUserId()))
-                        .put(fileUploadBody)
-                        .build();
-                response = toServer.newCall(request).execute();
-                boolean flag = response.isSuccessful();
-                //응답 코드 200등등
-                int responseCode = response.code();
-                if (flag) {
-                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
-                    Log.e("response응답바디", response.body().string()); //json으로 변신
-                    return "success";
-                }
-
-            } catch (UnknownHostException une) {
-                Log.e("aa", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                Log.e("bb", uee.toString());
-            } catch (Exception e) {
-                Log.e("cc", e.toString());
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-            return "fail";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if (result.equalsIgnoreCase("success")) {
-                UpLoadValueObject fileValue = upLoadFile;
-                if (fileValue.tempFiles) {
-                    fileValue.file.deleteOnExit(); //임시파일을 삭제한다
-                }
-                toMainActivityFromthis();
-            } else if(result.equals("fail")){
-                getSupportFragmentManager().beginTransaction()
-                        .add(MiddleAloneDialogFragment.newInstance(3),
-                                "middle_edit_profile_fail").commit();
-            }
-            tbDone.setEnabled(true);
         }
     }
 

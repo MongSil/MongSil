@@ -81,38 +81,6 @@ public class MiddleSelectDialogFragment extends DialogFragment {
                     }
                 });
                 break;
-            case 1: // 글 저장하는 경우 [취소 / 확인]
-                dialog.setText(getResources().getText(R.string.save_post));
-                negative.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dismiss();
-                    }
-                });
-                positive.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dismiss();
-                        onMiddleSelectDialogListener.onMiddleSelect(1);
-                    }
-                });
-                break;
-            case 2: // 글 수정하는 경우 [취소 / 확인]
-                dialog.setText(getResources().getText(R.string.save_modify_profile));
-                negative.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dismiss();
-                    }
-                });
-                positive.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dismiss();
-                        onMiddleSelectDialogListener.onMiddleSelect(2);
-                    }
-                });
-                break;
             case 99: // 계정 삭제하는 경우 [취소 / 확인]
                 dialog.setText(getResources().getText(R.string.account_leave));
                 negative.setOnClickListener(new View.OnClickListener() {

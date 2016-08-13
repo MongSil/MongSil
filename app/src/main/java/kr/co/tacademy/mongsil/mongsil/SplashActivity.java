@@ -161,6 +161,7 @@ public class SplashActivity extends BaseActivity {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(SplashActivity.this, AppTutorialActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                         startActivity(intent);
                         finish();
                     }
@@ -171,6 +172,7 @@ public class SplashActivity extends BaseActivity {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(SplashActivity.this, AppTutorialActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                         startActivity(intent);
                         finish();
                     }
@@ -188,13 +190,8 @@ public class SplashActivity extends BaseActivity {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
                     != PackageManager.PERMISSION_GRANTED) {
-                if (shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE)) {
                     requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE},
                             PERMISSION_REQUEST_PHONE_STATE);
-                } else {
-                    requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE},
-                            PERMISSION_REQUEST_PHONE_STATE);
-                }
             } else {
                 //사용자가 언제나 허락
                 if (PropertyManager.getInstance().getDeviceId().isEmpty()) {

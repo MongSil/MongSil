@@ -350,6 +350,7 @@ public class PostDetailActivity extends BaseActivity
 
                 replyAdapter.add(result);
                 replyRecycler.setAdapter(replyAdapter);
+                replyRecycler.smoothScrollToPosition(result.size()-1);
             }
         }
     }

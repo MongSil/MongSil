@@ -89,7 +89,7 @@ public class BottomPicDialogFragment extends DialogFragment {
 
 
         // 기본 이미지
-        btnSecond.setOnClickListener(new View.OnClickListener() {
+        btnThird.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dismiss();
@@ -108,14 +108,9 @@ public class BottomPicDialogFragment extends DialogFragment {
                     != PackageManager.PERMISSION_GRANTED
                     || getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
-
-                if (shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE)) {
-                    requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE},
-                            PERMISSION_REQUEST_STORAGE);
-                } else {
-                    requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE},
-                            PERMISSION_REQUEST_STORAGE);
-                }
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PERMISSION_REQUEST_STORAGE);
             } else {
                 //사용자가 언제나 허락
             }

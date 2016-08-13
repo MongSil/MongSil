@@ -184,7 +184,7 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
 
         final CircleImageView imgProfile =
                 (CircleImageView) menu.findViewById(R.id.img_profile);
-        if(!PropertyManager.getInstance().getUserProfileImg().equals("null")) {
+        if(!PropertyManager.getInstance().getUserProfileImg().isEmpty()) {
             Glide.with(MongSilApplication.getMongSilContext())
                     .load(PropertyManager.getInstance().getUserProfileImg())
                     .asBitmap()
