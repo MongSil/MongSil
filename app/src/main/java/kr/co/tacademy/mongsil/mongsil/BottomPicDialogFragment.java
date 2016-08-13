@@ -2,12 +2,10 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +59,7 @@ public class BottomPicDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.dialog_triple_bottom, container, false);
         Button btnFirst = (Button) view.findViewById(R.id.btn_first);
         Button btnSecond = (Button) view.findViewById(R.id.btn_second);
+        Button btnThird = (Button) view.findViewById(R.id.btn_third);
         Button btnClose = (Button) view.findViewById(R.id.btn_close);
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,10 +87,20 @@ public class BottomPicDialogFragment extends DialogFragment {
             }
         });
 
+
+        // 기본 이미지
+        btnSecond.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+                onBottomPicDialogListener.onSelectBottomPic(2);
+            }
+        });
+
         return view;
     }
 
-    private final int MY_PERMISSION_REQUEST_STORAGE = 100;
+    private final int PERMISSION_REQUEST_STORAGE = 101;
 
     private void checkPermission() {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -100,11 +109,12 @@ public class BottomPicDialogFragment extends DialogFragment {
                     || getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
 
-                if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    requestPermissions(
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                                    Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            MY_PERMISSION_REQUEST_STORAGE);
+                if (shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE)) {
+                    requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE},
+                            PERMISSION_REQUEST_STORAGE);
+                } else {
+                    requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE},
+                            PERMISSION_REQUEST_STORAGE);
                 }
             } else {
                 //사용자가 언제나 허락
@@ -114,7 +124,7 @@ public class BottomPicDialogFragment extends DialogFragment {
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSION_REQUEST_STORAGE:
+            case PERMISSION_REQUEST_STORAGE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 
@@ -141,7 +151,7 @@ public class BottomPicDialogFragment extends DialogFragment {
         WindowManager.LayoutParams wlp = window.getAttributes();
         wlp.windowAnimations = R.style.BottomDialogAnimation;
         wlp.gravity = Gravity.BOTTOM;
-        wlp.height = getResources().getDimensionPixelSize(R.dimen.dialog_pic_vertical)*2;
+        wlp.height = (int)(getResources().getDimensionPixelSize(R.dimen.dialog_pic_vertical)*1.5);
         window.setAttributes(wlp);
     }
 }

@@ -75,13 +75,13 @@ public class PostDetailActivity extends BaseActivity
         tbThreeDot = (ImageView) toolbar.findViewById(R.id.img_threeDot);
 
         imgBackground = (ImageView) findViewById(R.id.img_post_detail_background);
-        imgWeatherIcon = (ImageView) findViewById(R.id.img_preview_weather_icon);
+        imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
 
-        postContent = (TextView) findViewById(R.id.text_preview_post_content);
-        postLocation = (TextView) findViewById(R.id.text_preview_post_location);
-        postTime = (TextView) findViewById(R.id.text_preview_post_time);
-        postName = (TextView) findViewById(R.id.text_preview_post_name);
-        postReplyCount = (TextView) findViewById(R.id.text_preview_post_comment_count);
+        postContent = (TextView) findViewById(R.id.text_post_content);
+        postLocation = (TextView) findViewById(R.id.text_post_location);
+        postTime = (TextView) findViewById(R.id.text_post_time);
+        postName = (TextView) findViewById(R.id.text_post_name);
+        postReplyCount = (TextView) findViewById(R.id.text_post_comment_count);
         editReply = (EditText) findViewById(R.id.edit_reply);
 
         replyEditContainer = (RelativeLayout) findViewById(R.id.reply_edit_container);
@@ -411,6 +411,8 @@ public class PostDetailActivity extends BaseActivity
             if (result.equals("success")) {
                 new AsyncPostDetailReplyJSONList().execute(
                         postId);
+                Integer replyCountUp = Integer.valueOf(postReplyCount.getText().toString());
+                postReplyCount.setText(String.valueOf(replyCountUp+1));
             } else if (result.equals("fail")) {
                 // 실패
             }
@@ -533,7 +535,7 @@ public class PostDetailActivity extends BaseActivity
 
     private void toMainActivityFromthis() {
         Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
     }

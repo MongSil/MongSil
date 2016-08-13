@@ -63,16 +63,16 @@ public class PostPreviewDialogFragment extends DialogFragment {
         imgBackground = (ImageView) view.findViewById(R.id.img_preview_background);
         imgBackground.setBackgroundResource(imgRes);
 
-        postContent = (TextView) view.findViewById(R.id.text_preview_post_content);
+        postContent = (TextView) view.findViewById(R.id.text_post_content);
         postContent.setText(content);
 
-        postLocation = (TextView) view.findViewById(R.id.text_preview_post_location);
+        postLocation = (TextView) view.findViewById(R.id.text_post_location);
         postLocation.setText(location);
 
-        postName = (TextView) view.findViewById(R.id.text_preview_post_name);
+        postName = (TextView) view.findViewById(R.id.text_post_name);
         postName.setText(PropertyManager.getInstance().getNickname());
 
-        postTime = (TextView) view.findViewById(R.id.text_preview_post_time);
+        postTime = (TextView) view.findViewById(R.id.text_post_time);
         postTime.setText(TimeData.PreviewPostTime());
 
 

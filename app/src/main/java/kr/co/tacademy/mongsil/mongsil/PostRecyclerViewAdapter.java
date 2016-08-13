@@ -101,10 +101,10 @@ public class PostRecyclerViewAdapter
             this.view = view;
             imgPostProfile = (CircleImageView) view.findViewById(R.id.img_post_profile);
             imgPostProfileIcon = (ImageView) view.findViewById(R.id.img_post_profile_icon);
-            postName = (TextView) view.findViewById(R.id.text_preview_post_name);
+            postName = (TextView) view.findViewById(R.id.text_post_name);
             postContainer = (RelativeLayout) view.findViewById(R.id.post_content_container);
-            postContent = (TextView) view.findViewById(R.id.text_preview_post_content);
-            postTime = (TextView) view.findViewById(R.id.text_preview_post_time);
+            postContent = (TextView) view.findViewById(R.id.text_post_content);
+            postTime = (TextView) view.findViewById(R.id.text_post_time);
             btnNext = (Button) view.findViewById(R.id.btn_next);
         }
 

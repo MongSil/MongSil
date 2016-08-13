@@ -12,9 +12,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
@@ -42,21 +39,23 @@ public class SignUpActivity extends BaseActivity
         setContentView(R.layout.activity_sign_up);
 
         editName = (EditText) findViewById(R.id.edit_name);
-        editName.setOnClickListener(new View.OnClickListener() {
+        /*editName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 editName.setHint("");
             }
-        });
+        });*/
         editName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
                 if(b) {
                     editName.setHint("");
+                    editName.setCursorVisible(true);
                 } else {
                     InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(editName.getWindowToken(), 0);
                     editName.setHint(getResources().getText(R.string.name));
+                    editName.setCursorVisible(false);
                 }
             }
         });
@@ -72,8 +71,11 @@ public class SignUpActivity extends BaseActivity
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (editable != null && location != null) {
+                if(!editable.toString().isEmpty()
+                        && !location.getText().toString().equals("지역")) {
                     imgDone.setVisibility(View.VISIBLE);
+                } else {
+                    imgDone.setVisibility(View.GONE);
                 }
             }
         });
@@ -178,10 +180,14 @@ public class SignUpActivity extends BaseActivity
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if (result.isEmpty() | result.equals("null")) {
+            Log.e("회원가입 결과", result);
+            if (!result.isEmpty() | !result.equals("null")) {
                 PropertyManager.getInstance().setNickname(editName.getText().toString());
                 PropertyManager.getInstance().setLocation(location.getText().toString());
                 PropertyManager.getInstance().setUserId(result);
+                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             } else if (result.equals("fail")) {
                 // 실패
                 getSupportFragmentManager().beginTransaction()
@@ -201,7 +207,10 @@ public class SignUpActivity extends BaseActivity
     }
 
     @Override
-    public void onSelect(String selectLocation) {
+    public void onSelectLocation(String selectLocation) {
         location.setText(selectLocation);
+        if(!editName.getText().toString().isEmpty()) {
+            imgDone.setVisibility(View.VISIBLE);
+        }
     }
 }

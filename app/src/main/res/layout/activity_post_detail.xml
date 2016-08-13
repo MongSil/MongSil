@@ -54,12 +54,13 @@
             </android.support.v7.widget.Toolbar>
 
             <ImageView
-                android:id="@+id/img_preview_weather_icon"
+                android:id="@+id/img_weather_icon"
                 android:layout_width="match_parent"
                 android:layout_height="156dp"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="@dimen/toolbar_size"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                app:layout_collapseMode="parallax"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
@@ -77,10 +78,10 @@
                 android:background="@color/post_background">
 
                 <TextView
-                    android:id="@+id/text_preview_post_content"
+                    android:id="@+id/text_post_content"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_above="@+id/post_preview_info_container"
+                    android:layout_above="@+id/post_info_container"
                     android:layout_centerHorizontal="true"
                     android:layout_marginLeft="50dp"
                     android:layout_marginRight="50dp"
@@ -92,13 +93,13 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_below="@+id/text_preview_post_content"
+                    android:layout_below="@+id/text_post_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
                     android:background="@color/post_line" />
 
                 <RelativeLayout
-                    android:id="@+id/post_preview_info_container"
+                    android:id="@+id/post_info_container"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_alignParentBottom="true"
@@ -109,7 +110,7 @@
                     android:layout_marginTop="5dp">
 
                     <TextView
-                        android:id="@+id/text_preview_post_location"
+                        android:id="@+id/text_post_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -119,18 +120,18 @@
                         android:textSize="12sp" />
 
                     <TextView
-                        android:id="@+id/text_preview_post_time"
+                        android:id="@+id/text_post_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="3dp"
-                        android:layout_toEndOf="@+id/text_preview_post_location"
-                        android:layout_toRightOf="@+id/text_preview_post_location"
+                        android:layout_toEndOf="@+id/text_post_location"
+                        android:layout_toRightOf="@+id/text_post_location"
                         android:textColor="@android:color/white"
                         android:textSize="12sp" />
 
                     <TextView
-                        android:id="@+id/text_preview_post_name"
+                        android:id="@+id/text_post_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
@@ -139,7 +140,7 @@
                         android:textSize="12sp" />
 
                     <TextView
-                        android:id="@+id/text_preview_post_comment_count"
+                        android:id="@+id/text_post_comment_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"

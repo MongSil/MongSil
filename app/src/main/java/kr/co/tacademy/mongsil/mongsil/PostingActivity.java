@@ -128,9 +128,8 @@ public class PostingActivity extends BaseActivity
                 pagerPos = selectWeatherPager.getCurrentItem();
                 if (pagerPos < WEATHER_COUNT && pagerPos > 0) {
                     selectWeatherPager.setCurrentItem(pagerPos + 1);
-                } else if (pagerPos == WEATHER_COUNT - 1) {
-                    selectWeatherPager.setCurrentItem(0);
-                }
+                } else if (pagerPos == WEATHER_COUNT) {
+                    selectWeatherPager.setCurrentItem(0);                }
             }
         });
 
@@ -204,7 +203,7 @@ public class PostingActivity extends BaseActivity
         public Object instantiateItem(ViewGroup container, int position) {
             View view = getLayoutInflater()
                     .inflate(R.layout.layout_posting_select_weather, container, false);
-            imgWeatherIcon = (ImageView) view.findViewById(R.id.img_preview_weather_icon);
+            imgWeatherIcon = (ImageView) view.findViewById(R.id.img_weather_icon);
             imgWeatherIcon.setImageResource(
                     WeatherData.imgFromWeatherCode(String.valueOf(position + 1), 0));
             if (imgWeatherIcon.isShown()) {

@@ -24,6 +24,21 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by ccei on 2016-08-09.
  */
 public class SelectLocationDialogFragment extends DialogFragment {
+    public interface OnSelectLocationListener {
+        void onSelectLocation(String selectLocation);
+    }
+
+    OnSelectLocationListener selectListener;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnSelectLocationListener) {
+            selectListener = (OnSelectLocationListener) context;
+        }
+    }
+
+
 
     public SelectLocationDialogFragment() {
     }
@@ -38,20 +53,6 @@ public class SelectLocationDialogFragment extends DialogFragment {
 
     RecyclerView selectLocationRecycle;
     private int selectedPos = 0;
-
-    public static interface OnSelectLocationListener {
-        public abstract void onSelect(String selectLocation);
-    }
-
-    private OnSelectLocationListener selectListener;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnSelectLocationListener) {
-            selectListener = (OnSelectLocationListener) context;
-        }
-    }
 
     public static SelectLocationDialogFragment newInstance() {
         SelectLocationDialogFragment fragment =
@@ -109,7 +110,7 @@ public class SelectLocationDialogFragment extends DialogFragment {
         tbDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                selectListener.onSelect(locationNames.get(selectedPos));
+                selectListener.onSelectLocation(locationNames.get(selectedPos));
                 dismiss();
             }
         });

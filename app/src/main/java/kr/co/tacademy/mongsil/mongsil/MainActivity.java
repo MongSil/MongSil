@@ -14,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,7 +101,6 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
             new AsyncLatLonWeatherJSONList().execute(latLon[0], latLon[1]);
 
         }
-        // TODO : 11개 지역 위도경도 추가해야함
         tbTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,7 +129,7 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         if(animBackgroundWeather.isShown()) {
             ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
         }
-        imgWeatherIcon = (ImageView) findViewById(R.id.img_preview_weather_icon);
+        imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
         if(imgWeatherIcon.isShown()) {
             ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
         }
@@ -204,6 +204,7 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.e("UserProfile : ", PropertyManager.getInstance().getUserProfileImg());
                 startActivity(new Intent(MainActivity.this, EditProfileActivity.class));
             }
         });

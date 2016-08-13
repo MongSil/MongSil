@@ -2,7 +2,6 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
@@ -10,8 +9,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
@@ -19,9 +16,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
@@ -38,7 +32,7 @@ import okhttp3.ResponseBody;
 import static android.util.Log.e;
 
 public class SplashActivity extends BaseActivity {
-    private static final int MY_PERMISSION_REQUEST_STATE = 100;
+    private static final int PERMISSION_REQUEST_PHONE_STATE = 100;
 
     LinearLayout splashContainer;
     ImageView imgSplashHere, imgSplashTitle;
@@ -151,14 +145,14 @@ public class SplashActivity extends BaseActivity {
             super.onPostExecute(result);
             Log.e("응답바디 msg 값 : ", result);
             if (result.equalsIgnoreCase("success")) {
-                splashContainer.setOnClickListener(new View.OnClickListener() {
+                handler.postDelayed(new Runnable() {
                     @Override
-                    public void onClick(View view) {
+                    public void run() {
                         Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
                     }
-                });
+                }, 4500);
             }else if (result.equalsIgnoreCase("fail")) {
                 getSupportFragmentManager().beginTransaction().
                         add(MiddleAloneDialogFragment.newInstance(91),
@@ -190,20 +184,23 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
-    private void checkPermission() {
+    public void checkPermission() {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
                     != PackageManager.PERMISSION_GRANTED) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE)) {
-                    // Explain to the user why we need to write the permission.
                     requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE},
-                            MY_PERMISSION_REQUEST_STATE);
+                            PERMISSION_REQUEST_PHONE_STATE);
+                } else {
+                    requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE},
+                            PERMISSION_REQUEST_PHONE_STATE);
                 }
             } else {
                 //사용자가 언제나 허락
                 if (PropertyManager.getInstance().getDeviceId().isEmpty()) {
                     PropertyManager.getInstance().setDeviceId(getDevicesUUID());
                 }
+                Log.e("생성된 UUID", PropertyManager.getInstance().getDeviceId());
                 new AsyncLoginRequest().execute();
             }
         }
@@ -211,13 +208,13 @@ public class SplashActivity extends BaseActivity {
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSION_REQUEST_STATE:
+            case PERMISSION_REQUEST_PHONE_STATE:
                 //사용자가 퍼미션을 OK했을 경우
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (PropertyManager.getInstance().getDeviceId().isEmpty()) {
                         PropertyManager.getInstance().setDeviceId(getDevicesUUID());
                     }
+                    Log.e("생성된 UUID", PropertyManager.getInstance().getDeviceId());
                     new AsyncLoginRequest().execute();
                 } else {
                     //사용자가 퍼미션을 거절했을 경우

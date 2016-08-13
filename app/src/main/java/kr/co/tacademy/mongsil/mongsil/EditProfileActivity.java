@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -112,7 +113,10 @@ public class EditProfileActivity extends BaseActivity
         imgProfileContainer =
                 (LinearLayout) findViewById(R.id.img_profile_container);
         imgProfile = (CircleImageView) findViewById(R.id.img_profile);
-        if(!PropertyManager.getInstance().getUserProfileImg().equals("null")) {
+        //TODO : 로그가 왜 안뜨지
+        Log.e("UserProfile : ", PropertyManager.getInstance().getUserProfileImg());
+        if(!PropertyManager.getInstance().getUserProfileImg().equals("null")
+                || !PropertyManager.getInstance().getUserProfileImg().equals("")) {
             Glide.with(MongSilApplication.getMongSilContext())
                     .load(PropertyManager.getInstance().getUserProfileImg())
                     .into(imgProfile);
@@ -193,7 +197,7 @@ public class EditProfileActivity extends BaseActivity
     private void doTakePhotoAction() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         //업로드할 파일의 이름
-        currentFileName = "upload_" + String.valueOf(System.currentTimeMillis() / 1000) + ".jpg";
+        currentFileName = "upload_" + String.valueOf(System.currentTimeMillis() / 1000) + ".png";
         currentSelectedUri = Uri.fromFile(new File(myImageDir, currentFileName));
         cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, currentSelectedUri);
         startActivityForResult(cameraIntent, PICK_FROM_CAMERA);
@@ -284,7 +288,10 @@ public class EditProfileActivity extends BaseActivity
                     myImageDir                   // directory
             );
             final FileOutputStream bitmapStream = new FileOutputStream(tempFile);
-            tempBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bitmapStream);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 4;
+            Bitmap resized = Bitmap.createScaledBitmap( tempBitmap, 300, 300, true );
+            resized.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
             upLoadFile = new UpLoadValueObject(tempFile, true);
             if (bitmapStream != null) {
                 bitmapStream.close();
@@ -341,12 +348,15 @@ public class EditProfileActivity extends BaseActivity
             case 1 :
                 doTakeAlbumAction();
                 break;
+            case 2 :
+                PropertyManager.getInstance().setUserProfileImg("");
+                imgProfile.setImageResource(R.drawable.none_my_profile);
         }
     }
 
     // 지역 선택 다이어로그 셀렉터 인터페이스에서 받음
     @Override
-    public void onSelect(String selectLocation) {
+    public void onSelectLocation(String selectLocation) {
         editLocation.setText(selectLocation);
     }
 
@@ -416,10 +426,10 @@ public class EditProfileActivity extends BaseActivity
         }
     }
 
-    // 이미지 업로드
+    // 프로필 업로드
     private class FileUpLoadAsyncTask extends AsyncTask<UpLoadValueObject, Void, String> {
-        private String username; //보낼쿼리
-        private String area; //보낼쿼리
+        private String username;
+        private String area;
         private String uploadCode;
         //업로드할 Mime Type 설정
         private final MediaType IMAGE_MIME_TYPE = MediaType.parse("image/*");

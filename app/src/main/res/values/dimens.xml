@@ -7,6 +7,6 @@
     <dimen name="post_detail_toolbar_size">156dp</dimen>
     <dimen name="btn_posting">66dp</dimen>
     <dimen name="slidingmenu_offset">0dp</dimen>
-    <dimen name="dialog_pic_vertical">156dp</dimen>
+    <dimen name="dialog_pic_vertical">200dp</dimen>
     <dimen name="dialog_middle_vertical_margin">142dp</dimen>
 </resources>

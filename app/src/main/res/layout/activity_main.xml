@@ -30,7 +30,7 @@
                 android:layout_height="match_parent">
 
                 <ImageView
-                    android:id="@+id/img_preview_weather_icon"
+                    android:id="@+id/img_weather_icon"
                     android:layout_marginTop="10dp"
                     android:layout_width="123dp"
                     android:layout_height="123dp"/>

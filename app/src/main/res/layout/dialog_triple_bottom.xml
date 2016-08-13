@@ -46,6 +46,11 @@
             android:layout_gravity="center"
             android:layout_weight="1" />
 
+        <View
+            android:background="@color/line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
         <Button
             android:id="@+id/btn_third"
             android:text="@string/select_remove"
