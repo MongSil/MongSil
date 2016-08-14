@@ -7,25 +7,30 @@
     <ImageView
         android:id="@+id/img_two_cloud03_cut"
         android:src="@drawable/cloud03_cut_02"
-        android:layout_marginBottom="72dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:scaleType="fitXY" />
+
+    <ImageView
+        android:id="@+id/img_tutorial_sunny"
+        android:src="@drawable/tutorial_sunny"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top" />
 
     <ImageView
         android:id="@+id/img_two_cloud02_cut"
         android:src="@drawable/cloud02_cut_02"
-        android:layout_marginBottom="50dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:scaleType="fitXY" />
 
 
     <ImageView
-        android:id="@+id/img_tutorial_city"
-        android:src="@drawable/tutorial_city"
+        android:id="@+id/img_tutorial_weather"
+        android:src="@drawable/tutorial_weather"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top" />
@@ -46,14 +51,12 @@
         android:layout_gravity="center_horizontal|bottom"
         android:scaleType="fitXY" />
     <ImageView
-        android:id="@+id/img_twinkle"
-        android:src="@drawable/tutorial_twinkle02"
+        android:id="@+id/cloud04_cut"
+        android:src="@drawable/cloud04_cut_02"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:scaleType="fitXY" />
-
-
     <LinearLayout
         android:orientation="vertical"
         android:layout_gravity="center"

@@ -26,16 +26,16 @@ public class AppTutorialActivity extends BaseActivity {
         if(savedInstanceState != null) {
             pager = (ViewPagerParallax) findViewById(R.id.viewpager_tutorial);
             pager.set_max_pages(MAX_PAGES);
-            pager.setBackgroundAsset(R.drawable.tutorial_background);
+            pager.setBackgroundAsset(R.raw.tutorial_background);
             pager.setAdapter(new tutorialPagerAdapter(getSupportFragmentManager()));
-            pager.setPageTransformer(true, new CrossFadePageTransformer());
+            //pager.setPageTransformer(true, new CrossFadePageTransformer());
         }
 
         pager = (ViewPagerParallax) findViewById(R.id.viewpager_tutorial);
         pager.set_max_pages(MAX_PAGES);
-        pager.setBackgroundAsset(R.drawable.tutorial_background);
+        pager.setBackgroundAsset(R.raw.tutorial_background);
         pager.setAdapter(new tutorialPagerAdapter(getSupportFragmentManager()));
-        pager.setPageTransformer(true, new CrossFadePageTransformer());
+        //pager.setPageTransformer(true, new CrossFadePageTransformer());
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -147,7 +147,7 @@ public class AppTutorialActivity extends BaseActivity {
 
             // 두번째
             View navi = page.findViewById(R.id.img_tutorial_navi);
-            View city = page.findViewById(R.id.img_tutorial_city);
+            View city = page.findViewById(R.id.img_tutorial_weather);
             View cloud2CutTwo = page.findViewById(R.id.img_two_cloud02_cut);
             View cloud2CutThree = page.findViewById(R.id.img_two_cloud03_cut);
 

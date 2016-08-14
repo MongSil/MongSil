@@ -38,8 +38,6 @@ public class TutorialPane extends Fragment{
                 view = inflater.inflate(
                                 res.getLayout(R.layout.fragment_tutorial_one),
                                 container, false);
-                ImageView rain = (ImageView) view.findViewById(R.id.img_tutorial_rain);
-                ((AnimationDrawable) rain.getDrawable()).start();
                 break;
             case 1:
                 view = inflater.inflate(

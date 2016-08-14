@@ -7,18 +7,23 @@
     <ImageView
         android:id="@+id/img_one_cloud03_cut"
         android:src="@drawable/cloud03_cut_01"
-        android:layout_marginBottom="72dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:scaleType="fitXY" />
 
     <ImageView
-        android:id="@+id/img_one_cloud02_cut"
-        android:src="@drawable/cloud02_cut_01"
-        android:layout_marginBottom="50dp"
+        android:id="@+id/img_tutorial_sunny"
+        android:src="@drawable/tutorial_sunny"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top" />
+
+    <ImageView
+        android:id="@+id/img_one_cloud02_cut"
+        android:src="@drawable/cloud02_cut_01"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:scaleType="fitXY" />
     <ImageView
@@ -28,18 +33,12 @@
         android:layout_gravity="center_horizontal|bottom"
         android:scaleType="fitXY" />
     <ImageView
-        android:id="@+id/img_twinkle"
-        android:src="@drawable/tutorial_twinkle01"
+        android:id="@+id/cloud04_cut"
+        android:src="@drawable/cloud04_cut_01"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:scaleType="fitXY" />
-
-    <ImageView
-        android:id="@+id/img_tutorial_rain"
-        android:src="@drawable/anim_list_strong_rain"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -68,12 +67,4 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/img_tutorial_mongsil"
-        android:src="@drawable/tutorial_mongsil"
-        android:layout_marginTop="70dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|top" />
 </FrameLayout>

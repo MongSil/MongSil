@@ -101,7 +101,6 @@ public class MainActivity extends BaseActivity
                     add(MiddleAloneDialogFragment.newInstance(0), "middle_done").commit();
         }
 
-        // GPS 여부
         // TODO : GPS가 켜져 있을 경우 - GPS 지역
 
         // 글 작성 프레그먼트와 슬라이딩메뉴 프레그먼트를 선언
@@ -222,6 +221,7 @@ public class MainActivity extends BaseActivity
 
         final CircleImageView imgProfile =
                 (CircleImageView) menu.findViewById(R.id.img_profile);
+        Log.e("프로필이미지 value : ", " " + PropertyManager.getInstance().getUserProfileImg());
         if (!PropertyManager.getInstance().getUserProfileImg().isEmpty()) {
             Glide.with(MongSilApplication.getMongSilContext())
                     .load(PropertyManager.getInstance().getUserProfileImg())
@@ -235,7 +235,6 @@ public class MainActivity extends BaseActivity
                                     BlurBuilder.blur(resource, 5));
                         }
                     });
-
         } else {
             imgProfile.setImageResource(R.drawable.none_my_profile);
         }

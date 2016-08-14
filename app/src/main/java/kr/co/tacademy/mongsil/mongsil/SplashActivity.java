@@ -123,6 +123,7 @@ public class SplashActivity extends BaseActivity {
                 int responseCode = response.code();
                 if (responseCode >= 400) return null;
                 if (flag) {
+                    Log.e("UserId : ", " -- " + PropertyManager.getInstance().getUserId());
                     return ParseDataParseHandler.postJSONUserLogin(
                             new StringBuilder(responseBody.string()));
                 }

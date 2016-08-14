@@ -69,7 +69,7 @@ public class EditProfileActivity extends BaseActivity
     // 계정삭제
     RelativeLayout leaveProfileContainer;
 
-    private UpLoadValueObject upLoadFile;
+    private UpLoadValueObject upLoadFile = null;
 
     class UpLoadValueObject {
         File file; //업로드할 파일
@@ -486,10 +486,14 @@ public class EditProfileActivity extends BaseActivity
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if (result.equalsIgnoreCase("success")) {
-                UpLoadValueObject fileValue = upLoadFile;
-                if (fileValue.tempFiles) {
-                    fileValue.file.deleteOnExit(); //임시파일을 삭제한다
+            Log.e("Result value : ", "> " + result);
+            if (result.equals("success")) {
+                if(upLoadFile != null) {
+                    UpLoadValueObject fileValue = upLoadFile;
+                    if (fileValue.tempFiles) {
+                        fileValue.file.deleteOnExit(); //임시파일을 삭제한다
+                    }
+                    //Todo : 형님이 프로필 이미지 링크 만들어주시면 PropertyManager.getInstance().setUserProfileImg();
                 }
                 toMainActivityFromthis();
             } else if(result.equals("fail")){
@@ -568,7 +572,7 @@ public class EditProfileActivity extends BaseActivity
 
     private void toMainActivityFromthis() {
         Intent intent = new Intent(EditProfileActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
     }

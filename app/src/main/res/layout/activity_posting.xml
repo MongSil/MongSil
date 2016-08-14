@@ -10,18 +10,10 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="kr.co.tacademy.mongsil.mongsil.PostingActivity">
-    <!-- viewpager 내용 : layout_posting_select_weather.xml -->
-
     <ImageView
         android:id="@+id/img_posting_background"
         android:scaleType="fitXY"
         android:fitsSystemWindows="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- layout_posting_select_weather.xml -->
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager_posting_select_weather"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -39,6 +31,13 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:src="@drawable/icon_left_arrow" />
+
+        <!-- viewpager 내용 : layout_posting_select_weather.xml -->
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager_posting_select_weather"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <ImageView
             android:id="@+id/img_right_weather"

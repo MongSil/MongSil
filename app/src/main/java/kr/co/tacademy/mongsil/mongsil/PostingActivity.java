@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -188,6 +189,13 @@ public class PostingActivity extends BaseActivity
             }
         });
 
+
+        // 날씨 이미지 백그라운드
+        imgPostingBackground = (ImageView)findViewById(R.id.img_posting_background);
+
+        /*imgPostingBackground.setImageResource(
+                    WeatherData.imgFromWeatherCode(String.valueOf(position), 1));*/
+
         // 날씨 선택
         selectWeatherPager =
                 (ViewPager) findViewById(R.id.viewpager_posting_select_weather);
@@ -211,7 +219,7 @@ public class PostingActivity extends BaseActivity
                 pagerPos = selectWeatherPager.getCurrentItem();
                 if (pagerPos < WEATHER_COUNT && pagerPos > 0) {
                     selectWeatherPager.setCurrentItem(pagerPos + 1);
-                } else if (pagerPos == WEATHER_COUNT) {
+                } else if (pagerPos == WEATHER_COUNT - 1) {
                     selectWeatherPager.setCurrentItem(0);
                 }
             }
@@ -269,7 +277,7 @@ public class PostingActivity extends BaseActivity
 
     // 날씨 뷰페이저 어뎁터
     private class WeatherPagerAdapter extends PagerAdapter {
-        ImageView imgWeatherBackground, imgWeatherIcon;
+        ImageView imgWeatherIcon;
 
         WeatherPagerAdapter() {
         }
@@ -300,15 +308,6 @@ public class PostingActivity extends BaseActivity
             if (imgWeatherIcon.isShown()) {
                 ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
             }
-            imgWeatherBackground = (ImageView) view.findViewById(R.id.img_weather_background);
-            if (imgPostingBackground != null) {
-                imgWeatherBackground.setVisibility(View.GONE);
-            } else {
-                imgWeatherBackground.setVisibility(View.VISIBLE);
-            }
-
-            /*imgWeatherBackground.setImageResource(
-                    WeatherData.imgFromWeatherCode(String.valueOf(position), 1));*/
             container.addView(view);
             return view;
         }
@@ -398,6 +397,10 @@ public class PostingActivity extends BaseActivity
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(cropUri, "image/*");
 
+       /* intent.putExtra("outputX", 200); // crop한 이미지의 x축 크기
+        intent.putExtra("outputY", 400); // crop한 이미지의 y축 크기
+        intent.putExtra("aspectX", 1); // crop 박스의 x축 비율
+        intent.putExtra("aspectY", 2); // crop 박스의 y축 비율*/
         intent.putExtra("scale", true);
         intent.putExtra("return-data", true);
 

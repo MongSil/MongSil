@@ -22,10 +22,11 @@
     </android.support.v7.widget.Toolbar>
 
     <!-- RecyclerView 내용 : layout_alarm_item.xml -->
-    <android.support.v7.widget.RecyclerView
+
+    <kr.co.tacademy.mongsil.mongsil.RefreshRecyclerView
         android:id="@+id/alarm_recycler"
         android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </android.support.v7.widget.RecyclerView>
+    </kr.co.tacademy.mongsil.mongsil.RefreshRecyclerView>
 </LinearLayout>

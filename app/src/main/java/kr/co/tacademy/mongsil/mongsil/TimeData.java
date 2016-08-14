@@ -144,7 +144,7 @@ public class TimeData {
 
                 if (hourSubTime > 23) {
                     return String.valueOf(daySubTime) + "일 전";
-                } else if (hourSubTime > 1) {
+                } else if (hourSubTime >= 1) {
                     return String.valueOf(hourSubTime) + "시간 전";
                 } else if (hourSubTime < 1) {
                     return String.valueOf(minuteSubTime) + "분 전";

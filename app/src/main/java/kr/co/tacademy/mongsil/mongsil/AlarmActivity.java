@@ -3,6 +3,7 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +15,12 @@ import android.view.MenuItem;
  */
 public class AlarmActivity extends BaseActivity {
 
-    RecyclerView alarmRecycler;
-    Handler handler;
+    RefreshRecyclerView alarmRecycler;
+    Handler handler = new Handler(){
+        public void handleMessage(Message msg){
+            alarmRecycler.notifyDataSetChanged();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +36,25 @@ public class AlarmActivity extends BaseActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        alarmRecycler = (RecyclerView) findViewById(R.id.alarm_recycler);
+        alarmRecycler = (RefreshRecyclerView) findViewById(R.id.alarm_recycler);
+        alarmRecycler.setMode(Mode.REFRESH);
+        alarmRecycler.setRereshListener(new RefreshListener() {
+            @Override
+            public void pullToReresh() {
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        handler.sendEmptyMessage(1);
+                    }
+                }, 2000);
+            }
+
+            @Override
+            public void loadMore() {
+                // none
+            }
+        });
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(getApplicationContext());
         alarmRecycler.setLayoutManager(layoutManager);
@@ -43,7 +66,7 @@ public class AlarmActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home :
+            case android.R.id.home:
                 toMainActivityFromthis();
                 return true;
         }
