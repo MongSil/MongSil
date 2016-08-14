@@ -1,6 +1,7 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -136,6 +139,9 @@ public class PostDetailActivity extends BaseActivity
         imgWeatherIcon.setImageResource(
                 WeatherData.imgFromWeatherCode(
                         String.valueOf(post.weatherCode), 0));
+        imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
+                R.anim.bounce_interpolator, new LinearInterpolator()));
+        ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
 
         // 포스트 내용
         postContent.setText(post.content);
@@ -246,6 +252,14 @@ public class PostDetailActivity extends BaseActivity
                 showCommentSheet();
             }
         });*/
+    }
+
+    // 애니메이션 인터폴레이터 적용
+    private Animation AnimationApplyInterpolater(
+            int resourceId, final Interpolator interpolator) {
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), resourceId);
+        animation.setInterpolator(interpolator);
+        return animation;
     }
 
     // 글 상세내용 가져오기

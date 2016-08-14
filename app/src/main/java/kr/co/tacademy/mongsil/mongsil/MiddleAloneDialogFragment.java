@@ -77,7 +77,15 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                     }
                 });
                 break;
-
+            case 12 : // 글 작성 내용이 없는 경우 [확인]
+                dialog.setText(getResources().getText(R.string.save_none_post));
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                break;
             case 90 : // 로그인 실패한 경우 [확인]
                 dialog.setText(getResources().getText(R.string.login_fail));
                 positive.setOnClickListener(new View.OnClickListener() {

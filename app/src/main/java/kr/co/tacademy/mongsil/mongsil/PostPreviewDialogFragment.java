@@ -1,5 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -7,28 +8,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class PostPreviewDialogFragment extends DialogFragment {
     private static final String LOCATION = "location";
     private static final String CONTENT = "content";
-    private static final String IMGRES = "imgres";
+    private static final String WEATHER_POS = "weather_pos";
+    private static final String PHOTO = "photo";
 
     private String location;
     private String content;
-    private int imgRes;
+    private int weatherPos;
+    private int photo;
 
 
     public PostPreviewDialogFragment() {
     }
 
-    public static PostPreviewDialogFragment newInstance(String location, String content, int imgRes) {
+    public static PostPreviewDialogFragment newInstance(
+            String location, String content, int weatherPos, int photo) {
         PostPreviewDialogFragment fragment = new PostPreviewDialogFragment();
         Bundle args = new Bundle();
         args.putString(LOCATION, location);
         args.putString(CONTENT, content);
-        args.putInt(IMGRES, imgRes);
+        args.putInt(WEATHER_POS, weatherPos);
+        args.putInt(PHOTO, photo);
         fragment.setArguments(args);
         return fragment;
     }
@@ -39,12 +48,13 @@ public class PostPreviewDialogFragment extends DialogFragment {
         if (getArguments() != null) {
             location = getArguments().getString(LOCATION);
             content = getArguments().getString(CONTENT);
-            imgRes = getArguments().getInt(IMGRES);
+            weatherPos = getArguments().getInt(WEATHER_POS);
+            photo = getArguments().getInt(PHOTO);
         }
         setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
     }
 
-    ImageView imgClose, imgBackground;
+    ImageView imgClose, imgBackground, imgWeatherIcon;
     TextView postContent, postLocation, postName, postTime;
 
     @Override
@@ -61,10 +71,22 @@ public class PostPreviewDialogFragment extends DialogFragment {
         });
 
         imgBackground = (ImageView) view.findViewById(R.id.img_preview_background);
-        imgBackground.setBackgroundResource(imgRes);
+        imgBackground.setBackgroundResource(R.drawable.sign_up_background);
+        /*if(photo != 0) {
+            imgBackground.setBackgroundResource(
+            WeatherData.imgFromWeatherCode(String.valueOf(weatherPos), 3));
+        } else {
+        }*/
 
         postContent = (TextView) view.findViewById(R.id.text_post_content);
         postContent.setText(content);
+
+        imgWeatherIcon = (ImageView) view.findViewById(R.id.img_weather_icon);
+        imgWeatherIcon.setImageResource(
+                WeatherData.imgFromWeatherCode(String.valueOf(weatherPos), 0));
+        imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
+                R.anim.bounce_interpolator, new LinearInterpolator()));
+        ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
 
         postLocation = (TextView) view.findViewById(R.id.text_post_location);
         postLocation.setText(location);
@@ -77,6 +99,14 @@ public class PostPreviewDialogFragment extends DialogFragment {
 
 
         return view;
+    }
+
+    // 애니메이션 인터폴레이터 적용
+    private Animation AnimationApplyInterpolater(
+            int resourceId, final Interpolator interpolator) {
+        Animation animation = AnimationUtils.loadAnimation(getContext(), resourceId);
+        animation.setInterpolator(interpolator);
+        return animation;
     }
 
     @Override

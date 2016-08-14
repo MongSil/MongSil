@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <!-- 뷰페이저 안 : layout_tutorial_content -->
-    <kr.co.tacademy.mongsil.mongsil.ViewPagerParallax
+    <android.support.v4.view.ViewPager
         android:id="@+id/viewpager_tutorial"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <ImageView
         android:id="@+id/img_tutorial_skip"
-        android:src="@drawable/tutorial_skip"
-        android:gravity="center"
-        android:layout_marginBottom="72dp"
         android:layout_width="82dp"
         android:layout_height="32dp"
-        android:layout_gravity="center_horizontal|bottom" />
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="72dp"
+        android:gravity="center"
+        android:src="@drawable/tutorial_skip" />
+
     <RelativeLayout
         android:id="@+id/viewPager_indicator"
-        android:layout_gravity="bottom"
         android:layout_width="match_parent"
         android:layout_height="72dp"
+        android:layout_gravity="bottom"
         android:layout_marginTop="5dp"
         android:gravity="center">
 
         <LinearLayout
             android:id="@+id/viewPager_count_dots"
-            android:layout_marginTop="13dp"
-            android:layout_marginBottom="52dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
+            android:layout_marginBottom="52dp"
+            android:layout_marginTop="13dp"
             android:gravity="center"
             android:orientation="horizontal" />
     </RelativeLayout>

@@ -89,11 +89,13 @@ public class EditProfileActivity extends BaseActivity
                     try {
                         resizedBitmap = Glide.with(getApplicationContext()).
                                 load(file).asBitmap().into(100, 100).get();
+                        Log.e("이미지 사이징", "성공!");
                     } catch (InterruptedException ie) {
                         ie.printStackTrace();
                     } catch (ExecutionException ee) {
                         ee.printStackTrace();
                     }
+                    Log.e("이미지 사이징", "실패!");
                     return null;
                 }
 

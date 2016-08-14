@@ -8,13 +8,14 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 public class AppTutorialActivity extends BaseActivity {
     private static final int MAX_PAGES = 3;
 
-    ViewPagerParallax pager;
+    ViewPager pager;
     ImageView imgTutorialSkip;
     LinearLayout indicator;
 
@@ -23,22 +24,14 @@ public class AppTutorialActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_tutorial);
 
-        if(savedInstanceState != null) {
-            pager = (ViewPagerParallax) findViewById(R.id.viewpager_tutorial);
-            pager.set_max_pages(MAX_PAGES);
-            pager.setBackgroundAsset(R.raw.tutorial_background);
-            pager.setAdapter(new tutorialPagerAdapter(getSupportFragmentManager()));
-            //pager.setPageTransformer(true, new CrossFadePageTransformer());
-        }
-
-        pager = (ViewPagerParallax) findViewById(R.id.viewpager_tutorial);
-        pager.set_max_pages(MAX_PAGES);
-        pager.setBackgroundAsset(R.raw.tutorial_background);
-        pager.setAdapter(new tutorialPagerAdapter(getSupportFragmentManager()));
-        //pager.setPageTransformer(true, new CrossFadePageTransformer());
+        pager = (ViewPager) findViewById(R.id.viewpager_tutorial);
+        final tutorialPagerAdapter adapter = new tutorialPagerAdapter(getSupportFragmentManager());
+        pager.setAdapter(adapter);
+        pager.setPageTransformer(true, new CrossFadePageTransformer());
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                //Unused
             }
 
             @Override
@@ -51,7 +44,6 @@ public class AppTutorialActivity extends BaseActivity {
                 //Unused
             }
         });
-
         buildIndicator();
 
         imgTutorialSkip = (ImageView) findViewById(R.id.img_tutorial_skip);
@@ -95,6 +87,7 @@ public class AppTutorialActivity extends BaseActivity {
 
     private void endTutorial() {
         Intent intent = new Intent(AppTutorialActivity.this, SignUpActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
         finish();
     }
@@ -141,7 +134,7 @@ public class AppTutorialActivity extends BaseActivity {
             View title = page.findViewById(R.id.text_tutorial_title);
             View explain = page.findViewById(R.id.text_tutorial_explain);
 
-            // 첫번째
+            /*// 첫번째
             View cloudCutTwo = page.findViewById(R.id.img_one_cloud02_cut);
             View cloudCutThree = page.findViewById(R.id.img_one_cloud03_cut);
 
@@ -155,7 +148,7 @@ public class AppTutorialActivity extends BaseActivity {
 
             View write = page.findViewById(R.id.img_tutorial_write);
             View cloud3CutTwo = page.findViewById(R.id.img_three_cloud02_cut);
-            View cloud3CutThree = page.findViewById(R.id.img_three_cloud03_cut);
+            View cloud3CutThree = page.findViewById(R.id.img_three_cloud03_cut);*/
 
             if(position <= -1.0f || position >= 1.0f) {
             } else if( position == 0.0f ) {
@@ -169,7 +162,7 @@ public class AppTutorialActivity extends BaseActivity {
                     explain.setAlpha(1.0f - Math.abs(position));
                 }
 
-                // 첫번째
+                /*// 첫번째
                 if (cloudCutTwo != null) {
                     cloudCutTwo.setTranslationX(-(float)(pageWidth/1.5 * position));
                 }
@@ -201,7 +194,7 @@ public class AppTutorialActivity extends BaseActivity {
                 }
                 if (cloud3CutThree != null) {
                     cloud3CutThree.setTranslationX((float)(pageWidth/1.6 * position));
-                }
+                }*/
 
             }
         }

@@ -13,6 +13,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -20,11 +23,13 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,8 +52,9 @@ import okhttp3.Response;
 
 public class PostingActivity extends BaseActivity
         implements SearchPoiDialogFragment.OnPOISearchListener,
-                BottomPicDialogFragment.OnBottomPicDialogListener {
-    private static final int WEATHER_COUNT = 13;
+                BottomPicDialogFragment.OnBottomPicDialogListener,
+                SelectWeatherFragment.OnSelectWeatherListener {
+    private static final int PAGER_MAGIC_COUNT = 131072;
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
     private static final int FILTER_FROM_CAMERA = 2;
@@ -59,9 +65,10 @@ public class PostingActivity extends BaseActivity
     // 날씨
     ImageView imgPreview, leftWeather, rightWeather;
     ViewPager selectWeatherPager;
-    int pagerPos;
+    int pagerPos = 0;
 
     // 배경
+    ScrollView scrollPosting;
     ImageView imgPostingBackground;
 
     // 포스팅
@@ -145,32 +152,40 @@ public class PostingActivity extends BaseActivity
         tbSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tbSave.setEnabled(false);
-                // 아이콘 코드 임시 "0"
-                // 백그라운드 이미지 임시 ""
-                if (!intent.hasExtra("postdata")) {
-                    new AsyncPostingRequest(upLoadFile).execute(
-                            area1,  // 지역1
-                            area2,  // 지역2
-                            PropertyManager.getInstance().getUserId(), // 아이디
-                            String.valueOf(selectWeatherPager.getCurrentItem()), // 날씨 테마 코드
-                            "0",    // 아이콘 코드
-                            editPosting.getText().toString()    // 글 내용
-                    );
+                String postContent = editPosting.getText().toString();
+                if (postContent.isEmpty()) {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(MiddleAloneDialogFragment.newInstance(12),
+                                    "middle_none_post").commit();
+                    editPosting.requestFocus();
                 } else {
-                    tbLocation.setEnabled(false);
-                    Post post = intent.getParcelableExtra("postdata");
-                    if(!post.bgImg.isEmpty()) {
-                        Glide.with(getApplicationContext())
-                                .load(post.bgImg)
-                                .into(imgPostingBackground);
+                    tbSave.setEnabled(false);
+                    // 아이콘 코드 임시 "0"
+                    // 백그라운드 이미지 임시 ""
+                    if (!intent.hasExtra("postdata")) {
+                        new AsyncPostingRequest(upLoadFile).execute(
+                                area1,  // 지역1
+                                area2,  // 지역2
+                                PropertyManager.getInstance().getUserId(), // 아이디
+                                String.valueOf(pagerPos), // 날씨 테마 코드
+                                "0",    // 아이콘 코드
+                                postContent    // 글 내용
+                        );
+                    } else {
+                        tbLocation.setEnabled(false);
+                        Post post = intent.getParcelableExtra("postdata");
+                        if (!post.bgImg.isEmpty()) {
+                            Glide.with(getApplicationContext())
+                                    .load(post.bgImg)
+                                    .into(imgPostingBackground);
+                        }
+                        new AsyncModifyPostingRequest(intent.getStringExtra("bgImg"), upLoadFile).execute(
+                                PropertyManager.getInstance().getUserId(), // 아이디
+                                String.valueOf(pagerPos), // 날씨 테마 코드
+                                "0",    // 아이콘 코드
+                                postContent     // 글 내용
+                        );
                     }
-                    new AsyncModifyPostingRequest(intent.getStringExtra("bgImg"), upLoadFile).execute(
-                            PropertyManager.getInstance().getUserId(), // 아이디
-                            String.valueOf(selectWeatherPager.getCurrentItem()), // 날씨 테마 코드
-                            "0",    // 아이콘 코드
-                            editPosting.getText().toString()    // 글 내용
-                    );
                 }
             }
         });
@@ -181,47 +196,50 @@ public class PostingActivity extends BaseActivity
         imgPreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(PostPreviewDialogFragment.newInstance(
-                                area1,
-                                editPosting.getText().toString(),
-                                0), "preview").commit();
+                if(upLoadFile == null) {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(PostPreviewDialogFragment.newInstance(
+                                    area1,
+                                    editPosting.getText().toString(),
+                                    pagerPos,
+                                    0), "preview").commit();
+                } else {
+
+                }
             }
         });
 
-
-        // 날씨 이미지 백그라운드
+        // 백그라운드 이미지
+        scrollPosting = (ScrollView) findViewById(R.id.scroll_posting);
+        scrollPosting.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
         imgPostingBackground = (ImageView)findViewById(R.id.img_posting_background);
-
-        /*imgPostingBackground.setImageResource(
-                    WeatherData.imgFromWeatherCode(String.valueOf(position), 1));*/
+        // TODO : 누나한테 글 쓰기 기본 배경 달라고해야함
 
         // 날씨 선택
         selectWeatherPager =
                 (ViewPager) findViewById(R.id.viewpager_posting_select_weather);
-        selectWeatherPager.setAdapter(new WeatherPagerAdapter());
+        selectWeatherPager.setAdapter(
+                new WeatherPagerAdapter(getSupportFragmentManager()));
+        selectWeatherPager.setCurrentItem(((PAGER_MAGIC_COUNT / 2) - 4), false);
         leftWeather = (ImageView) findViewById(R.id.img_left_weather);
         leftWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pagerPos = selectWeatherPager.getCurrentItem();
-                if (pagerPos < WEATHER_COUNT && pagerPos > 0) {
-                    selectWeatherPager.setCurrentItem(pagerPos - 1);
-                } else if (pagerPos == 0) {
-                    selectWeatherPager.setCurrentItem(WEATHER_COUNT - 1);
-                }
+                int currentPos = selectWeatherPager.getCurrentItem();
+                selectWeatherPager.setCurrentItem(currentPos - 1);
             }
         });
         rightWeather = (ImageView) findViewById(R.id.img_right_weather);
         rightWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pagerPos = selectWeatherPager.getCurrentItem();
-                if (pagerPos < WEATHER_COUNT && pagerPos > 0) {
-                    selectWeatherPager.setCurrentItem(pagerPos + 1);
-                } else if (pagerPos == WEATHER_COUNT - 1) {
-                    selectWeatherPager.setCurrentItem(0);
-                }
+                int currentPos = selectWeatherPager.getCurrentItem();
+                selectWeatherPager.setCurrentItem(currentPos + 1);
             }
         });
 
@@ -276,41 +294,26 @@ public class PostingActivity extends BaseActivity
     }
 
     // 날씨 뷰페이저 어뎁터
-    private class WeatherPagerAdapter extends PagerAdapter {
-        ImageView imgWeatherIcon;
+    private class WeatherPagerAdapter extends FragmentStatePagerAdapter {
 
-        WeatherPagerAdapter() {
+        WeatherPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
         }
 
         @Override
         public int getCount() {
-            return WEATHER_COUNT;
+            return PAGER_MAGIC_COUNT;
         }
 
         @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
+        public Fragment getItem(int position) {
+            return SelectWeatherFragment.newInstance(position);
         }
+    }
 
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
-
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            View view = getLayoutInflater()
-                    .inflate(R.layout.layout_posting_select_weather, container, false);
-            imgWeatherIcon = (ImageView) view.findViewById(R.id.img_weather_icon);
-            imgWeatherIcon.setImageResource(
-                    WeatherData.imgFromWeatherCode(String.valueOf(position + 1), 0));
-            if (imgWeatherIcon.isShown()) {
-                ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
-            }
-            container.addView(view);
-            return view;
-        }
+    @Override
+    public void onSelectWeather(int position) {
+        pagerPos = position;
     }
 
     /**

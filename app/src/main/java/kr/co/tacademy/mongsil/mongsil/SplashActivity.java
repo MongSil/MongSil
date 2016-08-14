@@ -146,14 +146,14 @@ public class SplashActivity extends BaseActivity {
             super.onPostExecute(result);
             Log.e("응답바디 msg 값 : ", result);
             if (result.equalsIgnoreCase("success")) {
-                handler.postDelayed(new Runnable() {
+                splashContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void run() {
+                    public void onClick(View view) {
                         Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
                     }
-                }, 4500);
+                });
             }else if (result.equalsIgnoreCase("fail")) {
                 getSupportFragmentManager().beginTransaction().
                         add(MiddleAloneDialogFragment.newInstance(91),

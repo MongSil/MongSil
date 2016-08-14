@@ -32,6 +32,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -60,6 +61,7 @@ public class MainActivity extends BaseActivity
     ImageView tbSearch;
 
     // 날씨 필드
+    FrameLayout weatherContainer;
     ImageView animBackgroundWeather, imgWeatherIcon;
     TextView day, week, month;
 
@@ -137,6 +139,7 @@ public class MainActivity extends BaseActivity
             }
         });
 
+        // 슬라이딩 메뉴(프로필메뉴)
         slidingMenu = new SlidingMenu(getApplicationContext());
         slidingMenu.setMode(SlidingMenu.LEFT);
         slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
@@ -145,17 +148,12 @@ public class MainActivity extends BaseActivity
         slidingMenu.setMenu(loadSlidingMenu());
 
         // 날씨
+        weatherContainer = (FrameLayout) findViewById(R.id.main_weather_container);
         animBackgroundWeather = (ImageView) findViewById(R.id.anim_background_weather);
-        if (animBackgroundWeather.isShown()) {
-            ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
-        }
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
-        if (imgWeatherIcon.isShown()) {
-            ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
-        }
-        imgWeatherIcon.setAnimation(
-                AnimationApplyInterpolater(
+        imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
                         R.anim.bounce_interpolator, new LinearInterpolator()));
+
         day = (TextView) findViewById(R.id.text_day);
         day.setText(TimeData.dayFormat);
         week = (TextView) findViewById(R.id.text_week);
@@ -210,7 +208,6 @@ public class MainActivity extends BaseActivity
                     .commit();
         }
     }
-
     // 슬라이딩메뉴 뷰
     public View loadSlidingMenu() {
         View menu = getLayoutInflater().inflate(R.layout.layout_profile_menu, null);
@@ -435,7 +432,10 @@ public class MainActivity extends BaseActivity
         protected void onPostExecute(WeatherData result) {
             if (result != null) {
                 imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.code, 0));
-                // TODO : animBackgroundWeather.setBackground(WeatherData.imgFromWeatherCode(result.code, 1));
+                weatherContainer.setBackgroundResource(WeatherData.imgFromWeatherCode(result.code, 1));
+                animBackgroundWeather.setImageResource(WeatherData.imgFromWeatherCode(result.code, 2));
+                ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
+                ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
             }
         }
     }

@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 /**
  * Created by ccei on 2016-08-02.
  * Sourced By https://github.com/MatthieuLJ/ViewPagerParallax
+ * 쓰면 느리지 않고 깔끔해서 좋음. 하지만 뻑나서 아예 안뜰 땔가 있음
  */
 public class ViewPagerParallax extends ViewPager {
     private int background_id = -1;

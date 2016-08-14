@@ -9,5 +9,4 @@
     <item android:drawable="@drawable/small_rain05" android:duration="100" />
     <item android:drawable="@drawable/small_rain06" android:duration="100" />
     <item android:drawable="@drawable/small_rain07" android:duration="100" />
-    <item android:drawable="@drawable/small_rain08" android:duration="100" />
 </animation-list>

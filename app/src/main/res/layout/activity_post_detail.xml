@@ -9,6 +9,7 @@
 
     <ImageView
         android:id="@+id/img_post_detail_background"
+        android:background="@drawable/sign_up_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY" />
@@ -60,7 +61,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="@dimen/toolbar_size"
                 android:scaleType="centerInside"
-                app:layout_collapseMode="parallax"/>
+                app:layout_collapseMode="pin"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
