@@ -11,6 +11,9 @@ public class NetworkDefineConstant {
     // SK GET Request
     public static final String SK_POI_SEARCH
             = "https://apis.skplanetx.com/tmap/pois?searchKeyword=%s&resCoordType=WGS84GEO&version=1";
+    public static final String SK_REVERSE_GEOCOING
+            = "https://apis.skplanetx.com/tmap/geo/reversegeocoding?" +
+                            "lon=%s&lat=%s&coordType=WGS84GEO&version=1";
     public static final String SK_WEATHER_LAT_LON
             = "http://apis.skplanetx.com/weather/current/"
             + "minutely?version=1&lat=%s&lon=%s";

@@ -54,8 +54,7 @@ import okhttp3.ResponseBody;
 import static android.util.Log.e;
 
 public class MainActivity extends BaseActivity
-        implements SearchPoiDialogFragment.OnPOISearchListener,
-                MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
+        implements SearchPoiDialogFragment.OnPOISearchListener {
     // 툴바 필드
     TextView tbTitle;
     ImageView tbSearch;
@@ -64,7 +63,7 @@ public class MainActivity extends BaseActivity
     ImageView animBackgroundWeather, imgWeatherIcon;
     TextView day, week, month;
 
-    // 글작성 프레그먼트
+    // 글목록 프레그먼트
     MainPostFragment mainPostFragment;
 
     // 슬라이딩메뉴
@@ -76,6 +75,7 @@ public class MainActivity extends BaseActivity
 
     // LBS
     LocationManager locationManager;
+    Location location;
     //boolean isNetworkEnabled;
     private String gpsProvider = LocationManager.GPS_PROVIDER;
     //private String networkProvider = LocationManager.NETWORK_PROVIDER;
@@ -84,7 +84,7 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
-        if(PropertyManager.getInstance().getUseGPS()) {
+        if (PropertyManager.getInstance().getUseGPS()) {
             updateLocation();
         }
     }
@@ -96,20 +96,16 @@ public class MainActivity extends BaseActivity
         Intent intent = getIntent();
 
         // 글 삭제를 하고난 뒤의 다이어로그 창
-        if(intent.getBooleanExtra("post_remove", false)) {
+        if (intent.getBooleanExtra("post_remove", false)) {
             getSupportFragmentManager().beginTransaction().
                     add(MiddleAloneDialogFragment.newInstance(0), "middle_done").commit();
         }
 
         // GPS 여부
         // TODO : GPS가 켜져 있을 경우 - GPS 지역
-        if (!PropertyManager.getInstance().getUseGPS()) {
-            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-        }
 
         // 글 작성 프레그먼트와 슬라이딩메뉴 프레그먼트를 선언
-        if ( savedInstanceState == null ) {
+        if (savedInstanceState == null) {
             mainPostFragment = MainPostFragment.newInstance(
                     PropertyManager.getInstance().getLocation());
             getSupportFragmentManager().beginTransaction()
@@ -117,7 +113,7 @@ public class MainActivity extends BaseActivity
                     .commit();
         }
         // 툴바 추가
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -126,17 +122,6 @@ public class MainActivity extends BaseActivity
             actionBar.setDisplayShowTitleEnabled(false);
         }
         tbTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
-        tbTitle.setText(PropertyManager.getInstance().getLocation());
-        if(!getIntent().hasExtra("area1")) {
-            new AsyncLatLonWeatherJSONList().execute(
-                    PropertyManager.getInstance().getLatLocation(),
-                    PropertyManager.getInstance().getLonLocation());
-        } else {
-            String[] latLon =
-                    LocationData.ChangeToLatLon(getIntent().getStringExtra("area1"));
-            new AsyncLatLonWeatherJSONList().execute(latLon[0], latLon[1]);
-
-        }
         tbTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -162,11 +147,11 @@ public class MainActivity extends BaseActivity
 
         // 날씨
         animBackgroundWeather = (ImageView) findViewById(R.id.anim_background_weather);
-        if(animBackgroundWeather.isShown()) {
+        if (animBackgroundWeather.isShown()) {
             ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
         }
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
-        if(imgWeatherIcon.isShown()) {
+        if (imgWeatherIcon.isShown()) {
             ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
         }
         imgWeatherIcon.setAnimation(
@@ -187,11 +172,27 @@ public class MainActivity extends BaseActivity
                 startActivity(new Intent(getApplicationContext(), PostingActivity.class));
             }
         });
+        tbTitle.setText(PropertyManager.getInstance().getLocation());
+        if (!getIntent().hasExtra("area1")) {
+            new AsyncLatLonWeatherJSONList().execute(
+                    PropertyManager.getInstance().getLatLocation(),
+                    PropertyManager.getInstance().getLonLocation());
+        } else {
+            String[] latLon =
+                    LocationData.ChangeToLatLon(getIntent().getStringExtra("area1"));
+            new AsyncLatLonWeatherJSONList().execute(latLon[0], latLon[1]);
+
+        }
+        if (PropertyManager.getInstance().getUseGPS()) {
+            if (location != null) {
+                getLocation(location);
+            }
+        }
     }
 
     // 애니메이션 인터폴레이터 적용
     private Animation AnimationApplyInterpolater(
-            int resourceId, final Interpolator interpolator){
+            int resourceId, final Interpolator interpolator) {
         Animation animation = AnimationUtils.loadAnimation(this, resourceId);
         animation.setInterpolator(interpolator);
         return animation;
@@ -200,7 +201,7 @@ public class MainActivity extends BaseActivity
     // 날씨를 검색해서 지역 정보를 받아옴
     @Override
     public void onPOISearch(POIData POIData) {
-        if(POIData != null) {
+        if (POIData != null) {
             String location = POIData.upperAddrName;
             tbTitle.setText(location);
             new AsyncLatLonWeatherJSONList().execute(POIData.noorLat, POIData.noorLon);
@@ -210,6 +211,7 @@ public class MainActivity extends BaseActivity
                     .commit();
         }
     }
+
     // 슬라이딩메뉴 뷰
     public View loadSlidingMenu() {
         View menu = getLayoutInflater().inflate(R.layout.layout_profile_menu, null);
@@ -220,7 +222,7 @@ public class MainActivity extends BaseActivity
 
         final CircleImageView imgProfile =
                 (CircleImageView) menu.findViewById(R.id.img_profile);
-        if(!PropertyManager.getInstance().getUserProfileImg().isEmpty()) {
+        if (!PropertyManager.getInstance().getUserProfileImg().isEmpty()) {
             Glide.with(MongSilApplication.getMongSilContext())
                     .load(PropertyManager.getInstance().getUserProfileImg())
                     .asBitmap()
@@ -254,7 +256,7 @@ public class MainActivity extends BaseActivity
         imgSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                 startActivity(new Intent(MainActivity.this, SettingActivity.class));
+                startActivity(new Intent(MainActivity.this, SettingActivity.class));
             }
         });
         imgAlarm = (ImageView) menu.findViewById(R.id.img_alarm);
@@ -273,7 +275,7 @@ public class MainActivity extends BaseActivity
         });
 
         final ViewPager viewPager = (ViewPager) menu.findViewById(R.id.viewpager_menu);
-        if(viewPager != null) {
+        if (viewPager != null) {
             MenuViewPagerAdapter adapter =
                     new MenuViewPagerAdapter(getSupportFragmentManager());
             String[] tabTitle = MongSilApplication.getMongSilContext()
@@ -367,7 +369,7 @@ public class MainActivity extends BaseActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home :
+            case android.R.id.home:
                 slidingMenu.showMenu();
                 return true;
         }
@@ -377,7 +379,7 @@ public class MainActivity extends BaseActivity
     // 백 버튼 눌렀을 때
     @Override
     public void onBackPressed() {
-        if(slidingMenu.isMenuShowing()) {
+        if (slidingMenu.isMenuShowing()) {
             slidingMenu.toggle();
             return;
         }
@@ -391,7 +393,7 @@ public class MainActivity extends BaseActivity
 
         @Override
         protected WeatherData doInBackground(String... args) {
-            try{
+            try {
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
@@ -416,7 +418,7 @@ public class MainActivity extends BaseActivity
                             new StringBuilder(responseBody.string()));
                 }
                 responseBody.close();
-            }catch (UnknownHostException une) {
+            } catch (UnknownHostException une) {
                 e("connectionFail", une.toString());
             } catch (UnsupportedEncodingException uee) {
                 e("connectionFail", uee.toString());
@@ -432,24 +434,75 @@ public class MainActivity extends BaseActivity
 
         @Override
         protected void onPostExecute(WeatherData result) {
-            if(result != null) {
+            if (result != null) {
                 imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.code, 0));
                 // TODO : animBackgroundWeather.setBackground(WeatherData.imgFromWeatherCode(result.code, 1));
             }
         }
     }
 
-    @Override
-    public void onMiddleSelect(int select) {
-        switch (select) {
-            case 90:
-                requestPermission();
-                break;
+    // 역지오코딩 AsyncTask
+    public class AsyncReGeoJSONList extends AsyncTask<String, Integer, String> {
+
+        Response response;
+
+        @Override
+        protected String doInBackground(String... args) {
+            try{
+                OkHttpClient toServer = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                Request request = new Request.Builder()
+                        .addHeader("Accept", "application/json")
+                        .addHeader("appKey", NetworkDefineConstant.SK_APP_KEY)
+                        .url(String.format(
+                                NetworkDefineConstant.SK_REVERSE_GEOCOING,
+                                args[0], args[1]))
+                        .build();
+                Response response = toServer.newCall(request).execute();
+                ResponseBody responseBody = response.body();
+
+                boolean flag = response.isSuccessful();
+                int responseCode = response.code();
+                if (responseCode >= 400) return null;
+                if (flag) {
+                    return ParseDataParseHandler.getJSONResGeo(
+                            new StringBuilder(responseBody.string()));
+                }
+                responseBody.close();
+            }catch (UnknownHostException une) {
+                e("connectionFail", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                e("connectionFail", uee.toString());
+            } catch (Exception e) {
+                e("connectionFail", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if(result != null){
+                String GPSlocation = LocationData.ChangeToShortName(result);
+                tbTitle.setText(GPSlocation);
+                mainPostFragment = MainPostFragment.newInstance(GPSlocation);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_post_fragment_container, mainPostFragment)
+                        .commit();
+            }
         }
     }
 
+    // 하위 GPS 기능
     private void updateLocation() {
-        if (!locationManager.isProviderEnabled(gpsProvider)) {
+        //if (!locationManager.isProviderEnabled(gpsProvider)) {
+        if (!PropertyManager.getInstance().getUseGPS()) {
             return;
         }
 
@@ -459,20 +512,15 @@ public class MainActivity extends BaseActivity
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(MiddleSelectDialogFragment.newInstance(90), "middle_location").commit();
+                requestPermission();
                 return;
             }
             requestPermission();
             return;
         }
-        Location location = locationManager.getLastKnownLocation(gpsProvider);
-
-        if (location != null) {
-            getLocation(location);
-        }
-
-        locationManager.requestLocationUpdates(gpsProvider, 5000, 5, gpsListener);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        location = locationManager.getLastKnownLocation(gpsProvider);
+        //locationManager.requestLocationUpdates(gpsProvider, 5000, 5, gpsListener);
     }
 
     LocationListener gpsListener = new LocationListener() {
@@ -501,14 +549,18 @@ public class MainActivity extends BaseActivity
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        locationManager.removeUpdates(gpsListener);
+        if (PropertyManager.getInstance().getUseGPS()) {
+            locationManager.removeUpdates(gpsListener);
+        }
     }
 
     private void getLocation(Location location) {
         String lat = String.valueOf(location.getLatitude());
         String lon = String.valueOf(location.getLongitude());
-
+        Log.e("locaiton info:", lat + ", " + "lon");
         new AsyncLatLonWeatherJSONList().execute(lat, lon);
+        new AsyncReGeoJSONList().execute(lat, lon);
+
     }
 
     private static final int RC_FINE_LOCATION = 100;

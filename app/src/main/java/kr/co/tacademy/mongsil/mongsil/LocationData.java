@@ -18,6 +18,14 @@ public class LocationData {
             "부산",
             "제주"
     };
+
+    public static String[] locationCutName = {
+        "경기",
+        "충청",
+        "경상",
+        "전라"
+    };
+
     public static String[] latList = {
             "37.4548790",
             "37.5670652",
@@ -45,6 +53,20 @@ public class LocationData {
             "129.0758175",
             "126.5309697"
     };
+
+    public static String ChangeToShortName(String area) {
+        String cutName = area.substring(0, 3);
+        if(cutName.equals(locationCutName[0])) { // 경기
+            cutName = locationName[1];      // 서울
+        } else if (cutName.equals(locationCutName[1])) { // 충청
+            cutName = locationName[3];       // 충주
+        } else if (cutName.equals(locationCutName[2])) { // 경상
+            cutName = locationName[8];       // 울산
+        } else if (cutName.equals(locationCutName[3])) { // 전라
+            cutName = locationName[7];       // 전주
+        }
+        return cutName;
+    }
 
     public static String[] ChangeToLatLon(String area) {
         int position = 0;

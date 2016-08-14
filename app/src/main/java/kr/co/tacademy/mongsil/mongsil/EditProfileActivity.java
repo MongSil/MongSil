@@ -136,12 +136,10 @@ public class EditProfileActivity extends BaseActivity
             public void onClick(View view) {
                 PropertyManager.getInstance().setNickname(editName.getText().toString());
                 PropertyManager.getInstance().setLocation(editLocation.getText().toString());
-                if(upLoadFile != null) {
-                    new FileUpLoadAsyncTask(
-                            PropertyManager.getInstance().getNickname(),
-                            PropertyManager.getInstance().getLocation())
-                            .execute(upLoadFile);
-                }
+                new FileUpLoadAsyncTask(
+                        PropertyManager.getInstance().getNickname(),
+                        PropertyManager.getInstance().getLocation())
+                        .execute(upLoadFile);
             }
         });
 

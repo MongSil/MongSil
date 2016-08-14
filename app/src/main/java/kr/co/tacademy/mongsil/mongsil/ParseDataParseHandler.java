@@ -210,6 +210,25 @@ public class ParseDataParseHandler {
         }
         return null;
     }
+
+    public static String getJSONResGeo(StringBuilder buf) {
+
+        // 전체
+        JSONObject jsonObject = null;
+
+        try {
+            jsonObject = new JSONObject(buf.toString())
+                    .getJSONObject("addressInfo");
+
+            String cityDo = jsonObject.getString("city_do");
+
+            return cityDo;
+        } catch (JSONException je) {
+            Log.e("GET:PoiAllList", "JSON파싱 중 에러발생", je);
+        }
+        return null;
+    }
+
     public static WeatherData getJSONWeatherList(
             StringBuilder buf) {
 
