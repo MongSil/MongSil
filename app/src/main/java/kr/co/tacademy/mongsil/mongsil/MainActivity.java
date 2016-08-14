@@ -1,18 +1,28 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -43,7 +53,9 @@ import okhttp3.ResponseBody;
 
 import static android.util.Log.e;
 
-public class MainActivity extends BaseActivity implements SearchPoiDialogFragment.OnPOISearchListener {
+public class MainActivity extends BaseActivity
+        implements SearchPoiDialogFragment.OnPOISearchListener,
+                MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
     // 툴바 필드
     TextView tbTitle;
     ImageView tbSearch;
@@ -61,18 +73,42 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
 
     // 글쓰기 버튼
     FloatingActionButton btnCapturePost;
+
+    // LBS
+    LocationManager locationManager;
+    //boolean isNetworkEnabled;
+    private String gpsProvider = LocationManager.GPS_PROVIDER;
+    //private String networkProvider = LocationManager.NETWORK_PROVIDER;
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(PropertyManager.getInstance().getUseGPS()) {
+            updateLocation();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
+
+        // 글 삭제를 하고난 뒤의 다이어로그 창
         if(intent.getBooleanExtra("post_remove", false)) {
             getSupportFragmentManager().beginTransaction().
                     add(MiddleAloneDialogFragment.newInstance(0), "middle_done").commit();
         }
-        // 글 작성 프레그먼트와 슬라이딩메뉴 프레그먼트를 선언
+
+        // GPS 여부
         // TODO : GPS가 켜져 있을 경우 - GPS 지역
-        // TODO : 안켜짐 - 가입시 선택한 지역 반환
+        if (!PropertyManager.getInstance().getUseGPS()) {
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+        }
+
+        // 글 작성 프레그먼트와 슬라이딩메뉴 프레그먼트를 선언
         if ( savedInstanceState == null ) {
             mainPostFragment = MainPostFragment.newInstance(
                     PropertyManager.getInstance().getLocation());
@@ -403,48 +439,96 @@ public class MainActivity extends BaseActivity implements SearchPoiDialogFragmen
         }
     }
 
-    // 쓸일이 있겠지
-    /*public class AsyncUserInfoJSONList extends AsyncTask<String, Integer, UserData> {
+    @Override
+    public void onMiddleSelect(int select) {
+        switch (select) {
+            case 90:
+                requestPermission();
+                break;
+        }
+    }
+
+    private void updateLocation() {
+        if (!locationManager.isProviderEnabled(gpsProvider)) {
+            return;
+        }
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(MiddleSelectDialogFragment.newInstance(90), "middle_location").commit();
+                return;
+            }
+            requestPermission();
+            return;
+        }
+        Location location = locationManager.getLastKnownLocation(gpsProvider);
+
+        if (location != null) {
+            getLocation(location);
+        }
+
+        locationManager.requestLocationUpdates(gpsProvider, 5000, 5, gpsListener);
+    }
+
+    LocationListener gpsListener = new LocationListener() {
         @Override
-        protected UserData doInBackground(String... args) {
-            try{
-                OkHttpClient toServer = new OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
+        public void onLocationChanged(Location location) {
+        }
 
-                Request request = new Request.Builder()
-                        .url(String.format(
-                                NetworkDefineConstant.GET_SERVER_USER_INFO,
-                                args[0]))
-                        .build();
-                Response response = toServer.newCall(request).execute();
-                ResponseBody responseBody = response.body();
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
 
-                boolean flag = response.isSuccessful();
-                int responseCode = response.code();
-                if (responseCode >= 400) return null;
-                if (flag) {
-                    return ParseDataParseHandler.getJSONUserList(
-                            new StringBuilder(responseBody.string()));
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+        }
+    };
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        locationManager.removeUpdates(gpsListener);
+    }
+
+    private void getLocation(Location location) {
+        String lat = String.valueOf(location.getLatitude());
+        String lon = String.valueOf(location.getLongitude());
+
+        new AsyncLatLonWeatherJSONList().execute(lat, lon);
+    }
+
+    private static final int RC_FINE_LOCATION = 100;
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                RC_FINE_LOCATION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == RC_FINE_LOCATION) {
+            if (permissions != null && permissions.length > 0) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    updateLocation();
                 }
-                responseBody.close();
-            }catch (UnknownHostException une) {
-                e("connectionFail", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                e("connectionFail", uee.toString());
-            } catch (Exception e) {
-                e("connectionFail", e.toString());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(UserData result) {
-            if(result != null) {
-                data = result;
-
             }
         }
-    }*/
+    }
 }

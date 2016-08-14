@@ -81,6 +81,23 @@ public class MiddleSelectDialogFragment extends DialogFragment {
                     }
                 });
                 break;
+            case 90: // 위치권한 확인 다이어로그
+                dialog.setText(getResources().getText(R.string.post_remove_question));
+                // if( ~~ ) {
+                negative.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                        onMiddleSelectDialogListener.onMiddleSelect(0);
+                    }
+                });
+                break;
             case 99: // 계정 삭제하는 경우 [취소 / 확인]
                 dialog.setText(getResources().getText(R.string.account_leave));
                 negative.setOnClickListener(new View.OnClickListener() {

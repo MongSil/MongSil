@@ -77,6 +77,7 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                     }
                 });
                 break;
+
             case 90 : // 로그인 실패한 경우 [확인]
                 dialog.setText(getResources().getText(R.string.login_fail));
                 positive.setOnClickListener(new View.OnClickListener() {
