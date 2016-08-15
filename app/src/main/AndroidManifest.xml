@@ -39,30 +39,36 @@
             android:name=".SettingActivity"
             android:parentActivityName=".MainActivity" />
         <activity
+            android:name=".ProgramInfoActivity"
+            android:parentActivityName=".SettingActivity"/>
+        <activity
             android:name=".AlarmActivity"
             android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".MapActivity"
+            android:parentActivityName=".SettingActivity"/>
         <activity
             android:name=".EditProfileActivity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PostDetailActivity"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".PostingActivity"
             android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity android:name=".CameraGalleryActivity" />
 
-        <receiver android:name = ".CheckNetwork">
+        <receiver android:name=".CheckNetwork">
             <intent-filter>
-                <action android:name="android.net.conn.BACKGROUND_DATA_SETTING_CHANGED"/>
+                <action android:name="android.net.conn.BACKGROUND_DATA_SETTING_CHANGED" />
             </intent-filter>
         </receiver>
 
         <meta-data
             android:name="kr.co.tacademy.mongsil.mongsil.MongSilGlideModule"
             android:value="GlideModule" />
-
-        <activity android:name=".MapActivity"/>
+        <activity android:name=".OtherUserProfileActivity" />
+        <activity android:name=".PhotoViewActivity" />
     </application>
 
 </manifest>

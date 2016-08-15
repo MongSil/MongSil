@@ -3,7 +3,6 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -34,27 +32,19 @@ import okhttp3.Response;
  */
 // 포스트 리스트 어답터
 public class PostRecyclerViewAdapter
-        extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-        implements BottomEditDialogFragment.OnBottomEditDialogListener,
-                MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
+        extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int LAYOUT_DATE = 1000;
     private static final int LAYOUT_POST = 2000;
     private static final int LAYOUT_MY_POST = 3000;
-    private static final int LAYOUT_MORE = 9999;
 
     List<Post> items;
     Context context;
-    FragmentManager fm;
 
     Post postData;
 
     PostRecyclerViewAdapter(Context context) {
         this.context = context;
         items = new ArrayList<Post>();
-    }
-    PostRecyclerViewAdapter(Context context, FragmentManager fm) {
-        this(context);
-        this.fm = fm;
     }
 
     public void add(ArrayList<Post> postItems) {
@@ -113,6 +103,15 @@ public class PostRecyclerViewAdapter
                 Glide.with(MongSilApplication.getMongSilContext())
                         .load(post.profileImg).into(imgPostProfile);
                 imgPostProfileIcon.setVisibility(View.GONE);
+                imgPostProfile.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(context, OtherUserProfileActivity.class);
+                        intent.putExtra("userid", String.valueOf(post.userId));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    }
+                });
             } else {
                 imgPostProfile.setImageResource(R.color.little_dark_gray);
                 imgPostProfileIcon.setVisibility(View.VISIBLE);
@@ -169,17 +168,19 @@ public class PostRecyclerViewAdapter
             myPostInfo.setText(
                     String.valueOf(TimeData.PostTime(date[1])
                             + " - 댓글 " + post.replyCount));
-            imgThreeDot.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    postData = post;
-                    if(fm != null) {
-                        fm.beginTransaction()
-                                .add(BottomEditDialogFragment.newInstance(),
-                                        "bottom_user_post").commit();
+            if(String.valueOf(post.userId).equals(PropertyManager.getInstance().getUserId())) {
+                imgThreeDot.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        postData = post;
+                        /*.beginTransaction()
+                            .add(BottomEditDialogFragment.newInstance(postData),
+                                    "bottom_user_post").commit();*/
                     }
-                }
-            });
+                });
+            } else {
+                imgThreeDot.setVisibility(View.GONE);
+            }
             myPostCard.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -190,23 +191,6 @@ public class PostRecyclerViewAdapter
                 }
             });
         }
-    }
-
-    // 하단 로딩 뷰홀더
-    public class FootViewHolder extends RecyclerView.ViewHolder {
-        final View view;
-        final ProgressBar loadProgress;
-
-        public FootViewHolder(View view) {
-            super(view);
-            this.view = view;
-            loadProgress = (ProgressBar) view.findViewById(R.id.load_progress);
-        }
-
-        public void setData() {
-            loadProgress.setIndeterminate(true);
-        }
-
     }
 
     @Override
@@ -223,9 +207,6 @@ public class PostRecyclerViewAdapter
             case LAYOUT_MY_POST :
                 view = inflater.inflate(R.layout.layout_my_post_item, parent, false);
                 return new MyPostViewHolder(view);
-            case LAYOUT_MORE :
-                view = inflater.inflate(R.layout.layout_foot_more, parent, false);
-                return new FootViewHolder(view);
         }
         return null;
     }
@@ -267,10 +248,9 @@ public class PostRecyclerViewAdapter
     // 글 삭제
     public class AsyncPostRemoveRequest extends AsyncTask<String, String, String> {
 
-        Response response;
-
         @Override
         protected String doInBackground(String... args) {
+            Response response = null;
             try {
                 OkHttpClient client = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
@@ -316,40 +296,10 @@ public class PostRecyclerViewAdapter
                 intent.putExtra("post_remove", true);
                 context.startActivity(intent);
             } else if(s.equals("fail")) {
-                if (fm != null ) {
-                    fm.beginTransaction().
-                            add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();
-                }
+                /*fragmentManager.beginTransaction().
+                        add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();*/
             }
         }
     }
 
-    // 글 수정과 글 삭제 하단 다이어로그
-    @Override
-    public void onSelectBottomEdit(int select) {
-        switch (select) {
-            case 0:
-                Intent intent = new Intent(context, PostingActivity.class);
-                intent.putExtra("postdata", postData);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
-                break;
-            case 1:
-                if(fm != null) {
-                    fm.beginTransaction()
-                            .add(MiddleSelectDialogFragment.newInstance(0),
-                                    "middle_post_remove").commit();
-                }
-                break;
-        }
-    }
-
-    // 글 삭제 다이어로그
-    @Override
-    public void onMiddleSelect(int select) {
-        switch (select) {
-            case 0 :
-                new AsyncPostRemoveRequest().execute(String.valueOf(postData.postId));
-        }
-    }
 }

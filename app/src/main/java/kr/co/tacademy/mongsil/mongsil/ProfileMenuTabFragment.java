@@ -60,8 +60,7 @@ public class ProfileMenuTabFragment extends Fragment {
 
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
-            postAdapter = new PostRecyclerViewAdapter(MongSilApplication.getMongSilContext(),
-                    getActivity().getSupportFragmentManager());
+            postAdapter = new PostRecyclerViewAdapter(MongSilApplication.getMongSilContext());
             userRecycler.setOnScrollListener(
                     new EndlessRecyclerOnScrollListener(layoutManager) {
                         @Override
@@ -76,7 +75,7 @@ public class ProfileMenuTabFragment extends Fragment {
             initPost(userId);
         } else {
             // 내가 쓴 댓글 탭
-            replyAdapter = new ReplyRecyclerViewAdapter();
+            replyAdapter = new ReplyRecyclerViewAdapter(getActivity().getSupportFragmentManager());
             userRecycler.setOnScrollListener(
                     new EndlessRecyclerOnScrollListener(layoutManager) {
                         @Override
@@ -111,11 +110,9 @@ public class ProfileMenuTabFragment extends Fragment {
 
     // 나의 이야기
     public class AsyncUserPostJSONList extends AsyncTask<String, Integer, PostData> {
-
-        Response response;
-
         @Override
         protected PostData doInBackground(String... args) {
+            Response response = null;
             try{
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
@@ -180,11 +177,9 @@ public class ProfileMenuTabFragment extends Fragment {
     // 내가 쓴 댓글
     public class AsyncUserReplyJSONList
             extends AsyncTask<String, Integer, ArrayList<ReplyData>> {
-
-        Response response;
-
         @Override
         protected ArrayList<ReplyData> doInBackground(String... args) {
+            Response response = null;
             try{
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
@@ -206,7 +201,6 @@ public class ProfileMenuTabFragment extends Fragment {
                     return ParseDataParseHandler.getJSONUsersReplyRequestList(
                             new StringBuilder(responseBody.string()));
                 }
-                responseBody.close();
             }catch (UnknownHostException une) {
                 e("fileUpLoad", une.toString());
             } catch (UnsupportedEncodingException uee) {

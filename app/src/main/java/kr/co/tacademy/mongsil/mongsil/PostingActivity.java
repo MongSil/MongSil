@@ -283,6 +283,7 @@ public class PostingActivity extends BaseActivity
 
     private void modifyPosting(Post postData) {
         modifyPostId = String.valueOf(postData.postId);
+        tbLocation.setEnabled(false);
         if (!postData.area2.isEmpty()) {
             tbLocation.setText(String.valueOf(postData.area1 + ", " + postData.area2));
         } else {
@@ -503,10 +504,7 @@ public class PostingActivity extends BaseActivity
 
         @Override
         protected String doInBackground(String... args) {
-
-            // TODO : 다 null 붙여주고 doinBackground 안에 넣어주기
             Response response = null;
-
             try {
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(30, TimeUnit.SECONDS)
@@ -572,7 +570,7 @@ public class PostingActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equalsIgnoreCase("success")) {
                 Intent intent = new Intent(PostingActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.putExtra("area1", area1);
                 startActivity(intent);
                 finish();
@@ -677,7 +675,7 @@ public class PostingActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equalsIgnoreCase("success")) {
                 Intent intent = new Intent(PostingActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.putExtra("area1", area1);
                 startActivity(intent);
                 finish();
@@ -712,7 +710,7 @@ public class PostingActivity extends BaseActivity
 
     private void toMainActivityFromthis() {
         Intent intent = new Intent(PostingActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
     }

@@ -1,10 +1,12 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +25,9 @@ import static android.util.Log.e;
 /**
  * Created by ccei on 2016-07-26.
  */
-public class MainPostFragment extends Fragment {
+public class MainPostFragment extends Fragment
+        implements BottomEditDialogFragment.OnBottomEditDialogListener,
+        MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
     public static final String AREA1 = "area1";
 
     RecyclerView postRecyclerView;
@@ -49,7 +53,7 @@ public class MainPostFragment extends Fragment {
         postRecyclerView =
                 (RecyclerView) inflater.inflate(R.layout.fragment_post, container, false);
 
-        postAdapter = new PostRecyclerViewAdapter(getContext());
+        postAdapter = new PostRecyclerViewAdapter(MongSilApplication.getMongSilContext());
         final LinearLayoutManager layoutManager =
                 new LinearLayoutManager(MongSilApplication.getMongSilContext());
         postRecyclerView.setLayoutManager(layoutManager);
@@ -87,20 +91,19 @@ public class MainPostFragment extends Fragment {
     public class AsyncPostJSONList extends AsyncTask<String, Integer, PostData> {
         @Override
         protected PostData doInBackground(String... args) {
+            Response response = null;
             try{
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
                         .build();
-                // TODO : 다른사람 프로필 사진을 클릭하면 프로필이 뜨게 만들어야함
-                // TODO : 다른사람 프로필에서 리사이클러뷰는 그 사람 정보의 리스트
 
                 Request request = new Request.Builder()
                         .url(String.format(
                                 NetworkDefineConstant.GET_SERVER_POST,
                                 args[0], args[1]))
                         .build();
-                Response response = toServer.newCall(request).execute();
+                response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 boolean flag = response.isSuccessful();
 
@@ -110,13 +113,16 @@ public class MainPostFragment extends Fragment {
                     return ParseDataParseHandler.getJSONPostRequestAllList(
                             new StringBuilder(responseBody.string()));
                 }
-                responseBody.close();
             }catch (UnknownHostException une) {
                 e("connectionFail", une.toString());
             } catch (UnsupportedEncodingException uee) {
                 e("connectionFail", uee.toString());
             } catch (Exception e) {
                 e("connectionFail", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
             return null;
         }
@@ -143,6 +149,92 @@ public class MainPostFragment extends Fragment {
 
                 postAdapter.add(result.post);
                 postRecyclerView.setAdapter(postAdapter);
+            }
+        }
+    }
+
+    String postId;
+
+    // 글 수정과 글 삭제 하단 다이어로그
+    @Override
+    public void onSelectBottomEdit(int select, Post post) {
+        postId = String.valueOf(post.postId);
+        switch (select) {
+            case 0:
+                Intent intent = new Intent(getActivity().getApplicationContext(), PostingActivity.class);
+                intent.putExtra("postdata", post);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getContext().startActivity(intent);
+                break;
+            case 1:
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .add(MiddleSelectDialogFragment.newInstance(0),
+                                "middle_post_remove").commit();
+                break;
+        }
+    }
+
+    // 글 삭제 다이어로그
+    @Override
+    public void onMiddleSelect(int select) {
+        switch (select) {
+            case 0 :
+                new AsyncPostRemoveRequest().execute(String.valueOf(postId));
+        }
+    }
+
+    // 글 삭제
+    public class AsyncPostRemoveRequest extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... args) {
+            Response response = null;
+            try {
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url(String.format(NetworkDefineConstant.DELETE_SERVER_POST_REMOVE,
+                                args[0]))
+                        .delete()
+                        .build();
+
+                response = client.newCall(request).execute();
+                boolean flag = response.isSuccessful();
+                //응답 코드 200등등
+                int responseCode = response.code();
+                if (flag) {
+                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
+                    Log.e("response응답바디", response.body().string()); //json으로 변신
+                    return "success";
+                }
+            } catch (UnknownHostException une) {
+                Log.e("aa", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                Log.e("bb", uee.toString());
+            } catch (Exception e) {
+                Log.e("cc", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+
+            return "fail";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (s.equals("success")) {
+                Intent intent = new Intent(getActivity().getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                intent.putExtra("post_remove", true);
+                getActivity().startActivity(intent);
+            } else if(s.equals("fail")) {
+                getActivity().getSupportFragmentManager().beginTransaction().
+                        add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();
             }
         }
     }

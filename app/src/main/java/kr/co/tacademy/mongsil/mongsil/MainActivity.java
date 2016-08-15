@@ -1,7 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,7 +10,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -22,7 +20,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -70,7 +67,6 @@ public class MainActivity extends BaseActivity
 
     // 슬라이딩메뉴
     SlidingMenu slidingMenu;
-    TabLayout tabLayout;
 
     // 글쓰기 버튼
     FloatingActionButton btnCapturePost;
@@ -208,15 +204,23 @@ public class MainActivity extends BaseActivity
                     .commit();
         }
     }
+
+
+    ImageView imgProfileBackground;
+    CircleImageView imgProfile;
+    TextView textMyName, textMyLocation;
+    ImageView imgSetting, imgAlarm, imgClose;
+    ViewPager viewPager;
+    TabLayout tabLayout;
+
     // 슬라이딩메뉴 뷰
     public View loadSlidingMenu() {
         View menu = getLayoutInflater().inflate(R.layout.layout_profile_menu, null);
 
-        TextView textMyName, textMyLocation;
-        final ImageView imgProfileBackground =
+        imgProfileBackground =
                 (ImageView) menu.findViewById(R.id.img_profile_background);
 
-        final CircleImageView imgProfile =
+        imgProfile =
                 (CircleImageView) menu.findViewById(R.id.img_profile);
         Log.e("프로필이미지 value : ", " " + PropertyManager.getInstance().getUserProfileImg());
         if (!PropertyManager.getInstance().getUserProfileImg().isEmpty()) {
@@ -247,7 +251,6 @@ public class MainActivity extends BaseActivity
         textMyName.setText(PropertyManager.getInstance().getNickname());
         textMyLocation.setText(PropertyManager.getInstance().getLocation());
 
-        ImageView imgSetting, imgAlarm, imgClose;
         imgSetting = (ImageView) menu.findViewById(R.id.img_setting);
         imgSetting.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -270,7 +273,7 @@ public class MainActivity extends BaseActivity
             }
         });
 
-        final ViewPager viewPager = (ViewPager) menu.findViewById(R.id.viewpager_menu);
+        viewPager = (ViewPager) menu.findViewById(R.id.viewpager_menu);
         if (viewPager != null) {
             MenuViewPagerAdapter adapter =
                     new MenuViewPagerAdapter(getSupportFragmentManager());
@@ -288,6 +291,8 @@ public class MainActivity extends BaseActivity
         // 탭 레이아웃 설정
         tabLayout = (TabLayout) menu.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+        final Typeface normalFont = Typeface.createFromAsset(getAssets(), "fonts/NotoSansKR-Regular.otf");
+        final Typeface boldFont = Typeface.createFromAsset(getAssets(), "fonts/NotoSansKR-Bold.otf");
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
 
             TabLayout.Tab tab = tabLayout.getTabAt(i);
@@ -298,12 +303,11 @@ public class MainActivity extends BaseActivity
 
                 tabTextView.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
                 tabTextView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
-
                 tabTextView.setText(tab.getText());
 
                 // First tab is the selected tab, so if i==0 then set BOLD typeface
                 if (i == 0) {
-                    tabTextView.setTypeface(null, Typeface.BOLD);
+                    tabTextView.setTypeface(boldFont);
                 }
             }
         }
@@ -312,13 +316,17 @@ public class MainActivity extends BaseActivity
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
                 TextView text = (TextView) tab.getCustomView();
-                text.setTypeface(null, Typeface.BOLD);
+                if (text != null) {
+                    text.setTypeface(boldFont);
+                }
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
                 TextView text = (TextView) tab.getCustomView();
-                text.setTypeface(null, Typeface.NORMAL);
+                if (text != null) {
+                    text.setTypeface(normalFont);
+                }
             }
 
             @Override
@@ -385,10 +393,9 @@ public class MainActivity extends BaseActivity
     // 위도, 경도 날씨 AsyncTask
     public class AsyncLatLonWeatherJSONList extends AsyncTask<String, Integer, WeatherData> {
 
-        Response response;
-
         @Override
         protected WeatherData doInBackground(String... args) {
+            Response response = null;
             try {
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
@@ -413,7 +420,6 @@ public class MainActivity extends BaseActivity
                     return ParseDataParseHandler.getJSONWeatherList(
                             new StringBuilder(responseBody.string()));
                 }
-                responseBody.close();
             } catch (UnknownHostException une) {
                 e("connectionFail", une.toString());
             } catch (UnsupportedEncodingException uee) {
@@ -434,8 +440,12 @@ public class MainActivity extends BaseActivity
                 imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.code, 0));
                 weatherContainer.setBackgroundResource(WeatherData.imgFromWeatherCode(result.code, 1));
                 animBackgroundWeather.setImageResource(WeatherData.imgFromWeatherCode(result.code, 2));
-                ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
-                ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+                if(animBackgroundWeather.isShown()) {
+                    ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
+                }
+                if(imgWeatherIcon.isShown()) {
+                    ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+                }
             }
         }
     }
@@ -443,10 +453,9 @@ public class MainActivity extends BaseActivity
     // 역지오코딩 AsyncTask
     public class AsyncReGeoJSONList extends AsyncTask<String, Integer, String> {
 
-        Response response;
-
         @Override
         protected String doInBackground(String... args) {
+            Response response = null;
             try{
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
@@ -460,7 +469,7 @@ public class MainActivity extends BaseActivity
                                 NetworkDefineConstant.SK_REVERSE_GEOCOING,
                                 args[0], args[1]))
                         .build();
-                Response response = toServer.newCall(request).execute();
+                response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
 
                 boolean flag = response.isSuccessful();
@@ -470,7 +479,6 @@ public class MainActivity extends BaseActivity
                     return ParseDataParseHandler.getJSONResGeo(
                             new StringBuilder(responseBody.string()));
                 }
-                responseBody.close();
             }catch (UnknownHostException une) {
                 e("connectionFail", une.toString());
             } catch (UnsupportedEncodingException uee) {

@@ -106,5 +106,8 @@
     <string name="signup_fail">가입에 실패했습니다..</string>
     <string name="login_fail">서버와 연결이 되지 않습니다! 잠시 후에 다시 연결해주세요.</string>
     <string name="connection_fail">네트워크 연결에 실패했습니다..</string>
-    <string name="save_none_post">글 내용을 적어주세요!</string>
+    <string name="none_save_post">글 내용을 적어주세요!</string>
+    <string name="none_user_info">선택하신 유저의 정보가 존재하지 않습니다.</string>
+    <string name="Apache_license">Apache license 2.0</string>
+    <string name="MIT_license">MIT license</string>
 </resources>

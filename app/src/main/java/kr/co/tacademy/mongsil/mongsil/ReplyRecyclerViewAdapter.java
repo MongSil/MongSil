@@ -1,6 +1,7 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,10 +26,15 @@ public class ReplyRecyclerViewAdapter
     public static final int POST_REPLY = 4000;
     public static final int USERS_REPLY = 5000;
 
+    FragmentManager fragmentManager;
     List<ReplyData> items;
 
     ReplyRecyclerViewAdapter() {
         items = new ArrayList<ReplyData>();
+    }
+    ReplyRecyclerViewAdapter(FragmentManager fragmentManager) {
+        this();
+        this.fragmentManager = fragmentManager;
     }
 
     public void add(ArrayList<ReplyData> replyItems) {
@@ -69,7 +75,11 @@ public class ReplyRecyclerViewAdapter
             imgProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // TODO : 다른사람 프로필로 가야함
+                    Intent intent = new Intent(
+                            MongSilApplication.getMongSilContext(), OtherUserProfileActivity.class);
+                    intent.putExtra("userid", String.valueOf(data.userId));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    MongSilApplication.getMongSilContext().startActivity(intent);
                 }
             });
             textName.setText(data.username);

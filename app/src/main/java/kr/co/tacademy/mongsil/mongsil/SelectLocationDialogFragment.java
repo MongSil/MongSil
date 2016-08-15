@@ -147,7 +147,6 @@ public class SelectLocationDialogFragment extends DialogFragment {
 
         @Override
         public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
-            // TODO : viewHolder.imgLocation.setImageResource();
             viewHolder.location.setText(locationNames.get(position));
             viewHolder.imgSelector.setSelected(selectedPos == position);
             viewHolder.imgLocation.setImageResource(locationImgs.get(position));

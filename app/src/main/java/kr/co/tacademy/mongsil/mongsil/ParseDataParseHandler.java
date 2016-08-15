@@ -254,7 +254,7 @@ public class ParseDataParseHandler {
         return null;
     }
 
-    public static UserData getJSONUserList(StringBuilder buf) {
+    public static UserData getJSONUserInfo(StringBuilder buf) {
 
         // 전체 - data
         JSONObject jsonObject = null;

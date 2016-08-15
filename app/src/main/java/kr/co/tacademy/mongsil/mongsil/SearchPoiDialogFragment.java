@@ -189,11 +189,9 @@ public class SearchPoiDialogFragment extends DialogFragment {
 
     // 지역검색 AsyncTask
     public class AsyncPoiJSONList extends AsyncTask<String, Integer, SearchPoiInfo> {
-
-        Response response;
-
         @Override
         protected SearchPoiInfo doInBackground(String... args) {
+            Response response = null;
             try{
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
@@ -207,7 +205,7 @@ public class SearchPoiDialogFragment extends DialogFragment {
                                 NetworkDefineConstant.SK_POI_SEARCH,
                                 args[0]))
                         .build();
-                Response response = toServer.newCall(request).execute();
+                response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
 
                 boolean flag = response.isSuccessful();
@@ -217,7 +215,6 @@ public class SearchPoiDialogFragment extends DialogFragment {
                     return ParseDataParseHandler.getJSONPoiList(
                             new StringBuilder(responseBody.string()));
                 }
-                responseBody.close();
             }catch (UnknownHostException une) {
                 e("connectionFail", une.toString());
             } catch (UnsupportedEncodingException uee) {

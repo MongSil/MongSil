@@ -86,7 +86,9 @@ public class PostPreviewDialogFragment extends DialogFragment {
                 WeatherData.imgFromWeatherCode(String.valueOf(weatherPos), 0));
         imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
                 R.anim.bounce_interpolator, new LinearInterpolator()));
-        ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        if(imgWeatherIcon.isShown()) {
+            ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        }
 
         postLocation = (TextView) view.findViewById(R.id.text_post_location);
         postLocation.setText(location);

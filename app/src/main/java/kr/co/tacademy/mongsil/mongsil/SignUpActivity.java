@@ -129,12 +129,9 @@ public class SignUpActivity extends BaseActivity
 
     // 가입 요청
     public class AsyncSignUpRequest extends AsyncTask<String, String, String> {
-
-        Response response;
-
         @Override
         protected String doInBackground(String... args) {
-
+            Response response = null;
             try {
                 //업로드는 타임 및 리드타임을 넉넉히 준다.
                 OkHttpClient client = new OkHttpClient.Builder()

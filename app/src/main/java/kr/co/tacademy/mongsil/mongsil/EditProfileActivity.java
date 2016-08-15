@@ -42,6 +42,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * Created by ccei on 2016-08-04.
@@ -58,6 +59,7 @@ public class EditProfileActivity extends BaseActivity
     TextView tbCancel, tbDone;
 
     // 프로필 사진
+    String firstProfile;
     LinearLayout imgProfileContainer;
     CircleImageView imgProfile;
 
@@ -138,14 +140,19 @@ public class EditProfileActivity extends BaseActivity
             public void onClick(View view) {
                 PropertyManager.getInstance().setNickname(editName.getText().toString());
                 PropertyManager.getInstance().setLocation(editLocation.getText().toString());
-                new FileUpLoadAsyncTask(
-                        PropertyManager.getInstance().getNickname(),
-                        PropertyManager.getInstance().getLocation())
-                        .execute(upLoadFile);
+                if(!firstProfile.equals(PropertyManager.getInstance().getUserProfileImg())) {
+                    new FileUpLoadAsyncTask(
+                            PropertyManager.getInstance().getNickname(),
+                            PropertyManager.getInstance().getLocation())
+                            .execute(upLoadFile);
+                } else {
+                    toMainActivityFromthis();
+                }
             }
         });
 
         // 프로필 사진 부분
+        firstProfile = PropertyManager.getInstance().getUserProfileImg();
         imgProfileContainer =
                 (LinearLayout) findViewById(R.id.img_profile_container);
         imgProfile = (CircleImageView) findViewById(R.id.img_profile);
@@ -404,7 +411,7 @@ public class EditProfileActivity extends BaseActivity
     }
 
     // 프로필 업로드
-    private class FileUpLoadAsyncTask extends AsyncTask<UpLoadValueObject, Void, String> {
+    private class FileUpLoadAsyncTask extends AsyncTask<UpLoadValueObject, Void, UserData> {
         private String username;
         private String area;
         private String uploadCode;
@@ -421,7 +428,7 @@ public class EditProfileActivity extends BaseActivity
         }
 
         @Override
-        protected String doInBackground(UpLoadValueObject... objects) {
+        protected UserData doInBackground(UpLoadValueObject... objects) {
             Response response = null;
 
             try {
@@ -463,13 +470,15 @@ public class EditProfileActivity extends BaseActivity
                         .put(fileUploadBody)
                         .build();
                 response = toServer.newCall(request).execute();
+                ResponseBody responseBody = response.body();
+
                 boolean flag = response.isSuccessful();
                 //응답 코드 200등등
                 int responseCode = response.code();
+                if (responseCode >= 400) return null;
                 if (flag) {
-                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
-                    Log.e("response응답바디", response.body().string()); //json으로 변신
-                    return "success";
+                    return ParseDataParseHandler.getJSONUserInfo(
+                            new StringBuilder(responseBody.string()));
                 }
             } catch (UnknownHostException une) {
                 Log.e("une", une.toString());
@@ -482,23 +491,23 @@ public class EditProfileActivity extends BaseActivity
                     response.close();
                 }
             }
-            return "fail";
+            return null;
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(UserData result) {
             super.onPostExecute(result);
             Log.e("Result value : ", "> " + result);
-            if (result.equals("success")) {
+            if (result != null) {
                 if(upLoadFile != null) {
                     UpLoadValueObject fileValue = upLoadFile;
                     if (fileValue.tempFiles) {
                         fileValue.file.deleteOnExit(); //임시파일을 삭제한다
                     }
-                    //Todo : 형님이 프로필 이미지 링크 만들어주시면 PropertyManager.getInstance().setUserProfileImg();
+                    PropertyManager.getInstance().setUserProfileImg(result.profileImg);
                 }
                 toMainActivityFromthis();
-            } else if(result.equals("fail")){
+            } else {
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(3),
                                 "middle_edit_profile_fail").commit();
@@ -509,11 +518,9 @@ public class EditProfileActivity extends BaseActivity
 
     // 계정 삭제
     public class AsyncUserRemoveRequest extends AsyncTask<String, String, String> {
-
-        Response response;
-
         @Override
         protected String doInBackground(String... args) {
+            Response response = null;
             try {
                 OkHttpClient client = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
@@ -557,6 +564,7 @@ public class EditProfileActivity extends BaseActivity
                 Intent intent = new Intent(EditProfileActivity.this, SplashActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
+                finish();
             } else if(result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(2), "middle_dialog").commit();
@@ -574,7 +582,7 @@ public class EditProfileActivity extends BaseActivity
 
     private void toMainActivityFromthis() {
         Intent intent = new Intent(EditProfileActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
     }

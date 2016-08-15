@@ -64,7 +64,7 @@ public class WeatherData {
             } else if(request == 1) {
                 return R.drawable.background_graycloud;
             } else if(request == 2) {
-                return R.drawable.anim_list_gray_cloud;
+                return R.drawable.anim_list_small_rain;
             }
         }
         if (code.equals("SKY_A05") || code.equals("4")) {
@@ -74,7 +74,7 @@ public class WeatherData {
             } else if(request == 1) {
                 return R.drawable.background_graycloud;
             } else if(request == 2) {
-                return R.drawable.anim_list_gray_cloud;
+                return R.drawable.anim_list_snow;
             }
         }
         if (code.equals("SKY_A06") || code.equals("5")) {
@@ -94,7 +94,7 @@ public class WeatherData {
             } else if(request == 1) {
                 return R.drawable.background_graycloud;
             } else if(request == 2) {
-                return R.drawable.anim_list_small_rain;
+                return R.drawable.anim_list_gray_cloud;
             }
         }
         if (code.equals("SKY_A08") || code.equals("7")) {
@@ -133,6 +133,8 @@ public class WeatherData {
                 return R.drawable.anim_list_icon_mongsil_bolt;
             } else if(request == 1) {
                 return R.drawable.background_graycloud;
+            } else if(request == 2) {
+                return R.drawable.anim_list_gray_cloud;
             }
         }
         if (code.equals("SKY_A12") || code.equals("11")) {
@@ -152,7 +154,7 @@ public class WeatherData {
             } else if(request == 1) {
                 return R.drawable.background_strong_rain;
             } else if(request == 2) {
-                return R.drawable.anim_list_strong_rain;
+                return R.drawable.anim_list_snow;
             }
         }
         if (code.equals("SKY_A14") || code.equals("13")) {

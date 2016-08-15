@@ -53,7 +53,7 @@ public class SettingActivity extends BaseActivity {
         programInfoContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO : 누르면 프로그램 정보로 이동 또는 다이어로그를 열게 한다
+                startActivity(new Intent(SettingActivity.this, ProgramInfoActivity.class));
             }
         });
         toggleGPS = (ToggleButton) findViewById(R.id.toggle_gps);
@@ -79,7 +79,7 @@ public class SettingActivity extends BaseActivity {
 
     private void toMainActivityFromthis() {
         Intent intent = new Intent(SettingActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
     }

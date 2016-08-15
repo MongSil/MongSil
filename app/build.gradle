@@ -37,4 +37,5 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'jp.wasabeef:glide-transformations:1.0.6'
+    compile 'com.github.chrisbanes.photoview:library:1.2.4'
 }

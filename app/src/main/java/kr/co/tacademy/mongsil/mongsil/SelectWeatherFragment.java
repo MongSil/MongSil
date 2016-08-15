@@ -57,7 +57,9 @@ public class SelectWeatherFragment extends Fragment {
                 WeatherData.imgFromWeatherCode(String.valueOf(currentPos), 0));
         imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
                 R.anim.bounce_interpolator, new LinearInterpolator()));
-        ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        if(imgWeatherIcon.isShown()) {
+            ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        }
 
         return view;
     }

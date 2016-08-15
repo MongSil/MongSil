@@ -73,7 +73,6 @@ public class PostDetailActivity extends BaseActivity
         postId = intent.getStringExtra(POST_ID);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //toolbar.setContentInsetsRelative(0, 16);
         tbTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         tbThreeDot = (ImageView) toolbar.findViewById(R.id.img_threeDot);
 
@@ -118,19 +117,22 @@ public class PostDetailActivity extends BaseActivity
         } else {
             tbTitle.setText(String.valueOf(post.area1));
         }
-        tbThreeDot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getSupportFragmentManager().beginTransaction().add(
-                        BottomEditDialogFragment.newInstance(), "bottom_post_detail").commit();
-            }
-        });
+        if(String.valueOf(post.userId).equals(PropertyManager.getInstance().getUserId())) {
+            tbThreeDot.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    getSupportFragmentManager().beginTransaction().add(
+                            BottomEditDialogFragment.newInstance(post), "bottom_post_detail").commit();
+                }
+            });
+        } else {
+            tbThreeDot.setVisibility(View.GONE);
+        }
 
         // background 이미지
         if (!post.bgImg.isEmpty()) {
             Glide.with(this).load(post.bgImg).into(imgBackground);
         } else {
-
             // TODO : weatherCode에 맞는 테마 배경을 넣어야함
             // WeatherData.imgFromWeatherCode(String.valueOf(post.weatherCode), 1));
             imgBackground.setImageResource(R.drawable.splash_background);
@@ -141,7 +143,9 @@ public class PostDetailActivity extends BaseActivity
                         String.valueOf(post.weatherCode), 0));
         imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
                 R.anim.bounce_interpolator, new LinearInterpolator()));
-        ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        if(imgWeatherIcon.isShown()) {
+            ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        }
 
         // 포스트 내용
         postContent.setText(post.content);
@@ -234,7 +238,7 @@ public class PostDetailActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 commentBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                // TODO : 댓글 수에 따라 창의 최대 위치가 변경됨
+                // 댓글 수에 따라 창의 최대 위치가 변경됨
                 if(post.replyCount > 3) {
                     replyContainer.setWeightSum(1);
                 } else if(post.replyCount > 0) {
@@ -264,11 +268,9 @@ public class PostDetailActivity extends BaseActivity
 
     // 글 상세내용 가져오기
     public class AsyncPostDetailJSONList extends AsyncTask<String, Integer, Post> {
-
-        Response response;
-
         @Override
         protected Post doInBackground(String... args) {
+            Response response = null;
             try {
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
@@ -280,7 +282,7 @@ public class PostDetailActivity extends BaseActivity
                                 NetworkDefineConstant.GET_SERVER_POST_DETAIL,
                                 args[0]))
                         .build();
-                Response response = toServer.newCall(request).execute();
+                response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
                 boolean flag = response.isSuccessful();
 
@@ -290,7 +292,6 @@ public class PostDetailActivity extends BaseActivity
                     return ParseDataParseHandler.getJSONPostDetailRequestList(
                             new StringBuilder(responseBody.string()));
                 }
-                responseBody.close();
             } catch (UnknownHostException une) {
                 e("connectionFail", une.toString());
             } catch (UnsupportedEncodingException uee) {
@@ -314,11 +315,9 @@ public class PostDetailActivity extends BaseActivity
 
     // 댓글목록 가져오기
     public class AsyncPostDetailReplyJSONList extends AsyncTask<String, Integer, ArrayList<ReplyData>> {
-
-        Response response;
-
         @Override
         protected ArrayList<ReplyData> doInBackground(String... args) {
+            Response response = null;
             try {
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
@@ -340,7 +339,6 @@ public class PostDetailActivity extends BaseActivity
                     return ParseDataParseHandler.getJSONReplyRequestList(
                             new StringBuilder(responseBody.string()));
                 }
-                responseBody.close();
             } catch (UnknownHostException une) {
                 e("connectionFail", une.toString());
             } catch (UnsupportedEncodingException uee) {
@@ -371,12 +369,9 @@ public class PostDetailActivity extends BaseActivity
 
     // 댓글달기
     public class AsyncReplingRequest extends AsyncTask<String, String, String> {
-
-        Response response;
-
         @Override
         protected String doInBackground(String... args) {
-
+            Response response = null;
             try {
                 //업로드는 타임 및 리드타임을 넉넉히 준다.
                 OkHttpClient client = new OkHttpClient.Builder()
@@ -436,11 +431,9 @@ public class PostDetailActivity extends BaseActivity
 
     // 글 삭제
     public class AsyncPostRemoveRequest extends AsyncTask<String, String, String> {
-
-        Response response;
-
         @Override
         protected String doInBackground(String... args) {
+            Response response = null;
             try {
                 OkHttpClient client = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
@@ -482,7 +475,7 @@ public class PostDetailActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equals("success")) {
                 Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.putExtra("post_remove", true);
                 startActivity(intent);
                 finish();
@@ -495,7 +488,7 @@ public class PostDetailActivity extends BaseActivity
 
     // 글 수정과 글 삭제 하단 다이어로그
     @Override
-    public void onSelectBottomEdit(int select) {
+    public void onSelectBottomEdit(int select, Post post) {
         switch (select) {
             case 0:
                 Intent intent = new Intent(getApplicationContext(), PostingActivity.class);
@@ -550,7 +543,7 @@ public class PostDetailActivity extends BaseActivity
 
     private void toMainActivityFromthis() {
         Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
     }

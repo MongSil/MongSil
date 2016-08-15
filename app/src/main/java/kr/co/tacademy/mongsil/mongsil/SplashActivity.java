@@ -77,7 +77,9 @@ public class SplashActivity extends BaseActivity {
 
         // 몽실 이미지
         imgSplashMongsil = (ImageView) findViewById(R.id.img_splash_mongsil);
-        ((AnimationDrawable) imgSplashMongsil.getDrawable()).start();
+        if(imgSplashMongsil.isShown()) {
+            ((AnimationDrawable) imgSplashMongsil.getDrawable()).start();
+        }
         Animation mongsilAnimation =
                 AnimationUtils.loadAnimation(
                         this, R.anim.splash_interpolator);
@@ -93,12 +95,9 @@ public class SplashActivity extends BaseActivity {
 
     // 로그인 요청
     public class AsyncLoginRequest extends AsyncTask<String, String, String> {
-
-        Response response;
-
         @Override
         protected String doInBackground(String... args) {
-
+            Response response = null;
             try {
                 //업로드는 타임 및 리드타임을 넉넉히 준다.
                 OkHttpClient client = new OkHttpClient.Builder()

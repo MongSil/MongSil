@@ -16,8 +16,9 @@ import android.widget.Button;
  * Created by ccei on 2016-08-12.
  */
 public class BottomEditDialogFragment extends DialogFragment {
+    private static final String POST = "post";
     public interface OnBottomEditDialogListener {
-        void onSelectBottomEdit(int select);
+        void onSelectBottomEdit(int select, Post post);
     }
 
     OnBottomEditDialogListener onBottomEditDialogListener;
@@ -30,17 +31,25 @@ public class BottomEditDialogFragment extends DialogFragment {
         }
     }
 
+    Post post;
+
     public BottomEditDialogFragment() {
     }
 
-    public static BottomEditDialogFragment newInstance() {
+    public static BottomEditDialogFragment newInstance(Post post) {
         BottomEditDialogFragment fragment = new BottomEditDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(POST, post);
+        fragment.setArguments(bundle);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            this.post = getArguments().getParcelable(POST);
+        }
         setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
     }
 
@@ -58,7 +67,7 @@ public class BottomEditDialogFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
                 dismiss();
-                onBottomEditDialogListener.onSelectBottomEdit(0);
+                onBottomEditDialogListener.onSelectBottomEdit(0, post);
             }
         });
 
@@ -68,7 +77,7 @@ public class BottomEditDialogFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
                 dismiss();
-                onBottomEditDialogListener.onSelectBottomEdit(1);
+                onBottomEditDialogListener.onSelectBottomEdit(1, post);
             }
         });
 
