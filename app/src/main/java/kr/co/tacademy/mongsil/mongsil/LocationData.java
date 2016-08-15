@@ -70,15 +70,16 @@ public class LocationData {
 
     public static String[] ChangeToLatLon(String area) {
         int position = 0;
-        String[] latLon;
+        String[] latLon = null;
 
-        for(;position < locationName.length ; position++) {
-            if(locationName[position].equals(area)) {
+        for (; position < locationName.length; position++) {
+            if (locationName[position].equals(area)) {
                 break;
             }
         }
-
-        latLon = new String[]{latList[position], lonList[position]};
+        if (position < locationName.length){
+            latLon = new String[]{latList[position], lonList[position]};
+        }
 
         return latLon;
     }

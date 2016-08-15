@@ -81,6 +81,23 @@ public class MiddleSelectDialogFragment extends DialogFragment {
                     }
                 });
                 break;
+            case 10: // GPS 위치 설정창 요구하는 경우 [취소 / 확인]
+                dialog.setText(getResources().getText(R.string.gps_setting_request));
+                // if( ~~ ) {
+                negative.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                        onMiddleSelectDialogListener.onMiddleSelect(10);
+                    }
+                });
+                break;
             case 99: // 계정 삭제하는 경우 [취소 / 확인]
                 dialog.setText(getResources().getText(R.string.account_leave));
                 negative.setOnClickListener(new View.OnClickListener() {

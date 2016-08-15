@@ -110,4 +110,5 @@
     <string name="none_user_info">선택하신 유저의 정보가 존재하지 않습니다.</string>
     <string name="Apache_license">Apache license 2.0</string>
     <string name="MIT_license">MIT license</string>
+    <string name="gps_setting_request">GPS 셋팅이 되지 않았을수도 있습니다.   설정창으로 가시겠습니까?</string>
 </resources>

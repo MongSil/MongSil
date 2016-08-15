@@ -10,6 +10,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -52,7 +54,8 @@ import okhttp3.ResponseBody;
 import static android.util.Log.e;
 
 public class MainActivity extends BaseActivity
-        implements SearchPoiDialogFragment.OnPOISearchListener {
+        implements SearchPoiDialogFragment.OnPOISearchListener,
+                MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
     // 툴바 필드
     TextView tbTitle;
     ImageView tbSearch;
@@ -71,20 +74,14 @@ public class MainActivity extends BaseActivity
     // 글쓰기 버튼
     FloatingActionButton btnCapturePost;
 
-    // LBS
-    LocationManager locationManager;
-    Location location;
-    //boolean isNetworkEnabled;
-    private String gpsProvider = LocationManager.GPS_PROVIDER;
-    //private String networkProvider = LocationManager.NETWORK_PROVIDER;
-
+    // GPSInfo
+    GPSInfo gpsInfo;
+    Handler handler = new Handler();
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (PropertyManager.getInstance().getUseGPS()) {
-            updateLocation();
-        }
+        requestGPSPermission();
     }
 
     @Override
@@ -98,8 +95,6 @@ public class MainActivity extends BaseActivity
             getSupportFragmentManager().beginTransaction().
                     add(MiddleAloneDialogFragment.newInstance(0), "middle_done").commit();
         }
-
-        // TODO : GPS가 켜져 있을 경우 - GPS 지역
 
         // 글 작성 프레그먼트와 슬라이딩메뉴 프레그먼트를 선언
         if (savedInstanceState == null) {
@@ -148,7 +143,7 @@ public class MainActivity extends BaseActivity
         animBackgroundWeather = (ImageView) findViewById(R.id.anim_background_weather);
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
         imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
-                        R.anim.bounce_interpolator, new LinearInterpolator()));
+                R.anim.bounce_interpolator, new LinearInterpolator()));
 
         day = (TextView) findViewById(R.id.text_day);
         day.setText(TimeData.dayFormat);
@@ -166,21 +161,18 @@ public class MainActivity extends BaseActivity
             }
         });
         tbTitle.setText(PropertyManager.getInstance().getLocation());
+
         if (!getIntent().hasExtra("area1")) {
             new AsyncLatLonWeatherJSONList().execute(
                     PropertyManager.getInstance().getLatLocation(),
                     PropertyManager.getInstance().getLonLocation());
         } else {
+            // 글을 작성하고 난 후의 지역 설정
             String[] latLon =
                     LocationData.ChangeToLatLon(getIntent().getStringExtra("area1"));
             new AsyncLatLonWeatherJSONList().execute(latLon[0], latLon[1]);
+        }
 
-        }
-        if (PropertyManager.getInstance().getUseGPS()) {
-            if (location != null) {
-                getLocation(location);
-            }
-        }
     }
 
     // 애니메이션 인터폴레이터 적용
@@ -204,7 +196,6 @@ public class MainActivity extends BaseActivity
                     .commit();
         }
     }
-
 
     ImageView imgProfileBackground;
     CircleImageView imgProfile;
@@ -337,7 +328,6 @@ public class MainActivity extends BaseActivity
         return menu;
     }
 
-
     // 메뉴 뷰페이저 어답터
     private static class MenuViewPagerAdapter extends FragmentPagerAdapter {
         private final ArrayList<ProfileMenuTabFragment> fragments
@@ -440,10 +430,10 @@ public class MainActivity extends BaseActivity
                 imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.code, 0));
                 weatherContainer.setBackgroundResource(WeatherData.imgFromWeatherCode(result.code, 1));
                 animBackgroundWeather.setImageResource(WeatherData.imgFromWeatherCode(result.code, 2));
-                if(animBackgroundWeather.isShown()) {
+                if (animBackgroundWeather.isShown()) {
                     ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
                 }
-                if(imgWeatherIcon.isShown()) {
+                if (imgWeatherIcon.isShown()) {
                     ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
                 }
             }
@@ -456,7 +446,7 @@ public class MainActivity extends BaseActivity
         @Override
         protected String doInBackground(String... args) {
             Response response = null;
-            try{
+            try {
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
@@ -479,7 +469,7 @@ public class MainActivity extends BaseActivity
                     return ParseDataParseHandler.getJSONResGeo(
                             new StringBuilder(responseBody.string()));
                 }
-            }catch (UnknownHostException une) {
+            } catch (UnknownHostException une) {
                 e("connectionFail", une.toString());
             } catch (UnsupportedEncodingException uee) {
                 e("connectionFail", uee.toString());
@@ -495,7 +485,7 @@ public class MainActivity extends BaseActivity
 
         @Override
         protected void onPostExecute(String result) {
-            if(result != null){
+            if (result != null) {
                 String GPSlocation = LocationData.ChangeToShortName(result);
                 tbTitle.setText(GPSlocation);
                 mainPostFragment = MainPostFragment.newInstance(GPSlocation);
@@ -506,9 +496,54 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    // 하위 GPS 기능
-    private void updateLocation() {
-        //if (!locationManager.isProviderEnabled(gpsProvider)) {
+    // 아래 전부 GPS 기능 관련
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (gpsInfo != null) {
+            gpsInfo.stopGPS();
+        }
+    }
+
+    private void getLocation() {
+        if (PropertyManager.getInstance().getUseGPS()) {
+            if (gpsInfo == null) {
+                gpsInfo = new GPSInfo(getApplicationContext());
+            }
+            if (gpsInfo.isGetLocation()) {
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        String lat = String.valueOf(gpsInfo.getLatitude());
+                        String lon = String.valueOf(gpsInfo.getLongitude());
+                        Log.e("locaiton info:", lat + ", " + lon);
+                        if(!(lat.equals("0.0") || lon.equals("0.0"))) {
+                            new AsyncLatLonWeatherJSONList().execute(lat, lon);
+                            new AsyncReGeoJSONList().execute(lat, lon);
+                        }
+                    }
+                }, 2000);
+            } else {
+                if(!(gpsInfo.isGPSEnabled || gpsInfo.isNetworkEnabled)) {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(MiddleSelectDialogFragment.newInstance(10),
+                                    "middle_gps_setting_request").commitAllowingStateLoss();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onMiddleSelect(int select) {
+        switch (select) {
+            case 10 :
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+                break;
+        }
+    }
+
+    public void requestGPSPermission() {
         if (!PropertyManager.getInstance().getUseGPS()) {
             return;
         }
@@ -523,51 +558,9 @@ public class MainActivity extends BaseActivity
                 return;
             }
             requestPermission();
-            return;
+        } else {
+            getLocation();
         }
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        location = locationManager.getLastKnownLocation(gpsProvider);
-        //locationManager.requestLocationUpdates(gpsProvider, 5000, 5, gpsListener);
-    }
-
-    LocationListener gpsListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-        }
-    };
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        if (PropertyManager.getInstance().getUseGPS()) {
-            locationManager.removeUpdates(gpsListener);
-        }
-    }
-
-    private void getLocation(Location location) {
-        String lat = String.valueOf(location.getLatitude());
-        String lon = String.valueOf(location.getLongitude());
-        Log.e("locaiton info:", lat + ", " + "lon");
-        new AsyncLatLonWeatherJSONList().execute(lat, lon);
-        new AsyncReGeoJSONList().execute(lat, lon);
-
     }
 
     private static final int RC_FINE_LOCATION = 100;
@@ -585,7 +578,7 @@ public class MainActivity extends BaseActivity
         if (requestCode == RC_FINE_LOCATION) {
             if (permissions != null && permissions.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    updateLocation();
+                    getLocation();
                 }
             }
         }

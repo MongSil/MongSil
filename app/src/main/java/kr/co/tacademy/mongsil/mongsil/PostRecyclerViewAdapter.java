@@ -169,6 +169,7 @@ public class PostRecyclerViewAdapter
                     String.valueOf(TimeData.PostTime(date[1])
                             + " - 댓글 " + post.replyCount));
             if(String.valueOf(post.userId).equals(PropertyManager.getInstance().getUserId())) {
+                imgThreeDot.setVisibility(View.VISIBLE);
                 imgThreeDot.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
