@@ -3,6 +3,11 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
 public class PropertyManager {
     private static PropertyManager instance;

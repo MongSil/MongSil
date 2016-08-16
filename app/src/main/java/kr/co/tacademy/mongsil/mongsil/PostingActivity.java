@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -36,8 +37,10 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutionException;
@@ -92,33 +95,29 @@ public class PostingActivity extends BaseActivity
         }
 
         private File resizingFile(final File file) {
-            new AsyncTask<Void, Void, Void>() {
-                Bitmap resizedBitmap = null;
-
-                @Override
-                protected Void doInBackground(Void... voids) {
-                    Looper.prepare();
-                    try {
-                        resizedBitmap = Glide.with(getApplicationContext()).
-                                load(file).asBitmap().into(100, 100).get();
-                    } catch (InterruptedException ie) {
-                        ie.printStackTrace();
-                    } catch (ExecutionException ee) {
-                        ee.printStackTrace();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 4;
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            Bitmap orgImage = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+            Bitmap resize = Bitmap.createBitmap(
+                    orgImage, 0, 0, orgImage.getWidth(), orgImage.getHeight(), matrix, true);
+            OutputStream out = null;
+            try {
+                out = new FileOutputStream(file);
+                resize.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                return file;
+            } catch (FileNotFoundException fe) {
+                fe.printStackTrace();
+            } finally {
+                try {
+                    if(out != null) {
+                        out.close();
                     }
-                    return null;
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
-                @Override
-                protected void onPostExecute(Void aVoid) {
-                    super.onPostExecute(aVoid);
-                    if (resizedBitmap != null) {
-                        Log.d("resizingFile", "Image resizing Done!");
-                        tempSavedBitmapFile(resizedBitmap);
-                    }
-                    Log.d("resizingFile", "Image resizing fail...");
-                }
-            };
+            }
             return file;
         }
     }

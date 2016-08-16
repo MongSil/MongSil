@@ -71,7 +71,8 @@
     <string name="tutorial_one_explain">포스트로 내가 사는 동네의\n실시간 날씨를 알아보아요</string>
     <string name="tutorial_two_explain">다른 동네의 날씨가 궁금하면\n검색해보아요</string>
     <string name="tutorial_three_explain">포스트를 작성하여 다른 사람들의\n실시간 기상캐스터가 되어보아요</string>
-    <string name="search_location_header">즐겨찾기</string>
+    <string name="search_location_mark_header">즐겨찾기</string>
+    <string name="search_location_content_header">검색내역</string>
     <string name="push_setting_title">푸시 알림 설정</string>
     <string name="push_setting">댓글알림</string>
     <string name="normal_setting">일반</string>

@@ -40,8 +40,7 @@ public class MainPostFragment extends Fragment
     }
     public static MainPostFragment newInstance(String location) {
         MainPostFragment fragment = new MainPostFragment();
-        Bundle bundle;
-        bundle = new Bundle();
+        Bundle bundle = new Bundle();
         bundle.putString(AREA1, location);
         fragment.setArguments(bundle);
         return fragment;

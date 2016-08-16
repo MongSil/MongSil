@@ -1,11 +1,17 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -37,18 +43,8 @@ import static android.util.Log.e;
  * Created by ccei on 2016-08-02.
  * POI 검색 -> 지역 선택 -> 위도경도 불러옴 -> 날씨 API
  */
-public class SearchPoiDialogFragment extends DialogFragment {
-    TextView emptySearch;
-    EditText editSearch;
-    ImageView imgSearchCancel;
-    InputMethodManager imm;
-
-    RecyclerView searchRecycler;
-    SearchPoiRecyclerViewAdapter poiAdapter;
-    ArrayList<POIData> POIData;
-
-    public SearchPoiDialogFragment() { }
-
+public class SearchPoiDialogFragment extends DialogFragment
+        implements AdapterCallback {
     public static interface OnPOISearchListener {
         public abstract void onPOISearch(POIData POIData);
     }
@@ -63,10 +59,30 @@ public class SearchPoiDialogFragment extends DialogFragment {
         }
     }
 
+
+    TextView emptySearch;
+    EditText editSearch;
+    ImageView imgSearchCancel;
+    InputMethodManager imm;
+
+    // 즐겨찾기 DB
+    protected UserDBHelper userDB = null;
+
+    RecyclerView searchRecycler;
+    SearchPOIRecyclerViewAdapter poiAdapter;
+    ArrayList<POIData> markedList;
+    ArrayList<POIData> datas;
+
+    public SearchPoiDialogFragment() {
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(STYLE_NO_TITLE, R.style.LocationDialogTheme);
+        datas = new ArrayList<POIData>();
+        userDB = UserOpenHelperManager.
+                generateUserOpenHelper(getActivity());
     }
 
     @Override
@@ -83,9 +99,10 @@ public class SearchPoiDialogFragment extends DialogFragment {
 
         searchRecycler = (RecyclerView) view.findViewById(R.id.search_recycler);
         searchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        POIData = new ArrayList<POIData>();
-        poiAdapter = new SearchPoiRecyclerViewAdapter();
+        poiAdapter = new SearchPOIRecyclerViewAdapter(this);
         searchRecycler.setAdapter(poiAdapter);
+
+        markInit();
 
         searchContainer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,12 +112,12 @@ public class SearchPoiDialogFragment extends DialogFragment {
                 imgSearchCancel.setVisibility(View.VISIBLE);
                 editSearch.requestFocus();
                 imm = (InputMethodManager) getActivity()
-                                .getSystemService(Context.INPUT_METHOD_SERVICE);
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(editSearch, InputMethodManager.SHOW_FORCED);
                 editSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                     @Override
                     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                        if(i == EditorInfo.IME_ACTION_SEARCH || i == EditorInfo.IME_ACTION_NONE) {
+                        if (i == EditorInfo.IME_ACTION_SEARCH || i == EditorInfo.IME_ACTION_NONE) {
                             // 키보드에서 검색버튼을 누를 때
                             imm.hideSoftInputFromWindow(editSearch.getWindowToken(), 0);
                             new AsyncPoiJSONList().execute(editSearch.getText().toString());
@@ -121,8 +138,50 @@ public class SearchPoiDialogFragment extends DialogFragment {
         return view;
     }
 
+    private void markInit() {
+        markedList = userMarkList();
+        if (!(markedList == null || markedList.size() == 0)) {
+            for (POIData poiData : markedList) {
+                datas.add(poiData);
+                poiData.typeCode = 1;
+            }
+            datas.add(0, new POIData(0));
+        }
+        poiAdapter.add(datas);
+        poiAdapter.notifyDataSetChanged();
+    }
+
+    private void markChange(boolean select, POIData poiData) {
+        if (select) {
+            poiData.typeCode = 1;
+            for(int i = 0; i < datas.size() ; i++) {
+                if(datas.get(i).typeCode != poiData.typeCode) {
+                    datas.add(i, poiData);
+                    break;
+                }
+            }
+            if(datas.get(0).typeCode != 0) {
+                datas.add(0, new POIData(0));
+            }
+        } else {
+            for (int i = 0 ; i < datas.size() ; i++) {
+                if(datas.get(i)._id==poiData._id) {
+                    datas.remove(i);
+                    break;
+                }
+            }
+            if(datas.get(0).typeCode == 0 && datas.get(1).typeCode == 2) {
+                datas.remove(0);
+            }
+        }
+        poiAdapter.add(datas);
+        poiAdapter.notifyDataSetChanged();
+    }
+
     private void cancelSearch() {
-        imm.hideSoftInputFromWindow(editSearch.getWindowToken(), 0);
+        if(imm != null) {
+            imm.hideSoftInputFromWindow(editSearch.getWindowToken(), 0);
+        }
         emptySearch.setVisibility(View.VISIBLE);
         editSearch.setVisibility(View.GONE);
         editSearch.setText("");
@@ -138,53 +197,109 @@ public class SearchPoiDialogFragment extends DialogFragment {
         Display display = wm.getDefaultDisplay();
         wlp.windowAnimations = R.style.LocationDialogAnimation;
         wlp.gravity = Gravity.BOTTOM;
-        wlp.height = (int)(display.getHeight() * 0.9f);
+        wlp.height = (int) (display.getHeight() * 0.9f);
         getDialog().getWindow().setDimAmount(0);
         window.setAttributes(wlp);
     }
+    // 별을 눌렀을 때
+    @Override
+    public void onMarkCallback(boolean select, POIData poiData) {
+        SQLiteDatabase dbHandler = userDB.getWritableDatabase();
+        Cursor resultExist = null;
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        queryBuilder.setTables(UserDB.UserMark.TABLE_MARK_NAME);
 
-    // 주소 검색 리사이클러
-    public class SearchPoiRecyclerViewAdapter
-            extends RecyclerView.Adapter<SearchPoiRecyclerViewAdapter.ViewHolder> {
-
-        SearchPoiRecyclerViewAdapter() { }
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            final View view;
-            final TextView locationItem;
-
-            public ViewHolder(View view) {
-                super(view);
-                this.view = view;
-                locationItem =
-                        (TextView) view.findViewById(R.id.text_location_item);
-            }
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).
-                    inflate(R.layout.layout_search_location_item, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, final int position) {
-            holder.locationItem.setText(POIData.get(position).name);
-            holder.locationItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    searchListener.onPOISearch(POIData.get(position));
-                    cancelSearch();
-                    dismiss();
+        if (select) {
+            try {
+                String markName = poiData.name;
+                dbHandler.beginTransaction();
+                //이름이 등록되었는지 확인해 보는 쿼리 빌더
+                queryBuilder.appendWhere(UserDB.UserMark.USER_MARK_LOCATION + "='" + markName + "'");
+                //빌드된 쿼리로 결과집합을 알아 본다
+                //쿼리빌더를 사용 할 때는 첫번째 인자에 SQLiteDatabase객체를 등록함
+                resultExist = queryBuilder.query(dbHandler, null, null, null, null, null, null);
+                ContentValues markNameValues = new ContentValues();
+                if (resultExist.getCount() == 0) {
+                    //이름이 존재 하지 않는다면 걸그룹을 추가 한다.
+                    markNameValues.put(UserDB.UserMark.USER_MARK_LOCATION, markName);
+                } else { //이름이 존재 한다면 처음으로 돌아가버렷
+                    resultExist.moveToFirst();
                 }
-            });
+                markNameValues.put(UserDB.UserMark.USER_MARK_UPPER, poiData.upperAddrName);
+                markNameValues.put(UserDB.UserMark.USER_MARK_LAT, poiData.noorLat);
+                markNameValues.put(UserDB.UserMark.USER_MARK_LON, poiData.noorLon);
+                dbHandler.insert(UserDB.UserMark.TABLE_MARK_NAME, "NODATA",
+                        markNameValues);
+                markChange(select, poiData);
+                dbHandler.setTransactionSuccessful();
+            } catch (SQLiteException sqle) {
+                Log.e("SearchPOIDBError", sqle.toString());
+            } finally {
+                dbHandler.endTransaction();
+                if (resultExist != null) {
+                    resultExist.close();
+                }
+                dbHandler.close();
+            }
+        } else {
+            //빌드된 쿼리로 해당 결과 집합을 가져 온다
+            markChange(select, poiData);
+            dbHandler.execSQL("DELETE FROM " +
+                    UserDB.UserMark.TABLE_MARK_NAME
+                    + " WHERE " + UserDB.UserMark._ID +
+                    "=" + poiData._id + ";");
+            dbHandler.close();
         }
+    }
 
-        @Override
-        public int getItemCount() {
-            return POIData.size();
+    @Override
+    public void onSelectCallback(POIData poiData) {
+        searchListener.onPOISearch(poiData);
+        cancelSearch();
+        dismiss();
+    }
+
+    private ArrayList<POIData> userMarkList() {
+        SQLiteDatabase dbHandler = userDB.getReadableDatabase();
+
+        //걸그룹 테이블의 ID와 뮤직테이블 ID값의 해당하는 데이터를 가져오는 쿼리를 빌드
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        queryBuilder.setTables(UserDB.UserMark.TABLE_MARK_NAME);
+
+        //결과 집합으로 가져올 컬럼의 이름들(2개 이상 테이블로 빌드시 풀네임을 주어야 함)
+        String columnsToReturn[] = {
+                UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark._ID,
+                UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_LOCATION,
+                UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_UPPER,
+                UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_LAT,
+                UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_LON
+        };
+        //빌드된 쿼리로 해당 결과 집합을 가져 온다
+        Cursor joinResultSet = queryBuilder.query(dbHandler,
+                columnsToReturn, null, null, null, null,
+                "tbl_user_mark." + UserDB.UserMark.SORT_ORDER);
+
+        ArrayList<POIData> poiDatas = new ArrayList<POIData>();
+        if (joinResultSet.moveToFirst()) {
+            int resultSetSize = joinResultSet.getCount();
+            for (int i = 0; i < resultSetSize; i++) {
+                poiDatas.add(new POIData(
+                        joinResultSet.getLong(
+                                joinResultSet.getColumnIndex(UserDB.UserMark._ID)),
+                        joinResultSet.getString(
+                                joinResultSet.getColumnIndex(UserDB.UserMark.USER_MARK_LOCATION)),
+                        joinResultSet.getString(
+                                joinResultSet.getColumnIndex(UserDB.UserMark.USER_MARK_UPPER)),
+                        joinResultSet.getString(
+                                joinResultSet.getColumnIndex(UserDB.UserMark.USER_MARK_LAT)),
+                        joinResultSet.getString(
+                                joinResultSet.getColumnIndex(UserDB.UserMark.USER_MARK_LON))));
+                joinResultSet.moveToNext();
+            } //for문 끝
         }
+        joinResultSet.close();
+        dbHandler.close();
+        return poiDatas;
     }
 
     // 지역검색 AsyncTask
@@ -192,7 +307,7 @@ public class SearchPoiDialogFragment extends DialogFragment {
         @Override
         protected SearchPoiInfo doInBackground(String... args) {
             Response response = null;
-            try{
+            try {
                 OkHttpClient toServer = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
@@ -215,7 +330,7 @@ public class SearchPoiDialogFragment extends DialogFragment {
                     return ParseDataParseHandler.getJSONPoiList(
                             new StringBuilder(responseBody.string()));
                 }
-            }catch (UnknownHostException une) {
+            } catch (UnknownHostException une) {
                 e("connectionFail", une.toString());
             } catch (UnsupportedEncodingException uee) {
                 e("connectionFail", uee.toString());
@@ -231,15 +346,28 @@ public class SearchPoiDialogFragment extends DialogFragment {
 
         @Override
         protected void onPostExecute(SearchPoiInfo result) {
-            if(result != null && result.POIData.size() > 0){
-                POIData.clear();
-                for(int i = 0; i < result.POIData.size() ; i++) {
-                    POIData.add(result.POIData.get(i));
+            if (result != null && result.POIData.size() > 0) {
+                datas.clear();
+                markInit();
+                for (POIData poiData : result.POIData) {
+                    datas.add(poiData);
                 }
+                if(markedList != null && markedList.size() > 0) {
+                    datas.add(markedList.size() + 1, new POIData(2));
+                } else {
+                    datas.add(0, new POIData(2));
+                }
+                poiAdapter.add(datas);
                 poiAdapter.notifyDataSetChanged();
-                searchRecycler.setAdapter(poiAdapter);
-
             }
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (userDB != null) {
+            userDB.close();
         }
     }
 }

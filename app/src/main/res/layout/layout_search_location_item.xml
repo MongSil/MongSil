@@ -5,7 +5,7 @@
     android:layout_height="45dp">
 
     <ImageView
-        android:id="@+id/img_gray_star"
+        android:id="@+id/img_star"
         android:src="@drawable/gray_star"
         android:layout_width="30dp"
         android:layout_height="30dp"
@@ -24,8 +24,8 @@
         android:layout_centerVertical="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toRightOf="@+id/img_gray_star"
-        android:layout_toEndOf="@+id/img_gray_star" />
+        android:layout_toRightOf="@+id/img_star"
+        android:layout_toEndOf="@+id/img_star" />
     <View
         android:background="@color/little_dark_gray"
         android:layout_width="match_parent"

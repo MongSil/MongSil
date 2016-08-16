@@ -168,20 +168,6 @@ public class PostRecyclerViewAdapter
             myPostInfo.setText(
                     String.valueOf(TimeData.PostTime(date[1])
                             + " - 댓글 " + post.replyCount));
-            if(String.valueOf(post.userId).equals(PropertyManager.getInstance().getUserId())) {
-                imgThreeDot.setVisibility(View.VISIBLE);
-                imgThreeDot.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        postData = post;
-                        /*.beginTransaction()
-                            .add(BottomEditDialogFragment.newInstance(postData),
-                                    "bottom_user_post").commit();*/
-                    }
-                });
-            } else {
-                imgThreeDot.setVisibility(View.GONE);
-            }
             myPostCard.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
