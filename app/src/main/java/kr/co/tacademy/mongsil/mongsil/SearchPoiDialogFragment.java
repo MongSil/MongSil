@@ -155,12 +155,15 @@ public class SearchPoiDialogFragment extends DialogFragment
         if (select) {
             poiData.typeCode = 1;
             for(int i = 0; i < datas.size() ; i++) {
+                if(datas.get(i)._id != poiData._id) {
+                    break;
+                }
                 if(datas.get(i).typeCode != poiData.typeCode) {
                     datas.add(i, poiData);
                     break;
                 }
             }
-            if(datas.get(0).typeCode != 0) {
+            if(datas.get(0).typeCode != 0 && datas.get(1).typeCode != 2) {
                 datas.add(0, new POIData(0));
             }
         } else {
