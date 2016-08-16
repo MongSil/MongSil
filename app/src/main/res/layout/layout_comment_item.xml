@@ -35,7 +35,6 @@
         android:layout_toEndOf="@+id/img_profile" />
     <TextView
         android:id="@+id/text_comment_content"
-        android:singleLine="true"
         android:layout_marginRight="26dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

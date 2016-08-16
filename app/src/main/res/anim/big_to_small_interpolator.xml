@@ -6,7 +6,7 @@
         android:duration="@android:integer/config_mediumAnimTime"
         android:fromXScale="1.0"
         android:fromYScale="1.0"
-        android:pivotX="50%p"
+        android:pivotX="60%p"
         android:pivotY="2%p"
         android:toXScale="0.0"
         android:toYScale="0.0" />

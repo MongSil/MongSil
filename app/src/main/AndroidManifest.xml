@@ -52,10 +52,10 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PostDetailActivity"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".PostingActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize" />
+            android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
         <activity android:name=".CameraGalleryActivity" />
 
         <receiver android:name=".CheckNetwork">

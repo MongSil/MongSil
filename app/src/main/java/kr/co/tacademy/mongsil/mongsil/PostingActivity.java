@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -126,6 +127,7 @@ public class PostingActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posting);
+        AndroidBug5497Workaround.assistActivity(this);
 
         final Intent intent = getIntent();
 
@@ -244,6 +246,12 @@ public class PostingActivity extends BaseActivity
 
         // 포스팅
         editPosting = (EditText) findViewById(R.id.edit_posting);
+        editPosting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
         editPosting.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {

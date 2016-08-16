@@ -59,7 +59,6 @@ public class SearchPoiDialogFragment extends DialogFragment
         }
     }
 
-
     TextView emptySearch;
     EditText editSearch;
     ImageView imgSearchCancel;
@@ -154,6 +153,7 @@ public class SearchPoiDialogFragment extends DialogFragment
     private void markChange(boolean select, POIData poiData) {
         if (select) {
             poiData.typeCode = 1;
+            datas.add(0, new POIData(0));
             for(int i = 0; i < datas.size() ; i++) {
                 if(datas.get(i)._id != poiData._id) {
                     break;
@@ -163,8 +163,11 @@ public class SearchPoiDialogFragment extends DialogFragment
                     break;
                 }
             }
-            if(datas.get(0).typeCode != 0 && datas.get(1).typeCode != 2) {
-                datas.add(0, new POIData(0));
+            for(int i = 1; i < datas.size() ; i++) {
+                if (datas.get(i).typeCode == 0) {
+                    datas.remove(i);
+                    break;
+                }
             }
         } else {
             for (int i = 0 ; i < datas.size() ; i++) {
@@ -173,8 +176,13 @@ public class SearchPoiDialogFragment extends DialogFragment
                     break;
                 }
             }
-            if(datas.get(0).typeCode == 0 && datas.get(1).typeCode == 2) {
-                datas.remove(0);
+            if(datas.size() == 2 && datas.get(0).typeCode == 0) {
+                datas.clear();
+            }
+            if(!datas.isEmpty()) {
+                if (datas.get(0).typeCode == 0 && datas.get(1).typeCode == 2) {
+                    datas.remove(0);
+                }
             }
         }
         poiAdapter.add(datas);
@@ -200,7 +208,7 @@ public class SearchPoiDialogFragment extends DialogFragment
         Display display = wm.getDefaultDisplay();
         wlp.windowAnimations = R.style.LocationDialogAnimation;
         wlp.gravity = Gravity.BOTTOM;
-        wlp.height = (int) (display.getHeight() * 0.9f);
+        wlp.height = (int) (display.getHeight() * 0.925f);
         getDialog().getWindow().setDimAmount(0);
         window.setAttributes(wlp);
     }

@@ -10,6 +10,7 @@
         android:id="@+id/text_search_location_header"
         android:text="@string/search_location_mark_header"
         android:textSize="13sp"
+        android:textColor="@color/dark_gray"
         android:layout_marginLeft="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
