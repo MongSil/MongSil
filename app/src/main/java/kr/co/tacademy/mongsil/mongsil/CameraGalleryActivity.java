@@ -11,7 +11,7 @@ import android.widget.TextView;
 /**
  * Created by Han on 2016-07-30.
  */
-// deplicate
+@Deprecated
 public class CameraGalleryActivity extends BaseActivity {
 
     @Override

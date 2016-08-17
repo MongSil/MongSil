@@ -10,6 +10,7 @@ public class Post implements Parcelable{
     public static final int TYPE_LAYOUT_DATE = 0;
     public static final int TYPE_LAYOUT_POST = 1;
     public static final int TYPE_LAYOUT_MY_POST = 2;
+    public static final int TYPE_LAYOUT_MY_DATE = 3;
     int typeCode = 1;
 
     int    postId;

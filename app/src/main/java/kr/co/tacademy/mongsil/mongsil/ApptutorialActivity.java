@@ -130,10 +130,6 @@ public class AppTutorialActivity extends BaseActivity {
         public void transformPage(View page, float position) {
             int pageWidth = page.getWidth();
 
-
-            View title = page.findViewById(R.id.text_tutorial_title);
-            View explain = page.findViewById(R.id.text_tutorial_explain);
-
             /*// 첫번째
             View cloudCutTwo = page.findViewById(R.id.img_one_cloud02_cut);
             View cloudCutThree = page.findViewById(R.id.img_one_cloud03_cut);
@@ -153,14 +149,6 @@ public class AppTutorialActivity extends BaseActivity {
             if(position <= -1.0f || position >= 1.0f) {
             } else if( position == 0.0f ) {
             } else {
-                if (title != null) {
-                    title.setTranslationX(pageWidth * position);
-                    title.setAlpha(1.0f - Math.abs(position));
-                }
-                if (explain != null) {
-                    explain.setTranslationX(pageWidth * position);
-                    explain.setAlpha(1.0f - Math.abs(position));
-                }
 
                 /*// 첫번째
                 if (cloudCutTwo != null) {

@@ -22,12 +22,12 @@ public class TimeData {
 
 
     // day formats
-    public static String dayFormat =
-          new SimpleDateFormat("dd", Locale.ENGLISH).format(now);
-    public static String weakFormat =
+    public static String mainDateFormat =
+          new SimpleDateFormat("yyyy년 M월 d일", Locale.ENGLISH).format(now);
+    /*public static String weakFormat =
           new SimpleDateFormat("EEEE", Locale.ENGLISH).format(now);
     public static String monthFormat =
-          new SimpleDateFormat("MMMM", Locale.ENGLISH).format(now);
+          new SimpleDateFormat("MMMM", Locale.ENGLISH).format(now);*/
 
     // date formats
     private static SimpleDateFormat dateFormat =

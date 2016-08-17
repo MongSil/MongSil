@@ -1,110 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="kr.co.tacademy.mongsil.mongsil.MainActivity">
 
     <!-- 메인 화면 -->
-    <LinearLayout
-        android:orientation="vertical"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
         <!-- 날씨 -->
-        <FrameLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/main_weather_container"
-            android:background="@drawable/background_small_rain"
             android:layout_width="match_parent"
-            android:layout_height="253dp">
+            android:layout_height="253dp"
+            android:background="@drawable/background_small_rain">
+
+            <!-- 툴바 -->
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/toolbar_size"
+                android:theme="@style/ToolBar"
+                app:titleTextAppearance="@style/ToolBar.TitleText">
+
+                <TextView
+                    android:id="@+id/toolbar_title"
+                    style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:clickable="true"
+                    android:drawableLeft="@drawable/icon_nevi"
+                    android:drawablePadding="3dp"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/toolbar_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:paddingRight="@dimen/activity_horizontal_padding"
+                    android:scaleType="center"
+                    android:src="@drawable/search" />
+            </android.support.v7.widget.Toolbar>
+
             <ImageView
                 android:id="@+id/anim_background_weather"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-            <LinearLayout
-                android:gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_below="@+id/toolbar"
+                android:layout_centerHorizontal="true">
 
                 <ImageView
                     android:id="@+id/img_weather_icon"
-                    android:layout_marginTop="10dp"
-                    android:layout_width="123dp"
-                    android:layout_height="123dp"/>
-                <LinearLayout
-                    android:id="@+id/Linear_weather"
-                    android:orientation="vertical"
-                    android:layout_marginLeft="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-                        <TextView
-                            android:id="@+id/text_day"
-                            android:textSize="25sp"
-                            android:textStyle="bold"
-                            android:singleLine="true"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView
-                            android:id="@+id/text_week"
-                            android:textSize="10sp"
-                            android:singleLine="true"
-                            android:layout_marginLeft="10dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-                    <TextView
-                        android:id="@+id/text_month"
-                        android:textSize="20sp"
-                        android:layout_marginTop="3dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-                </LinearLayout>
-            </LinearLayout>
-        </FrameLayout>
+                    android:layout_marginRight="10dp"
+                    android:layout_width="140dp"
+                    android:layout_height="133dp" />
 
+                <TextView
+                    android:id="@+id/text_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="25dp"
+                    android:paddingBottom="8dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/img_weather_icon"
+                    android:layout_toEndOf="@+id/img_weather_icon" />
+
+                <TextView
+                    android:id="@+id/text_weathername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:textColor="@android:color/white"
+                    android:textSize="27sp"
+                    android:layout_below="@+id/text_date"
+                    android:layout_toRightOf="@+id/img_weather_icon"
+                    android:layout_toEndOf="@+id/img_weather_icon" />
+            </RelativeLayout>
+        </RelativeLayout>
         <!-- 글목록 컨테이너 -->
         <FrameLayout
             android:id="@+id/main_post_fragment_container"
-            android:background="@color/gray"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </FrameLayout>
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:layout_below="@+id/main_weather_container"
+            android:background="@color/gray" />
+    </RelativeLayout>
 
-    <!-- 툴바 -->
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/toolbar_size"
-        android:theme="@style/ToolBar"
-        app:titleTextAppearance="@style/ToolBar.TitleText">
-        <TextView
-            android:id="@+id/toolbar_title"
-            android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:drawableLeft="@drawable/icon_nevi"
-            android:drawablePadding="3dp"
-            style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-            android:clickable="true"
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center" />
-        <ImageView
-            android:id="@+id/toolbar_search"
-            android:src="@drawable/search"
-            android:paddingRight="@dimen/activity_horizontal_padding"
-            android:scaleType="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end" />
-    </android.support.v7.widget.Toolbar>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_capture_post"

@@ -64,14 +64,14 @@ public class SearchPOIRecyclerViewAdapter
                     (TextView) view.findViewById(R.id.text_location_item);
         }
 
-        private void setData(final POIData poiData) {
+        private void setData(final POIData poiData, final int position) {
             if (poiData.typeCode == 1) {
                 imgStar.setImageResource(R.drawable.yellow_star);
                 imgStar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         imgStar.setImageResource(R.drawable.gray_star);
-                        callback.onMarkCallback(false, poiData);
+                        callback.onMarkCallback(false, poiData, position);
                     }
                 });
                 locationItem.setText(poiData.name);
@@ -81,8 +81,9 @@ public class SearchPOIRecyclerViewAdapter
                 imgStar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        items.get(position);
                         imgStar.setImageResource(R.drawable.yellow_star);
-                        callback.onMarkCallback(true, poiData);
+                        callback.onMarkCallback(true, poiData, position);
                     }
                 });
             }
@@ -118,7 +119,7 @@ public class SearchPOIRecyclerViewAdapter
                 ((HeaderViewHolder) holder).setData(items.get(position).typeCode);
                 break;
             case LAYOUT_TYPE_ITEM:
-                ((ItemViewHolder) holder).setData(items.get(position));
+                ((ItemViewHolder) holder).setData(items.get(position), position);
                 break;
         }
     }

@@ -164,13 +164,13 @@ public class ParseDataParseHandler {
         return null;
     }
 
-    public static SearchPoiInfo getJSONPoiList(StringBuilder buf) {
+    public static SearchPOIInfo getJSONPoiList(StringBuilder buf) {
 
         // 전체
         JSONObject jsonObject = null;
 
         // searchPoiInfo
-        SearchPoiInfo searchPoiInfo;
+        SearchPOIInfo searchPoiInfo;
         JSONObject jsonPois = null;
 
         // POIData Array
@@ -200,7 +200,7 @@ public class ParseDataParseHandler {
                 jsonPOIDataList.add(POIData);
             }
 
-            searchPoiInfo = new SearchPoiInfo(jsonPOIDataList);
+            searchPoiInfo = new SearchPOIInfo(jsonPOIDataList);
             searchPoiInfo.totalCount = jsonObject.getInt("totalCount");
             searchPoiInfo.page = jsonObject.getInt("page");
 

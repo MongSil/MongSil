@@ -17,8 +17,6 @@ import android.widget.TextView;
 public class TutorialPane extends Fragment{
     final static String LAYOUT_POSITION = "layoutposition";
 
-    TextView tutorialTitle, tutorialExplain;
-
     public static TutorialPane newInstance(int layoutPosition) {
         TutorialPane tutorialPane = new TutorialPane();
         Bundle args = new Bundle();

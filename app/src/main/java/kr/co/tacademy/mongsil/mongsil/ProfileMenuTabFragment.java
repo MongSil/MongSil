@@ -118,7 +118,7 @@ public class ProfileMenuTabFragment extends Fragment {
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
                         .build();
-                // MainPostFragment 참조
+
                 Request request = new Request.Builder()
                         .url(String.format(
                                 NetworkDefineConstant.GET_SERVER_USER_POST,
@@ -161,11 +161,11 @@ public class ProfileMenuTabFragment extends Fragment {
 
                     String toCompare = result.post.get(i).date.split(" ")[0];
                     if(TimeData.compareDate(compare, toCompare)) {
-                        result.post.add(i+1, new Post(0, result.post.get(i+1).date));
+                        result.post.add(i+1, new Post(3, result.post.get(i+1).date));
                         compare = toCompare;
                     }
                     if(i == 0) {
-                        result.post.add(0, new Post(0, result.post.get(0).date));
+                        result.post.add(0, new Post(3, result.post.get(0).date));
                     }
                 }
                 postAdapter.add(result.post);

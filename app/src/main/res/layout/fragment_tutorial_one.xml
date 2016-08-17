@@ -33,13 +33,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
         android:scaleType="fitXY" />
-    <ImageView
-        android:id="@+id/cloud04_cut"
-        android:src="@drawable/cloud04_cut_01"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:scaleType="fitXY" />
 
     <LinearLayout
         android:orientation="vertical"

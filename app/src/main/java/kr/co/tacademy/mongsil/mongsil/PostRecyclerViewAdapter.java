@@ -35,7 +35,8 @@ public class PostRecyclerViewAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int LAYOUT_DATE = 1000;
     private static final int LAYOUT_POST = 2000;
-    private static final int LAYOUT_MY_POST = 3000;
+    private static final int LAYOUT_MY_DATE = 3000;
+    private static final int LAYOUT_MY_POST = 4000;
 
     List<Post> items;
     Context context;
@@ -132,6 +133,25 @@ public class PostRecyclerViewAdapter
         }
     }
 
+    // 나의 이야기 날짜를 표시하는 뷰홀더
+    public class MyDateViewHolder extends RecyclerView.ViewHolder {
+        final View view;
+        final TextView postDate;
+
+        public MyDateViewHolder(View view) {
+            super(view);
+            this.view = view;
+            postDate = (TextView) view.findViewById(R.id.text_my_post_date);
+        }
+
+        public void setData(Post post) {
+            postDate.setText(TimeData.dateCalculate(post.date));
+            if(post.typeCode == 2) {
+                postDate.setTextColor(0xEBEBEB);
+            }
+        }
+    }
+
     // 나의 이야기 탭 부분 뷰홀더
     public class MyPostViewHolder extends RecyclerView.ViewHolder {
         final View view;
@@ -191,6 +211,9 @@ public class PostRecyclerViewAdapter
             case LAYOUT_POST :
                 view = inflater.inflate(R.layout.layout_post_item, parent, false);
                 return new PostViewHolder(view);
+            case LAYOUT_MY_DATE :
+                view = inflater.inflate(R.layout.layout_my_post_date, parent, false);
+                return new MyDateViewHolder(view);
             case LAYOUT_MY_POST :
                 view = inflater.inflate(R.layout.layout_my_post_item, parent, false);
                 return new MyPostViewHolder(view);
@@ -207,6 +230,9 @@ public class PostRecyclerViewAdapter
             case LAYOUT_POST:
                 ((PostViewHolder) holder).setData(items.get(position));
                 break;
+            case LAYOUT_MY_DATE:
+                ((MyDateViewHolder) holder).setData(items.get(position));
+                break;
             case LAYOUT_MY_POST:
                 ((MyPostViewHolder) holder).setData(items.get(position));
                 break;
@@ -221,6 +247,8 @@ public class PostRecyclerViewAdapter
                 return LAYOUT_DATE;
             case Post.TYPE_LAYOUT_POST :
                 return LAYOUT_POST;
+            case Post.TYPE_LAYOUT_MY_DATE :
+                return LAYOUT_MY_DATE;
             case Post.TYPE_LAYOUT_MY_POST :
                 return LAYOUT_MY_POST;
         }

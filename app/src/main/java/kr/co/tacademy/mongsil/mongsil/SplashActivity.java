@@ -1,15 +1,11 @@
 package kr.co.tacademy.mongsil.mongsil;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -29,26 +25,17 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-import static android.util.Log.e;
-
 public class SplashActivity extends BaseActivity {
-    private static final int PERMISSION_REQUEST_PHONE_STATE = 100;
-
     LinearLayout splashContainer;
     ImageView imgSplashHere, imgSplashTitle;
     ImageView imgSplashMongsil, imgSplashShadow;
     Handler handler = new Handler();
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        checkPermission();
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        new AsyncLoginRequest().execute();
         splashContainer = (LinearLayout) findViewById(R.id.splash_container);
         // 타이틀
         imgSplashHere = (ImageView) findViewById(R.id.img_splash_title_text);
@@ -104,6 +91,10 @@ public class SplashActivity extends BaseActivity {
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
                         .build();
+
+                if(PropertyManager.getInstance().getDeviceId().isEmpty()) {
+                    PropertyManager.getInstance().setDeviceId(getDevicesUUID());
+                }
 
                 //요청 Body 세팅==> 그전 Query Parameter세팅과 같은 개념
                 RequestBody formBody = new FormBody.Builder()
@@ -186,51 +177,15 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
-    public void checkPermission() {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE},
-                            PERMISSION_REQUEST_PHONE_STATE);
-            } else {
-                //사용자가 언제나 허락
-                if (PropertyManager.getInstance().getDeviceId().isEmpty()) {
-                    PropertyManager.getInstance().setDeviceId(getDevicesUUID());
-                }
-                Log.e("생성된 UUID", PropertyManager.getInstance().getDeviceId());
-                new AsyncLoginRequest().execute();
-            }
-        }
-    }
-
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_REQUEST_PHONE_STATE:
-                //사용자가 퍼미션을 OK했을 경우
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (PropertyManager.getInstance().getDeviceId().isEmpty()) {
-                        PropertyManager.getInstance().setDeviceId(getDevicesUUID());
-                    }
-                    Log.e("생성된 UUID", PropertyManager.getInstance().getDeviceId());
-                    new AsyncLoginRequest().execute();
-                } else {
-                    //사용자가 퍼미션을 거절했을 경우
-                    finish();
-                }
-                break;
-        }
-    }
-
     private String getDevicesUUID() {
-        final TelephonyManager tm = (TelephonyManager)
-                getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-        final String tmDevice, tmSerial, androidId;
-        tmDevice = "" + tm.getDeviceId();
-        tmSerial = "" + tm.getSimSerialNumber();
-        androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-        UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
-        String deviceId = deviceUuid.toString();
-        Log.e("생성된 UUID : ", deviceId);
-        return deviceId;
+        UUID deviceUUID = null;
+        try {
+            String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+            deviceUUID = UUID.nameUUIDFromBytes(deviceId.getBytes("utf8"));
+            Log.e("생성된 UUID : ", deviceId);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return deviceUUID.toString();
     }
 }

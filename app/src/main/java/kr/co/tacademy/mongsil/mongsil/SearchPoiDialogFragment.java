@@ -43,7 +43,7 @@ import static android.util.Log.e;
  * Created by ccei on 2016-08-02.
  * POI 검색 -> 지역 선택 -> 위도경도 불러옴 -> 날씨 API
  */
-public class SearchPoiDialogFragment extends DialogFragment
+public class SearchPOIDialogFragment extends DialogFragment
         implements AdapterCallback {
     public static interface OnPOISearchListener {
         public abstract void onPOISearch(POIData POIData);
@@ -59,6 +59,7 @@ public class SearchPoiDialogFragment extends DialogFragment
         }
     }
 
+
     TextView emptySearch;
     EditText editSearch;
     ImageView imgSearchCancel;
@@ -72,7 +73,7 @@ public class SearchPoiDialogFragment extends DialogFragment
     ArrayList<POIData> markedList;
     ArrayList<POIData> datas;
 
-    public SearchPoiDialogFragment() {
+    public SearchPOIDialogFragment() {
     }
 
     @Override
@@ -150,7 +151,7 @@ public class SearchPoiDialogFragment extends DialogFragment
         poiAdapter.notifyDataSetChanged();
     }
 
-    private void markChange(boolean select, POIData poiData) {
+    private void markChange(boolean select, POIData poiData, int position) {
         if (select) {
             poiData.typeCode = 1;
             datas.add(0, new POIData(0));
@@ -214,7 +215,7 @@ public class SearchPoiDialogFragment extends DialogFragment
     }
     // 별을 눌렀을 때
     @Override
-    public void onMarkCallback(boolean select, POIData poiData) {
+    public void onMarkCallback(boolean select, POIData poiData, int position) {
         SQLiteDatabase dbHandler = userDB.getWritableDatabase();
         Cursor resultExist = null;
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
@@ -241,7 +242,7 @@ public class SearchPoiDialogFragment extends DialogFragment
                 markNameValues.put(UserDB.UserMark.USER_MARK_LON, poiData.noorLon);
                 dbHandler.insert(UserDB.UserMark.TABLE_MARK_NAME, "NODATA",
                         markNameValues);
-                markChange(select, poiData);
+                markChange(select, poiData, position);
                 dbHandler.setTransactionSuccessful();
             } catch (SQLiteException sqle) {
                 Log.e("SearchPOIDBError", sqle.toString());
@@ -254,7 +255,7 @@ public class SearchPoiDialogFragment extends DialogFragment
             }
         } else {
             //빌드된 쿼리로 해당 결과 집합을 가져 온다
-            markChange(select, poiData);
+            markChange(select, poiData, position);
             dbHandler.execSQL("DELETE FROM " +
                     UserDB.UserMark.TABLE_MARK_NAME
                     + " WHERE " + UserDB.UserMark._ID +
@@ -314,9 +315,9 @@ public class SearchPoiDialogFragment extends DialogFragment
     }
 
     // 지역검색 AsyncTask
-    public class AsyncPoiJSONList extends AsyncTask<String, Integer, SearchPoiInfo> {
+    public class AsyncPoiJSONList extends AsyncTask<String, Integer, SearchPOIInfo> {
         @Override
-        protected SearchPoiInfo doInBackground(String... args) {
+        protected SearchPOIInfo doInBackground(String... args) {
             Response response = null;
             try {
                 OkHttpClient toServer = new OkHttpClient.Builder()
@@ -356,7 +357,7 @@ public class SearchPoiDialogFragment extends DialogFragment
         }
 
         @Override
-        protected void onPostExecute(SearchPoiInfo result) {
+        protected void onPostExecute(SearchPOIInfo result) {
             if (result != null && result.POIData.size() > 0) {
                 datas.clear();
                 markInit();

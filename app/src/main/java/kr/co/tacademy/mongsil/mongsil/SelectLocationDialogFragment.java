@@ -1,7 +1,8 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
@@ -50,7 +51,6 @@ public class SelectLocationDialogFragment extends DialogFragment {
     ArrayList<String> locationNames;
     ArrayList<Integer> locationImgs;
 
-
     RecyclerView selectLocationRecycle;
     private int selectedPos = 0;
 
@@ -72,6 +72,7 @@ public class SelectLocationDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_signup_select_location, container, false);
+
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         ((BaseActivity) getActivity()).setSupportActionBar(toolbar);
         ActionBar actionBar = ((BaseActivity) getActivity()).getSupportActionBar();
@@ -96,7 +97,7 @@ public class SelectLocationDialogFragment extends DialogFragment {
         String[] locations = LocationData.locationName;
         int[] imgLocations = {
                 R.drawable.incheon, R.drawable.seoul, R.drawable.gangwon,
-                R.drawable.cheonju, 0, R.drawable.deagu,
+                R.drawable.cheonju, R.drawable.deajeon, R.drawable.deagu,
                 R.drawable.gwangju, R.drawable.jeonju, R.drawable.ulsan,
                 R.drawable.busan, R.drawable.jeju
         };
@@ -126,13 +127,13 @@ public class SelectLocationDialogFragment extends DialogFragment {
         public class ViewHolder extends RecyclerView.ViewHolder {
 
             private final CircleImageView imgLocation;
-            private final CircleImageView imgSelector;
+            private final ImageView imgSelector;
             private final TextView location;
 
             public ViewHolder(View itemView) {
                 super(itemView);
                 imgLocation = (CircleImageView) itemView.findViewById(R.id.img_signup_location_item);
-                imgSelector = (CircleImageView) itemView.findViewById(R.id.img_selector);
+                imgSelector = (ImageView) itemView.findViewById(R.id.img_selector);
                 location = (TextView) itemView.findViewById(R.id.text_signup_location_item);
             }
         }
@@ -149,6 +150,11 @@ public class SelectLocationDialogFragment extends DialogFragment {
         public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
             viewHolder.location.setText(locationNames.get(position));
             viewHolder.imgSelector.setSelected(selectedPos == position);
+            if(viewHolder.imgSelector.isSelected()) {
+                viewHolder.imgSelector.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.imgSelector.setVisibility(View.GONE);
+            }
             viewHolder.imgLocation.setImageResource(locationImgs.get(position));
             viewHolder.imgLocation.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -170,11 +176,11 @@ public class SelectLocationDialogFragment extends DialogFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Window window = getDialog().getWindow();
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        window.setBackgroundDrawable(new ColorDrawable(0x7000000));
-        lp.copyFrom(window.getAttributes());
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        window.setAttributes(lp);
+        WindowManager.LayoutParams wlp = new WindowManager.LayoutParams();
+        // TODO : 블러 배경
+        wlp.copyFrom(window.getAttributes());
+        wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        wlp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(wlp);
     }
 }

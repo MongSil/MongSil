@@ -7,17 +7,14 @@ import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -26,11 +23,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +38,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -55,7 +48,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class PostingActivity extends BaseActivity
-        implements SearchPoiDialogFragment.OnPOISearchListener,
+        implements SearchPOIDialogFragment.OnPOISearchListener,
                 BottomPicDialogFragment.OnBottomPicDialogListener,
                 SelectWeatherFragment.OnSelectWeatherListener {
     private static final int PAGER_MAGIC_COUNT = 131072;
@@ -91,35 +84,8 @@ public class PostingActivity extends BaseActivity
         boolean tempFiles; //임시파일 유무
 
         public UpLoadValueObject(File file, boolean tempFiles) {
-            this.file = resizingFile(file);
+            this.file = file;
             this.tempFiles = tempFiles;
-        }
-
-        private File resizingFile(final File file) {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 4;
-            Matrix matrix = new Matrix();
-            matrix.postRotate(90);
-            Bitmap orgImage = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-            Bitmap resize = Bitmap.createBitmap(
-                    orgImage, 0, 0, orgImage.getWidth(), orgImage.getHeight(), matrix, true);
-            OutputStream out = null;
-            try {
-                out = new FileOutputStream(file);
-                resize.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                return file;
-            } catch (FileNotFoundException fe) {
-                fe.printStackTrace();
-            } finally {
-                try {
-                    if(out != null) {
-                        out.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return file;
         }
     }
 
@@ -127,7 +93,6 @@ public class PostingActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posting);
-        AndroidBug5497Workaround.assistActivity(this);
 
         final Intent intent = getIntent();
 
@@ -146,7 +111,7 @@ public class PostingActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(new SearchPoiDialogFragment(), "search_posting").commit();
+                        .add(new SearchPOIDialogFragment(), "search_posting").commit();
             }
         });
         tbSave = (TextView) findViewById(R.id.text_save);
@@ -246,12 +211,6 @@ public class PostingActivity extends BaseActivity
 
         // 포스팅
         editPosting = (EditText) findViewById(R.id.edit_posting);
-        editPosting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
         editPosting.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
@@ -295,6 +254,10 @@ public class PostingActivity extends BaseActivity
             tbLocation.setText(String.valueOf(postData.area1 + ", " + postData.area2));
         } else {
             tbLocation.setText(String.valueOf(postData.area1));
+        }
+
+        if (!postData.bgImg.isEmpty()) {
+            Glide.with(this).load(postData.bgImg).into(imgPostingBackground);
         }
 
         selectWeatherPager.setCurrentItem(postData.weatherCode);
@@ -371,7 +334,9 @@ public class PostingActivity extends BaseActivity
                 if (currentSelectedUri != null) {
                     //실제 Image의 full path name을 얻어온다.
                     if (findImageFileNameFromUri(currentSelectedUri)) {
-                        upLoadFile = new UpLoadValueObject(new File(currentFileName), true);
+                        File galleryPicture = new File(currentFileName);
+                        upLoadFile = new UpLoadValueObject(
+                                resizingFile(galleryPicture, "gallery"), true);
                     }
                 } else {
                     Bundle extras = data.getExtras();
@@ -382,18 +347,48 @@ public class PostingActivity extends BaseActivity
                         Log.e("임시이미지파일저장", "실패");
                     }
                 }
-                FilterIntent(currentSelectedUri);
+                filterIntent(currentSelectedUri);
                 break;
 
             }
             case PICK_FROM_CAMERA: {
                 //카메라캡쳐를 이용해 가져온 이미지
-
-                upLoadFile = new UpLoadValueObject(new File(imageDir, currentFileName), true);
-                FilterIntent(currentSelectedUri);
+                File cameraPicture = new File(imageDir, currentFileName);
+                upLoadFile = new UpLoadValueObject(
+                        resizingFile(cameraPicture, "camera"), true);
+                filterIntent(currentSelectedUri);
                 break;
             }
         }
+    }
+
+    private File resizingFile(final File file, String divider) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+        Matrix matrix = new Matrix();
+        if(divider.equals("camera")) {
+            matrix.postRotate(90);
+        }
+        Bitmap orgImage = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        Bitmap resize = Bitmap.createBitmap(
+                orgImage, 0, 0, orgImage.getWidth(), orgImage.getHeight(), matrix, true);
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            resize.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            return file;
+        } catch (FileNotFoundException fe) {
+            fe.printStackTrace();
+        } finally {
+            try {
+                if(out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return file;
     }
 
     /*public Uri getImageUri(Bitmap inImage) {
@@ -404,7 +399,7 @@ public class PostingActivity extends BaseActivity
     }*/
 
     // TODO : 필터로 변신
-    private void FilterIntent(Uri cropUri) {
+    private void filterIntent(Uri cropUri) {
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(cropUri, "image/*");
 

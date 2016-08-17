@@ -12,16 +12,19 @@
         android:layout_marginBottom="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        <de.hdodenhof.circleimageview.CircleImageView
+        <ImageView
             android:id="@+id/img_signup_location_item"
-            android:src="@color/gray"
-            android:layout_width="82dp"
-            android:layout_height="82dp" />
-        <de.hdodenhof.circleimageview.CircleImageView
+            android:scaleType="centerInside"
+            android:layout_width="73dp"
+            android:layout_height="73dp" />
+        <ImageView
             android:id="@+id/img_selector"
+            android:src="@drawable/sign_up_check"
+            android:scaleType="centerInside"
+            android:visibility="gone"
             android:background="@drawable/selector_location_item"
-            android:layout_width="82dp"
-            android:layout_height="82dp" />
+            android:layout_width="73dp"
+            android:layout_height="73dp" />
     </FrameLayout>
 
     <TextView

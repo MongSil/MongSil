@@ -6,9 +6,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.Settings;
@@ -31,8 +28,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -54,16 +51,16 @@ import okhttp3.ResponseBody;
 import static android.util.Log.e;
 
 public class MainActivity extends BaseActivity
-        implements SearchPoiDialogFragment.OnPOISearchListener,
+        implements SearchPOIDialogFragment.OnPOISearchListener,
                 MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
     // 툴바 필드
     TextView tbTitle;
     ImageView tbSearch;
 
     // 날씨 필드
-    FrameLayout weatherContainer;
+    RelativeLayout weatherContainer;
     ImageView animBackgroundWeather, imgWeatherIcon;
-    TextView day, week, month;
+    TextView date, weatherName;
 
     // 글목록 프레그먼트
     MainPostFragment mainPostFragment;
@@ -118,7 +115,7 @@ public class MainActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(new SearchPoiDialogFragment(), "search_main").commit();
+                        .add(new SearchPOIDialogFragment(), "search_main").commit();
             }
         });
         tbSearch = (ImageView) toolbar.findViewById(R.id.toolbar_search);
@@ -139,18 +136,15 @@ public class MainActivity extends BaseActivity
         slidingMenu.setMenu(loadSlidingMenu());
 
         // 날씨
-        weatherContainer = (FrameLayout) findViewById(R.id.main_weather_container);
+        weatherContainer = (RelativeLayout) findViewById(R.id.main_weather_container);
         animBackgroundWeather = (ImageView) findViewById(R.id.anim_background_weather);
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
         imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
                 R.anim.bounce_interpolator, new LinearInterpolator()));
 
-        day = (TextView) findViewById(R.id.text_day);
-        day.setText(TimeData.dayFormat);
-        week = (TextView) findViewById(R.id.text_week);
-        week.setText(TimeData.weakFormat);
-        month = (TextView) findViewById(R.id.text_month);
-        month.setText(TimeData.monthFormat);
+        date = (TextView) findViewById(R.id.text_date);
+        date.setText(TimeData.mainDateFormat);
+        weatherName = (TextView) findViewById(R.id.text_weathername);
 
         // 글쓰기 버튼
         btnCapturePost = (FloatingActionButton) findViewById(R.id.btn_capture_post);
@@ -427,6 +421,7 @@ public class MainActivity extends BaseActivity
         @Override
         protected void onPostExecute(WeatherData result) {
             if (result != null) {
+                weatherName.setText(result.name);
                 imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.code, 0));
                 weatherContainer.setBackgroundResource(WeatherData.imgFromWeatherCode(result.code, 1));
                 animBackgroundWeather.setImageResource(WeatherData.imgFromWeatherCode(result.code, 2));

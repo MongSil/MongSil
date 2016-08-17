@@ -1,6 +1,7 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
@@ -18,6 +19,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -79,35 +81,8 @@ public class EditProfileActivity extends BaseActivity
         boolean tempFiles; //임시파일 유무
 
         public UpLoadValueObject(File file, boolean tempFiles) {
-            this.file = resizingFile(file);
+            this.file = file;
             this.tempFiles = tempFiles;
-        }
-
-        private File resizingFile(final File file) {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 4;
-            Matrix matrix = new Matrix();
-            matrix.postRotate(90);
-            Bitmap orgImage = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-            Bitmap resize = Bitmap.createBitmap(
-                    orgImage, 0, 0, orgImage.getWidth(), orgImage.getHeight(), matrix, true);
-            OutputStream out = null;
-            try {
-                out = new FileOutputStream(file);
-                resize.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                return file;
-            } catch (FileNotFoundException fe) {
-                fe.printStackTrace();
-            } finally {
-                try {
-                    if(out != null) {
-                        out.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return file;
         }
     }
 
@@ -191,7 +166,9 @@ public class EditProfileActivity extends BaseActivity
         editNameContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editName.requestFocus();
+                InputMethodManager imm =
+                        (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(editName, 0);
             }
         });
 
@@ -269,7 +246,9 @@ public class EditProfileActivity extends BaseActivity
                 if (currentSelectedUri != null) {
                     //실제 Image의 full path name을 얻어온다.
                     if (findImageFileNameFromUri(currentSelectedUri)) {
-                        upLoadFile = new UpLoadValueObject(new File(currentFileName), true);
+                        File galleryPicture = new File(currentFileName);
+                        upLoadFile = new UpLoadValueObject(
+                                resizingFile(galleryPicture, "gallery"), true);
                     }
                 } else {
                     Bundle extras = data.getExtras();
@@ -286,20 +265,41 @@ public class EditProfileActivity extends BaseActivity
             }
             case PICK_FROM_CAMERA: {
                 //카메라캡쳐를 이용해 가져온 이미지
-
-                upLoadFile = new UpLoadValueObject(new File(imageDir, currentFileName), true);
+                File cameraPicture = new File(imageDir, currentFileName);
+                upLoadFile = new UpLoadValueObject(
+                        resizingFile(cameraPicture, "camera"), true);
                 cropIntent(currentSelectedUri);
                 break;
             }
         }
     }
 
-    /*public Uri getImageUri(Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(getContentResolver(), inImage, currentFileName, null);
-        return Uri.parse(path);
-    }*/
+    private File resizingFile(final File file, String divider) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+        Matrix matrix = new Matrix();
+        matrix.postRotate(90);
+        Bitmap orgImage = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        Bitmap resize = Bitmap.createBitmap(
+                orgImage, 0, 0, orgImage.getWidth(), orgImage.getHeight(), matrix, true);
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            resize.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            return file;
+        } catch (FileNotFoundException fe) {
+            fe.printStackTrace();
+        } finally {
+            try {
+                if(out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return file;
+    }
 
     private  void  cropIntent(Uri cropUri){
         Intent intent = new Intent("com.android.camera.action.CROP");

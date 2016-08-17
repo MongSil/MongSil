@@ -120,7 +120,18 @@ public class PostDetailActivity extends BaseActivity
         } else {
             tbTitle.setText(String.valueOf(post.area1));
         }
-        if(String.valueOf(post.userId).equals(PropertyManager.getInstance().getUserId())) {
+
+        // background 이미지
+        if (!post.bgImg.isEmpty()) {
+            Glide.with(this).load(post.bgImg).into(imgBackground);
+        } else {
+            // TODO : weatherCode에 맞는 테마 배경을 넣어야함
+            // WeatherData.imgFromWeatherCode(String.valueOf(post.weatherCode), 1));
+            imgBackground.setImageResource(R.drawable.splash_background);
+        }
+
+        if(PropertyManager.getInstance().getUserId().equals(String.valueOf(post.userId))) {
+            tbThreeDot.setVisibility(View.VISIBLE);
             tbThreeDot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -130,15 +141,6 @@ public class PostDetailActivity extends BaseActivity
             });
         } else {
             tbThreeDot.setVisibility(View.GONE);
-        }
-
-        // background 이미지
-        if (!post.bgImg.isEmpty()) {
-            Glide.with(this).load(post.bgImg).into(imgBackground);
-        } else {
-            // TODO : weatherCode에 맞는 테마 배경을 넣어야함
-            // WeatherData.imgFromWeatherCode(String.valueOf(post.weatherCode), 1));
-            imgBackground.setImageResource(R.drawable.splash_background);
         }
         // 날씨 아이콘
         imgWeatherIcon.setImageResource(

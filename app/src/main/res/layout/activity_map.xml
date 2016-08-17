@@ -5,17 +5,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/map"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="kr.co.tacademy.mongsil.mongsil.MapActivity">
-
-    <ImageView
-        android:id="@+id/img_map_background"
-        android:background="@drawable/test_map"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:background="@color/dark_transparent_background"
@@ -34,125 +29,100 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <kr.co.tacademy.mongsil.mongsil.CustomWeatherButton
-            android:id="@+id/jeju"
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_incheon"
+            app:textLocationName="@string/incheon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/map_seoul"
+            android:layout_toStartOf="@id/map_seoul"/>
+
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_seoul"
+            app:textLocationName="@string/seoul"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"/>
+
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_gangwon"
+            app:textLocationName="@string/gangwon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/map_seoul"
+            android:layout_toEndOf="@id/map_seoul" />
+
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_chungju"
+            app:textLocationName="@string/chungju"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/map_seoul"/>
+
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_junju"
+            app:textLocationName="@string/junju"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
+
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_daejeon"
+            app:textLocationName="@string/daejeon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/map_junju"
+            android:layout_toEndOf="@id/map_junju"/>
+
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_gwangju"
+            app:textLocationName="@string/gwangju"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/map_junju"
+            android:layout_toEndOf="@id/map_junju" />
+
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_daegu"
+            app:textLocationName="@string/daegu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/map_ulsan"
+            android:layout_toStartOf="@id/map_ulsan" />
+
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_ulsan"
+            app:textLocationName="@string/ulsan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"/>
+
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_busan"
+            app:textLocationName="@string/busan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/map_ulsan"
+            android:layout_toStartOf="@id/map_ulsan" />
+
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_jeju"
             app:textLocationName="@string/jeju"
-            app:imgLocationBackground="@drawable/shape_weather_button"
-            app:imgLocationWeatherIcon="@drawable/anim_list_icon_mongsil_bolt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true" />
 
-        <kr.co.tacademy.mongsil.mongsil.CustomWeatherButton
-            android:id="@+id/busan"
-            app:textLocationName="@string/busan"
-            app:imgLocationBackground="@drawable/shape_weather_button"
-            app:imgLocationWeatherIcon="@drawable/anim_list_icon_mongsil_bolt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/jeju"
-            android:layout_alignLeft="@+id/jeju"
-            android:layout_alignStart="@+id/jeju" />
-
-        <kr.co.tacademy.mongsil.mongsil.CustomWeatherButton
-            android:id="@+id/ulsan"
-            app:textLocationName="@string/ulsan"
-            app:imgLocationBackground="@drawable/shape_weather_button"
-            app:imgLocationWeatherIcon="@drawable/anim_list_icon_mongsil_bolt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/busan"
-            android:layout_toRightOf="@+id/busan"
-            android:layout_toEndOf="@+id/busan" />
-
-        <kr.co.tacademy.mongsil.mongsil.CustomWeatherButton
-            android:id="@+id/junra"
-            app:textLocationName="@string/junju"
-            app:imgLocationBackground="@drawable/shape_weather_button"
-            app:imgLocationWeatherIcon="@drawable/anim_list_icon_mongsil_bolt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/ulsan"
-            android:layout_toLeftOf="@+id/ulsan"
-            android:layout_toStartOf="@+id/ulsan" />
-
-        <kr.co.tacademy.mongsil.mongsil.CustomWeatherButton
-            android:id="@+id/gwangju"
-            app:textLocationName="@string/gwangju"
-            app:imgLocationBackground="@drawable/shape_weather_button"
-            app:imgLocationWeatherIcon="@drawable/anim_list_icon_mongsil_bolt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/busan"
-            android:layout_toLeftOf="@+id/busan"
-            android:layout_toStartOf="@+id/busan" />
-
-        <kr.co.tacademy.mongsil.mongsil.CustomWeatherButton
-            android:id="@+id/daegu"
-            app:textLocationName="@string/daegu"
-            app:imgLocationBackground="@drawable/shape_weather_button"
-            app:imgLocationWeatherIcon="@drawable/anim_list_icon_mongsil_bolt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/ulsan"
-            android:layout_toRightOf="@+id/junra"
-            android:layout_toEndOf="@+id/junra" />
-
-        <kr.co.tacademy.mongsil.mongsil.CustomWeatherButton
-            android:id="@+id/daejeon"
-            app:textLocationName="@string/daejeon"
-            app:imgLocationBackground="@drawable/shape_weather_button"
-            app:imgLocationWeatherIcon="@drawable/anim_list_icon_mongsil_bolt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/junra"
-            android:layout_toRightOf="@+id/gwangju"
-            android:layout_toEndOf="@+id/gwangju" />
-
-        <kr.co.tacademy.mongsil.mongsil.CustomWeatherButton
-            android:id="@+id/chungchong"
-            app:textLocationName="@string/chungju"
-            app:imgLocationBackground="@drawable/shape_weather_button"
-            app:imgLocationWeatherIcon="@drawable/anim_list_icon_mongsil_bolt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/daejeon"
-            android:layout_toLeftOf="@+id/junra"
-            android:layout_toStartOf="@+id/junra" />
-
-        <kr.co.tacademy.mongsil.mongsil.CustomWeatherButton
-            android:id="@+id/gangwon"
-            app:textLocationName="@string/gangwon"
-            app:imgLocationBackground="@drawable/shape_weather_button"
-            app:imgLocationWeatherIcon="@drawable/anim_list_icon_mongsil_bolt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/daegu"
-            android:layout_toRightOf="@+id/daejeon"
-            android:layout_toEndOf="@+id/daejeon" />
-
-        <kr.co.tacademy.mongsil.mongsil.CustomWeatherButton
-            android:id="@+id/seoul"
-            app:textLocationName="@string/seoul"
-            app:imgLocationBackground="@drawable/shape_weather_button"
-            app:imgLocationWeatherIcon="@drawable/anim_list_icon_mongsil_bolt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/gangwon"
-            android:layout_toLeftOf="@+id/gangwon"
-            android:layout_toStartOf="@+id/gangwon" />
-
-        <kr.co.tacademy.mongsil.mongsil.CustomWeatherButton
-            android:id="@+id/incheon"
-            app:textLocationName="@string/incheon"
-            app:imgLocationBackground="@drawable/shape_weather_button"
-            app:imgLocationWeatherIcon="@drawable/anim_list_icon_mongsil_bolt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/seoul"
-            android:layout_toLeftOf="@+id/seoul"
-            android:layout_toStartOf="@+id/seoul" />
 
     </RelativeLayout>
 </FrameLayout>
