@@ -10,7 +10,7 @@ public class POIData {
     public static final int TYPE_CONTENT_ITEM = 3;
 
     int typeCode = 3;
-    long _id;
+    long id;
     String name;
     String noorLat;
     String noorLon;
@@ -23,11 +23,8 @@ public class POIData {
     POIData(int typeCode) {
         this.typeCode = typeCode;
     }
-    POIData(int typeCode, String name) {
-        this.typeCode = typeCode;
-    }
     POIData(long id, String name, String upperAddrName, String noorLat, String noorLon) {
-        this._id = id;
+        this.id = id;
         this.name = name;
         this.upperAddrName = upperAddrName;
         this.noorLat = noorLat;

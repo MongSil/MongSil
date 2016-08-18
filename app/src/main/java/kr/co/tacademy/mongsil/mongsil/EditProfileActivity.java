@@ -302,8 +302,13 @@ public class EditProfileActivity extends BaseActivity
     }
 
     private  void  cropIntent(Uri cropUri){
-        Intent intent = new Intent("com.android.camera.action.CROP");
+
+        Intent intent = new Intent(Intent.ACTION_EDIT);
         intent.setDataAndType(cropUri, "image/*");
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(intent, null));
+        /*Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(cropUri, "image*//*");
 
         intent.putExtra("outputX", 300);
         intent.putExtra("outputY", 300);
@@ -312,7 +317,7 @@ public class EditProfileActivity extends BaseActivity
         intent.putExtra("scale", true);
         intent.putExtra("return-data", true);
 
-        startActivityForResult(intent, CROP_FROM_CAMERA);
+        startActivityForResult(intent, CROP_FROM_CAMERA);*/
     }
     private boolean tempSavedBitmapFile(Bitmap tempBitmap) {
         boolean flag = false;

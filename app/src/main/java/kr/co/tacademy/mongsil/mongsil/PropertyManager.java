@@ -39,6 +39,8 @@ public class PropertyManager {
     public static final String KEY_SAVE_GALLERY = "savegallery";
     public static final String KEY_USE_GPS = "usegps";
 
+    public static final String KEY_MARK_COUNT = "markcount";
+
     // UUID(장치 아이디)
     public String getDeviceId() {
         return preferences.getString(KEY_DEVICE_ID, "");
@@ -136,6 +138,16 @@ public class PropertyManager {
 
     public void setUseGps(Boolean useGPS) {
         editor.putBoolean(KEY_USE_GPS, useGPS);
+        editor.commit();
+    }
+
+    // 현재 즐겨찾기 수
+    public int getMarkCount() {
+        return preferences.getInt(KEY_MARK_COUNT, 0);
+    }
+
+    public void setMarkCount(int markCount) {
+        editor.putInt(KEY_MARK_COUNT, markCount);
         editor.commit();
     }
 }

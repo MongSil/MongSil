@@ -51,8 +51,10 @@ import okhttp3.ResponseBody;
 import static android.util.Log.e;
 
 public class MainActivity extends BaseActivity
-        implements SearchPOIDialogFragment.OnPOISearchListener,
-                MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
+        implements SearchPOIDialogFragment.OnPOISearchListener {
+        //MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
+    public static final int RESULT_MAP = 1;
+
     // 툴바 필드
     TextView tbTitle;
     ImageView tbSearch;
@@ -71,24 +73,24 @@ public class MainActivity extends BaseActivity
     // 글쓰기 버튼
     FloatingActionButton btnCapturePost;
 
-    // GPSInfo
-    GPSInfo gpsInfo;
-    Handler handler = new Handler();
+    // GPS
+    GPSManager gpsManager;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        requestGPSPermission();
+    protected void onResume() {
+        super.onResume();
+        if (PropertyManager.getInstance().getUseGPS()) {
+            requestGPSPermission();
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent intent = getIntent();
 
-        // 글 삭제를 하고난 뒤의 다이어로그 창
-        if (intent.getBooleanExtra("post_remove", false)) {
+        // 글 삭제하고 난 후의 다이어로그 창
+        if (getIntent().getBooleanExtra("post_remove", false)) {
             getSupportFragmentManager().beginTransaction().
                     add(MiddleAloneDialogFragment.newInstance(0), "middle_done").commit();
         }
@@ -123,7 +125,7 @@ public class MainActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, MapActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, RESULT_MAP);
             }
         });
 
@@ -160,13 +162,15 @@ public class MainActivity extends BaseActivity
             new AsyncLatLonWeatherJSONList().execute(
                     PropertyManager.getInstance().getLatLocation(),
                     PropertyManager.getInstance().getLonLocation());
+        } else if(PropertyManager.getInstance().getUseGPS()) {
+            new AsyncLatLonWeatherJSONList().execute(
+                    gpsManager.getLatitude(),
+                    gpsManager.getLongitude());
         } else {
             // 글을 작성하고 난 후의 지역 설정
-            String[] latLon =
-                    LocationData.ChangeToLatLon(getIntent().getStringExtra("area1"));
-            new AsyncLatLonWeatherJSONList().execute(latLon[0], latLon[1]);
+            new AsyncLatLonWeatherJSONList().execute(
+                    LocationData.ChangeToLatLon(getIntent().getStringExtra("area1")));
         }
-
     }
 
     // 애니메이션 인터폴레이터 적용
@@ -175,6 +179,24 @@ public class MainActivity extends BaseActivity
         Animation animation = AnimationUtils.loadAnimation(this, resourceId);
         animation.setInterpolator(interpolator);
         return animation;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case RESULT_MAP:
+                    String location = data.getStringExtra("name");
+                    tbTitle.setText(location);
+                    new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(location));
+                    mainPostFragment = MainPostFragment.newInstance(location);
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_post_fragment_container, mainPostFragment)
+                            .commit();
+                    break;
+            }
+        }
     }
 
     // 날씨를 검색해서 지역 정보를 받아옴
@@ -386,6 +408,7 @@ public class MainActivity extends BaseActivity
                         .readTimeout(15, TimeUnit.SECONDS)
                         .build();
 
+                Log.e("좌표", args[0] + " " + args[1]);
                 Request request = new Request.Builder()
                         .addHeader("Accept", "application/json")
                         .addHeader("appKey", NetworkDefineConstant.SK_APP_KEY)
@@ -399,6 +422,7 @@ public class MainActivity extends BaseActivity
 
                 boolean flag = response.isSuccessful();
                 int responseCode = response.code();
+                Log.e("dd", responseCode + " ");
                 if (responseCode >= 400) return null;
                 if (flag) {
                     return ParseDataParseHandler.getJSONWeatherList(
@@ -495,31 +519,29 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onStop() {
         super.onStop();
-        if (gpsInfo != null) {
-            gpsInfo.stopGPS();
+        if( gpsManager != null) {
+            gpsManager.GPSstop();
         }
+        /*if (gpsInfo != null) {
+            gpsInfo.stopGPS();
+        }*/
     }
 
-    private void getLocation() {
+    /*private void getLocation() {
         if (PropertyManager.getInstance().getUseGPS()) {
             if (gpsInfo == null) {
                 gpsInfo = new GPSInfo(getApplicationContext());
             }
             if (gpsInfo.isGetLocation()) {
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        String lat = String.valueOf(gpsInfo.getLatitude());
-                        String lon = String.valueOf(gpsInfo.getLongitude());
-                        Log.e("locaiton info:", lat + ", " + lon);
-                        if(!(lat.equals("0.0") || lon.equals("0.0"))) {
-                            new AsyncLatLonWeatherJSONList().execute(lat, lon);
-                            new AsyncReGeoJSONList().execute(lat, lon);
-                        }
-                    }
-                }, 2000);
+                String lat = String.valueOf(gpsInfo.getLat());
+                String lon = String.valueOf(gpsInfo.getLng());
+                Log.e("locaiton info:", lat + ", " + lon);
+                if (!(lat.equals("0.0") || lon.equals("0.0"))) {
+                    new AsyncLatLonWeatherJSONList().execute(lat, lon);
+                    new AsyncReGeoJSONList().execute(lat, lon);
+                }
             } else {
-                if(!(gpsInfo.isGPSEnabled || gpsInfo.isNetworkEnabled)) {
+                if (!(gpsInfo.isGPSEnabled || gpsInfo.isNetworkEnabled)) {
                     getSupportFragmentManager().beginTransaction()
                             .add(MiddleSelectDialogFragment.newInstance(10),
                                     "middle_gps_setting_request").commitAllowingStateLoss();
@@ -531,12 +553,12 @@ public class MainActivity extends BaseActivity
     @Override
     public void onMiddleSelect(int select) {
         switch (select) {
-            case 10 :
+            case 10:
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
                 break;
         }
-    }
+    }*/
 
     public void requestGPSPermission() {
         if (!PropertyManager.getInstance().getUseGPS()) {
@@ -554,8 +576,14 @@ public class MainActivity extends BaseActivity
             }
             requestPermission();
         } else {
-            getLocation();
+            return;
         }
+        gpsManager = new GPSManager(this);
+        gpsManager.googleApiStart();
+        gpsManager.getLastKnownLocation();
+        new AsyncLatLonWeatherJSONList().execute(
+                gpsManager.getLatitude(),
+                gpsManager.getLongitude());
     }
 
     private static final int RC_FINE_LOCATION = 100;
@@ -573,7 +601,7 @@ public class MainActivity extends BaseActivity
         if (requestCode == RC_FINE_LOCATION) {
             if (permissions != null && permissions.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getLocation();
+                    //getLocation();
                 }
             }
         }

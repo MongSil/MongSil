@@ -125,7 +125,7 @@ public class PostRecyclerViewAdapter
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(context, PostDetailActivity.class);
-                    intent.putExtra("postid", String.valueOf(post.postId));
+                    intent.putExtra("post", post);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                 }
@@ -192,7 +192,7 @@ public class PostRecyclerViewAdapter
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(context, PostDetailActivity.class);
-                    intent.putExtra("postid", String.valueOf(post.postId));
+                    intent.putExtra("post", post);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                 }

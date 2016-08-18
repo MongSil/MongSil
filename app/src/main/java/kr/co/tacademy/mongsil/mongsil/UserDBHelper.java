@@ -17,7 +17,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
 
     //DB에서 사용 할 스키마을 생성 함
     @Override
-    public void onCreate(SQLiteDatabase girlsGroupDB) {
+    public void onCreate(SQLiteDatabase database) {
         StringBuilder markTBLSQL = new StringBuilder();
         markTBLSQL
                 .append("CREATE TABLE ")
@@ -34,9 +34,19 @@ public class UserDBHelper extends SQLiteOpenHelper {
                 .append(UserDB.UserMark.USER_MARK_LON)
                 .append(" TEXT ")
                 .append(" ); ");
-        Log.i("leelog query", markTBLSQL.toString());
-        girlsGroupDB.execSQL(markTBLSQL.toString());
+        database.execSQL(markTBLSQL.toString());
     }
+
+    /*public static void searchDB(SQLiteDatabase database) {
+        StringBuilder markTBLSQL = new StringBuilder();
+        markTBLSQL
+                .append("SELECT * FROM ")
+                .append(UserDB.UserMark.TABLE_MARK_NAME)
+                .append(" WHERE ")
+                .append(UserDB.UserMark.USER_MARK_LOCATION)
+                .append(" ; ");
+        database.execSQL(markTBLSQL.toString());
+    }*/
 
     //필요하다면 DB Instance를 업데이트 한다
     @Override

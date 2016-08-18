@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
@@ -20,11 +21,23 @@ import okhttp3.ResponseBody;
 
 import static android.util.Log.e;
 
-public class MapActivity extends BaseActivity {
-    public static final String LOCATION = "location";
+public class MapActivity extends BaseActivity implements View.OnClickListener{
+    public static final int RESULT_MAP = 1;
 
+    Intent intent;
     int order = 0;
-    MapWeatherButton weatherButton;
+    MapWeatherButton
+            mapIncheon,
+            mapSeoul,
+            mapGangwon,
+            mapChungju,
+            mapJunju,
+            mapDaejeon,
+            mapGwangju,
+            mapDaegu,
+            mapUlsan,
+            mapBusan,
+            mapJeju;
 
     int[] weatherId = {
             R.id.map_incheon,
@@ -54,21 +67,41 @@ public class MapActivity extends BaseActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        weatherButton = (MapWeatherButton) findViewById(weatherId[order]);
+        mapIncheon = (MapWeatherButton) findViewById(R.id.map_incheon);
+        mapIncheon.setOnClickListener(this);
+        mapSeoul   = (MapWeatherButton) findViewById(R.id.map_seoul);
+        mapSeoul.setOnClickListener(this);
+        mapGangwon = (MapWeatherButton) findViewById(R.id.map_gangwon);
+        mapGangwon.setOnClickListener(this);
+        mapChungju = (MapWeatherButton) findViewById(R.id.map_chungju);
+        mapChungju.setOnClickListener(this);
+        mapJunju   = (MapWeatherButton) findViewById(R.id.map_junju);
+        mapJunju.setOnClickListener(this);
+        mapDaejeon = (MapWeatherButton) findViewById(R.id.map_daejeon);
+        mapDaejeon.setOnClickListener(this);
+        mapGwangju = (MapWeatherButton) findViewById(R.id.map_gwangju);
+        mapGwangju.setOnClickListener(this);
+        mapDaegu   = (MapWeatherButton) findViewById(R.id.map_daegu);
+        mapDaegu.setOnClickListener(this);
+        mapUlsan   = (MapWeatherButton) findViewById(R.id.map_ulsan);
+        mapUlsan.setOnClickListener(this);
+        mapBusan   = (MapWeatherButton) findViewById(R.id.map_busan);
+        mapBusan.setOnClickListener(this);
+        mapJeju    = (MapWeatherButton) findViewById(R.id.map_jeju);
+        mapJeju.setOnClickListener(this);
 
-        new AsyncLatLonWeatherJSONList().execute(
-                LocationData.ChangeToLatLon(weatherButton.getLocationName()));
+        new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapIncheon.getLocationName()));
 
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home :
-                toMainActivityFromthis();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public void onClick(View view) {
+        MapWeatherButton v = (MapWeatherButton) view;
+        intent = getIntent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("name", v.getLocationName());
+        setResult(RESULT_OK,intent);
+        finish();
     }
 
     // 위도, 경도 날씨 AsyncTask
@@ -119,19 +152,75 @@ public class MapActivity extends BaseActivity {
         protected void onPostExecute(WeatherData result) {
             if (result != null) {
                 if(order < weatherId.length) {
-                    order++;
-                    weatherButton.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(result.code, 0));
-                    weatherButton.setImgLocationBackground(WeatherData.imgFromWeatherCode(result.code, 3));
-                    weatherButton = (MapWeatherButton) findViewById(weatherId[order]);
-                    new AsyncLatLonWeatherJSONList().execute(
-                            LocationData.ChangeToLatLon(weatherButton.getLocationName()));
+                    if( order == 0) {
+                        mapIncheon.setImgLocationBackground(WeatherData.imgFromWeatherCode(result.code, 0));
+                        mapIncheon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(result.code, 3));
+                        order++;
+                        new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapSeoul.getLocationName()));
+                        return;
+                    }
+                    initButton(result.code);
                 }
             }
         }
     }
 
+    private void initButton(String weatherCode) {
+        if (order == 1) {
+            mapSeoul.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapSeoul.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapGangwon.getLocationName()));
+        } else if (order == 2) {
+            mapGangwon.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapGangwon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapChungju.getLocationName()));
+        } else if (order == 3) {
+            mapChungju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapChungju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapJunju.getLocationName()));
+        } else if (order == 4) {
+            mapJunju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapJunju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapDaejeon.getLocationName()));
+        } else if (order == 5) {
+            mapDaejeon.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapDaejeon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapGwangju.getLocationName()));
+        } else if (order == 6) {
+            mapGwangju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapGwangju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapDaegu.getLocationName()));
+        } else if (order == 7) {
+            mapDaegu.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapDaegu.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapUlsan.getLocationName()));
+        } else if (order == 8) {
+            mapUlsan.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapUlsan.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapBusan.getLocationName()));
+        } else if (order == 9) {
+            mapBusan.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapBusan.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapJeju.getLocationName()));
+        } else if (order == 10) {
+            mapJeju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapJeju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+        }
+        order++;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home :
+                toMainActivityFromthis();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void toMainActivityFromthis() {
-        Intent intent = new Intent(MapActivity.this, MainActivity.class);
+        intent = new Intent(MapActivity.this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();

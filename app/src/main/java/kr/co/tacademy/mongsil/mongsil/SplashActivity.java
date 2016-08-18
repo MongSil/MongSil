@@ -1,11 +1,15 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -78,6 +82,7 @@ public class SplashActivity extends BaseActivity {
                 AnimationUtils.loadAnimation(
                         this, R.anim.anim_alpha_shadow);
         imgSplashShadow.startAnimation(shadowAnimation);
+        requestGPSPermission();
     }
 
     // 로그인 요청
@@ -139,9 +144,7 @@ public class SplashActivity extends BaseActivity {
                 splashContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
+                        toMainActivityFromthis();
                     }
                 });
             }else if (result.equalsIgnoreCase("fail")) {
@@ -188,4 +191,56 @@ public class SplashActivity extends BaseActivity {
         }
         return deviceUUID.toString();
     }
+
+    // GPS 퍼미션 확인
+    public void requestGPSPermission() {
+        if (!PropertyManager.getInstance().getUseGPS()) {
+            return;
+        }
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                requestPermission();
+                return;
+            }
+            requestPermission();
+        } else {
+
+        }
+    }
+
+    private static final int RC_FINE_LOCATION = 100;
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                RC_FINE_LOCATION);
+    }
+
+    private void toMainActivityFromthis() {
+        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == RC_FINE_LOCATION) {
+            if (permissions != null && permissions.length > 0) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    toMainActivityFromthis();
+                }
+            } else {
+                toMainActivityFromthis();
+            }
+        }
+    }
+
 }

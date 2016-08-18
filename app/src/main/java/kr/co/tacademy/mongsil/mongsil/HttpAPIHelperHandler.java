@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 
 // okHttp3를 쓰기로 해서 쓰지 않음 - 혹시 몰라서 남겨둠
+@Deprecated
 public class HttpAPIHelperHandler {
     private static final String DEBUG_TAG = "HttpAPIHelperHandler";
 

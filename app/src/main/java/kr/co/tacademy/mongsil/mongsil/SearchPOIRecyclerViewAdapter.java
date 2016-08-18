@@ -71,7 +71,7 @@ public class SearchPOIRecyclerViewAdapter
                     @Override
                     public void onClick(View view) {
                         imgStar.setImageResource(R.drawable.gray_star);
-                        callback.onMarkCallback(false, poiData, position);
+                        callback.onMarkCallback(false, poiData);
                     }
                 });
                 locationItem.setText(poiData.name);
@@ -83,7 +83,7 @@ public class SearchPOIRecyclerViewAdapter
                     public void onClick(View view) {
                         items.get(position);
                         imgStar.setImageResource(R.drawable.yellow_star);
-                        callback.onMarkCallback(true, poiData, position);
+                        callback.onMarkCallback(true, poiData);
                     }
                 });
             }

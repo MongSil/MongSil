@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -88,11 +89,11 @@ public class PostingActivity extends BaseActivity
             this.tempFiles = tempFiles;
         }
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posting);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 
         final Intent intent = getIntent();
 
@@ -398,19 +399,11 @@ public class PostingActivity extends BaseActivity
         return Uri.parse(path);
     }*/
 
-    // TODO : 필터로 변신
-    private void filterIntent(Uri cropUri) {
-        Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(cropUri, "image/*");
-
-       /* intent.putExtra("outputX", 200); // crop한 이미지의 x축 크기
-        intent.putExtra("outputY", 400); // crop한 이미지의 y축 크기
-        intent.putExtra("aspectX", 1); // crop 박스의 x축 비율
-        intent.putExtra("aspectY", 2); // crop 박스의 y축 비율*/
-        intent.putExtra("scale", true);
-        intent.putExtra("return-data", true);
-
-        startActivityForResult(intent, FILTER_FROM_CAMERA);
+    private void filterIntent(Uri filterUri) {
+        Intent intent = new Intent(Intent.ACTION_EDIT);
+        intent.setDataAndType(filterUri, "image/*");
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(intent, null));
     }
 
     private boolean tempSavedBitmapFile(Bitmap tempBitmap) {
@@ -488,7 +481,7 @@ public class PostingActivity extends BaseActivity
         }
     }
 
-
+    // TODO : ext 파일로 변환해서 형님께 드려야함
     // 포스팅 요청
     public class AsyncPostingRequest extends AsyncTask<String, String, String> {
 

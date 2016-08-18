@@ -151,43 +151,19 @@ public class SearchPOIDialogFragment extends DialogFragment
         poiAdapter.notifyDataSetChanged();
     }
 
-    private void markChange(boolean select, POIData poiData, int position) {
-        if (select) {
-            poiData.typeCode = 1;
+    private void markChange(boolean select, POIData poiData) {
+        markedList = userMarkList();
+        /*int totalCount = PropertyManager.getInstance().getMarkCount();
+
+        if (datas.get(0).typeCode != 0) {
             datas.add(0, new POIData(0));
-            for(int i = 0; i < datas.size() ; i++) {
-                if(datas.get(i)._id != poiData._id) {
-                    break;
-                }
-                if(datas.get(i).typeCode != poiData.typeCode) {
-                    datas.add(i, poiData);
-                    break;
-                }
-            }
-            for(int i = 1; i < datas.size() ; i++) {
-                if (datas.get(i).typeCode == 0) {
-                    datas.remove(i);
-                    break;
-                }
-            }
+        }
+        if (select) {
         } else {
-            for (int i = 0 ; i < datas.size() ; i++) {
-                if(datas.get(i)._id==poiData._id) {
-                    datas.remove(i);
-                    break;
-                }
-            }
-            if(datas.size() == 2 && datas.get(0).typeCode == 0) {
-                datas.clear();
-            }
-            if(!datas.isEmpty()) {
-                if (datas.get(0).typeCode == 0 && datas.get(1).typeCode == 2) {
-                    datas.remove(0);
-                }
             }
         }
         poiAdapter.add(datas);
-        poiAdapter.notifyDataSetChanged();
+        poiAdapter.notifyDataSetChanged();*/
     }
 
     private void cancelSearch() {
@@ -215,7 +191,7 @@ public class SearchPOIDialogFragment extends DialogFragment
     }
     // 별을 눌렀을 때
     @Override
-    public void onMarkCallback(boolean select, POIData poiData, int position) {
+    public void onMarkCallback(boolean select, POIData poiData) {
         SQLiteDatabase dbHandler = userDB.getWritableDatabase();
         Cursor resultExist = null;
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
@@ -237,12 +213,13 @@ public class SearchPOIDialogFragment extends DialogFragment
                 } else { //이름이 존재 한다면 처음으로 돌아가버렷
                     resultExist.moveToFirst();
                 }
+                markNameValues.put(UserDB.UserMark._ID, poiData.id);
                 markNameValues.put(UserDB.UserMark.USER_MARK_UPPER, poiData.upperAddrName);
                 markNameValues.put(UserDB.UserMark.USER_MARK_LAT, poiData.noorLat);
                 markNameValues.put(UserDB.UserMark.USER_MARK_LON, poiData.noorLon);
                 dbHandler.insert(UserDB.UserMark.TABLE_MARK_NAME, "NODATA",
                         markNameValues);
-                markChange(select, poiData, position);
+                markChange(select, poiData);
                 dbHandler.setTransactionSuccessful();
             } catch (SQLiteException sqle) {
                 Log.e("SearchPOIDBError", sqle.toString());
@@ -255,11 +232,11 @@ public class SearchPOIDialogFragment extends DialogFragment
             }
         } else {
             //빌드된 쿼리로 해당 결과 집합을 가져 온다
-            markChange(select, poiData, position);
+            markChange(select, poiData);
             dbHandler.execSQL("DELETE FROM " +
                     UserDB.UserMark.TABLE_MARK_NAME
                     + " WHERE " + UserDB.UserMark._ID +
-                    "=" + poiData._id + ";");
+                    "=" + poiData.id + ";");
             dbHandler.close();
         }
     }

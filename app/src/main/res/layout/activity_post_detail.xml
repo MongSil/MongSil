@@ -20,6 +20,7 @@
     </ScrollView>
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar_post_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/invisible">

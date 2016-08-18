@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Created by http://mainia.tistory.com/1153
@@ -49,9 +50,9 @@ public class GPSInfo extends Service implements LocationListener {
 
     public Location getLocation() {
         try {
-            locationManager = (LocationManager) context
-                    .getSystemService(LOCATION_SERVICE);
-
+            if(locationManager == null) {
+                locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
+            }
             // GPS 정보 가져오기
             isGPSEnabled = locationManager
                     .isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -70,26 +71,28 @@ public class GPSInfo extends Service implements LocationListener {
                         && ActivityCompat.checkSelfPermission(context,
                         Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     if (isNetworkEnabled) {
-                        locationManager.requestLocationUpdates(
-                                LocationManager.NETWORK_PROVIDER,
-                                MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                         if (locationManager != null) {
                             location = locationManager
                                     .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                         }
+                        if (location == null) {
+                            locationManager.requestLocationUpdates(
+                                    LocationManager.NETWORK_PROVIDER,
+                                    MIN_TIME_BW_UPDATES,
+                                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        }
                     }
 
                     if (isGPSEnabled) {
+                        if (locationManager != null) {
+                            location = locationManager
+                                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        }
                         if (location == null) {
                             locationManager.requestLocationUpdates(
                                     LocationManager.GPS_PROVIDER,
                                     MIN_TIME_BW_UPDATES,
                                     MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                            if (locationManager != null) {
-                                location = locationManager
-                                        .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            }
                         }
                     }
                 }
@@ -103,9 +106,9 @@ public class GPSInfo extends Service implements LocationListener {
 
     /**
      * 위도값을 가져옵니다.
-     * */
-    public double getLatitude(){
-        if(location != null){
+     */
+    public double getLat() {
+        if (location != null) {
             lat = location.getLatitude();
         }
         return lat;
@@ -113,9 +116,9 @@ public class GPSInfo extends Service implements LocationListener {
 
     /**
      * 경도값을 가져옵니다.
-     * */
-    public double getLongitude(){
-        if(location != null){
+     */
+    public double getLng() {
+        if (location != null) {
             lon = location.getLongitude();
         }
         return lon;
@@ -123,7 +126,7 @@ public class GPSInfo extends Service implements LocationListener {
 
     /**
      * GPS 나 wife 정보가 켜져있는지 확인합니다.
-     * */
+     */
     public boolean isGetLocation() {
         return this.isGetLocation;
     }
@@ -149,8 +152,8 @@ public class GPSInfo extends Service implements LocationListener {
             lat = location.getLatitude();
             lon = location.getLongitude();
             Log.e("위치", "lat" + lat + "lon" + lon);
+            Toast.makeText(context, "lat" + lat + "lon" + lon, Toast.LENGTH_SHORT).show();
         }
-
     }
 
     public void onStatusChanged(String provider, int status, Bundle extras) {

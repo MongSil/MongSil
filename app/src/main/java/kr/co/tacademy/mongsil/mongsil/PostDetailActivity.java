@@ -3,6 +3,7 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -41,10 +42,12 @@ import static android.util.Log.e;
 public class PostDetailActivity extends BaseActivity
         implements BottomEditDialogFragment.OnBottomEditDialogListener,
                 MiddleSelectDialogFragment.OnMiddleSelectDialogListener{
-    private static final String POST_ID = "postid";
+    private static final String POST = "post";
+    private static final String POSTID = "postid";
 
     String postId;
     // 툴바 필드
+    AppBarLayout appBar;
     Toolbar toolbar;
     TextView tbTitle;
     ImageView tbThreeDot;
@@ -66,15 +69,17 @@ public class PostDetailActivity extends BaseActivity
     EditText editReply;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        post = new Post();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_detail);
-        AndroidBug5497Workaround.assistActivity(this);
 
-        post = new Post();
-        Intent intent = getIntent();
-        postId = intent.getStringExtra(POST_ID);
-
+        appBar = (AppBarLayout) findViewById(R.id.appbar_post_detail);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         tbTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         tbThreeDot = (ImageView) toolbar.findViewById(R.id.img_threeDot);
@@ -102,8 +107,17 @@ public class PostDetailActivity extends BaseActivity
         editReply = (EditText) findViewById(R.id.edit_reply);
         replySend = (TextView) findViewById(R.id.text_reply_send);
 
-        new AsyncPostDetailReplyJSONList().execute(postId);
-        new AsyncPostDetailJSONList().execute(postId);
+        Intent intent = getIntent();
+        if(intent.hasExtra(POST)) {
+            // 글 목록, 나의 이야기 목록
+            post = intent.getParcelableExtra(POST);
+            postId = String.valueOf(post.postId);
+            init();
+        } else if(intent.hasExtra(POSTID)){
+            // 내가 쓴 댓글 목록
+            postId = intent.getStringExtra(POSTID);
+            new AsyncPostDetailJSONList().execute(postId);
+        }
     }
 
     private void init() {
@@ -168,6 +182,7 @@ public class PostDetailActivity extends BaseActivity
         // 포스트 코멘트 수
         postReplyCount.setText(String.valueOf(post.replyCount));
 
+        new AsyncPostDetailReplyJSONList().execute(String.valueOf(post.postId));
         // 댓글
         replyRecycler.setLayoutManager(
                 new LinearLayoutManager(MongSilApplication.getMongSilContext()));
@@ -183,6 +198,7 @@ public class PostDetailActivity extends BaseActivity
                     replyContainer.setVisibility(View.VISIBLE);
                     isReplyContainer = true;
                 } else {
+                    appBar.setExpanded(true);
                     Animation downAnim = AnimationUtils.loadAnimation(
                             getApplicationContext(), R.anim.anim_slide_out_bottom);
                     downAnim.setFillAfter(true);
@@ -237,30 +253,6 @@ public class PostDetailActivity extends BaseActivity
                 }
             }
         });
-
-
-        /*postReplyCount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                commentBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                // 댓글 수에 따라 창의 최대 위치가 변경됨
-                if(post.replyCount > 3) {
-                    replyContainer.setWeightSum(1);
-                } else if(post.replyCount > 0) {
-                }
-                commentBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-                    @Override
-                    public void onStateChanged(View bottomSheet, int newState) {
-
-                    }
-                    @Override
-                    public void onSlide(View bottomSheet, float slideOffset) {
-
-                    }
-                });
-                showCommentSheet();
-            }
-        });*/
     }
 
     // 애니메이션 인터폴레이터 적용
@@ -270,7 +262,6 @@ public class PostDetailActivity extends BaseActivity
         animation.setInterpolator(interpolator);
         return animation;
     }
-
     // 글 상세내용 가져오기
     public class AsyncPostDetailJSONList extends AsyncTask<String, Integer, Post> {
         @Override
@@ -540,6 +531,7 @@ public class PostDetailActivity extends BaseActivity
             });
             replyEditContainer.startAnimation(downAnim);
             isReplyContainer = false;
+            appBar.setExpanded(true);
         } else {
             super.onBackPressed();
             toMainActivityFromthis();

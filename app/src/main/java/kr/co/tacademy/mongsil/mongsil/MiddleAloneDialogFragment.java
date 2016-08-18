@@ -95,6 +95,15 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                     }
                 });
                 break;
+            case 80 : // 구글Api 연결에 실패한 경우
+                dialog.setText(getResources().getText(R.string.google_api_connection_fail));
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                break;
             case 90 : // 로그인 실패한 경우 [확인]
                 dialog.setText(getResources().getText(R.string.login_fail));
                 positive.setOnClickListener(new View.OnClickListener() {

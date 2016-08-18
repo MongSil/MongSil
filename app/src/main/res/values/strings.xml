@@ -112,4 +112,5 @@
     <string name="Apache_license">Apache license 2.0</string>
     <string name="MIT_license">MIT license</string>
     <string name="gps_setting_request">GPS 셋팅이 되지 않았을수도 있습니다.   설정창으로 가시겠습니까?</string>
+    <string name="google_api_connection_fail">위치 선정 네트워크 연결에 실패했습니다!</string>
 </resources>
