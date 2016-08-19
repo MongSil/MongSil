@@ -55,7 +55,7 @@ public class LocationData {
     };
 
     public static String ChangeToShortName(String area) {
-        String cutName = area.substring(0, 3);
+        String cutName = area.substring(0, 2);
         if(cutName.equals(locationCutName[0])) { // 경기
             cutName = locationName[1];      // 서울
         } else if (cutName.equals(locationCutName[1])) { // 충청

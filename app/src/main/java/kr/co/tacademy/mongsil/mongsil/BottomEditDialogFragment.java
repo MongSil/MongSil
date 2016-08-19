@@ -17,8 +17,9 @@ import android.widget.Button;
  */
 public class BottomEditDialogFragment extends DialogFragment {
     private static final String POST = "post";
+    private static final String REPLY = "reply";
     public interface OnBottomEditDialogListener {
-        void onSelectBottomEdit(int select, Post post);
+        void onSelectBottomEdit(int select, Post post, ReplyData data);
     }
 
     OnBottomEditDialogListener onBottomEditDialogListener;
@@ -32,6 +33,7 @@ public class BottomEditDialogFragment extends DialogFragment {
     }
 
     Post post;
+    ReplyData replyData;
 
     public BottomEditDialogFragment() {
     }
@@ -43,12 +45,23 @@ public class BottomEditDialogFragment extends DialogFragment {
         fragment.setArguments(bundle);
         return fragment;
     }
+    public static BottomEditDialogFragment newInstance(ReplyData data) {
+        BottomEditDialogFragment fragment = new BottomEditDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(REPLY, data);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            this.post = getArguments().getParcelable(POST);
+            if(getArguments().getParcelable(POST) != null) {
+                this.post = getArguments().getParcelable(POST);
+            } else {
+                this.replyData = getArguments().getParcelable(REPLY);
+            }
         }
         setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
     }
@@ -61,25 +74,48 @@ public class BottomEditDialogFragment extends DialogFragment {
         Button btnSecond = (Button) view.findViewById(R.id.btn_second);
         Button btnClose = (Button) view.findViewById(R.id.btn_close);
 
-        // 글 수정
-        btnFirst.setText(getResources().getString(R.string.post_modify));
-        btnFirst.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-                onBottomEditDialogListener.onSelectBottomEdit(0, post);
-            }
-        });
+        if(post != null) {
+            // 글 수정
+            btnFirst.setText(getResources().getString(R.string.post_modify));
+            btnFirst.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dismiss();
+                    onBottomEditDialogListener.onSelectBottomEdit(0, post, null);
+                }
+            });
 
-        // 글 삭제
-        btnSecond.setText(getResources().getString(R.string.post_remove));
-        btnSecond.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-                onBottomEditDialogListener.onSelectBottomEdit(1, post);
-            }
-        });
+            // 글 삭제
+            btnSecond.setText(getResources().getString(R.string.post_remove));
+            btnSecond.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dismiss();
+                    onBottomEditDialogListener.onSelectBottomEdit(1, post, null);
+                }
+            });
+        } else if(replyData != null) {
+            // 댓글 수정
+            btnFirst.setText(getResources().getString(R.string.reply_modify));
+            btnFirst.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dismiss();
+                    onBottomEditDialogListener.onSelectBottomEdit(2, null, replyData);
+                }
+            });
+
+            // 댓글 삭제
+            btnSecond.setText(getResources().getString(R.string.reply_remove));
+            btnSecond.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dismiss();
+                    onBottomEditDialogListener.onSelectBottomEdit(3, null, replyData);
+                }
+            });
+
+        }
 
         // 닫기
         btnClose.setOnClickListener(new View.OnClickListener() {

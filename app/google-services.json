@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1032990864742",
+    "firebase_url": "https://mongsil-1470287517850.firebaseio.com",
+    "project_id": "mongsil-1470287517850",
+    "storage_bucket": "mongsil-1470287517850.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1032990864742:android:7a166f0ef585eb44",
+        "android_client_info": {
+          "package_name": "kr.co.tacademy.mongsil.mongsil"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1032990864742-mks9q8dcocfju1liufrlusfkbrurepdc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kr.co.tacademy.mongsil.mongsil",
+            "certificate_hash": "22EDC6A71E8173FF30F4748D3103B84B3369FFEB"
+          }
+        },
+        {
+          "client_id": "1032990864742-n3m1buouu0deq4svman2r46clspr4dq0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAE6cBJc0BfmfRFLsdZTitpcU8BMlN7hwk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1032990864742-n3m1buouu0deq4svman2r46clspr4dq0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

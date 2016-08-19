@@ -1,15 +1,21 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
+import android.icu.util.RangeValueIterator;
+import android.icu.util.ValueIterator;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
@@ -67,7 +73,6 @@ public class MainPostFragment extends Fragment
                 }
             }
         });
-
         return postRecyclerView;
     }
 
@@ -156,7 +161,7 @@ public class MainPostFragment extends Fragment
 
     // 글 수정과 글 삭제 하단 다이어로그
     @Override
-    public void onSelectBottomEdit(int select, Post post) {
+    public void onSelectBottomEdit(int select, Post post, ReplyData data) {
         postId = String.valueOf(post.postId);
         switch (select) {
             case 0:

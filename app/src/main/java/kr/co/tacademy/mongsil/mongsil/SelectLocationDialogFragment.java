@@ -3,18 +3,25 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.os.Build;
 import android.os.Bundle;
+import android.renderscript.Allocation;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -51,6 +58,7 @@ public class SelectLocationDialogFragment extends DialogFragment {
     ArrayList<String> locationNames;
     ArrayList<Integer> locationImgs;
 
+    ImageView selectLocationBackground;
     RecyclerView selectLocationRecycle;
     private int selectedPos = 0;
 
@@ -88,6 +96,14 @@ public class SelectLocationDialogFragment extends DialogFragment {
         });
         tbDone = (TextView) view.findViewById(R.id.text_done);
 
+        selectLocationBackground =
+                (ImageView) view.findViewById(R.id.img_select_location_background);
+        //selectLocationBackground.setAlpha(0.5f);
+        WindowManager wm;
+        wm = (WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Bitmap emptyBitmap = Bitmap.createBitmap(display.getWidth(), display.getHeight(), null);
+        selectLocationBackground.setImageBitmap(BlurBuilder.blur(emptyBitmap, 15));
         selectLocationRecycle =
                 (RecyclerView) view.findViewById(R.id.signup_location_recycler);
         selectLocationRecycle.setLayoutManager(
@@ -106,6 +122,21 @@ public class SelectLocationDialogFragment extends DialogFragment {
             locationImgs.add(imgLocations[i]);
         }
 
+        /*private Bitmap BlurImage(Bitmap input) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
+            RenderScript rsScript = RenderScript.create(getActivity());
+            Allocation alloc = Allocation.createFromBitmap(rsScript, input);
+            ScriptIntrinsicBlur blur = ScriptIntrinsicBlur.create(rsScript, alloc.getElement());
+            blur.setRadius(12);
+            blur.setInput(alloc);
+            Bitmap result = Bitmap.createBitmap(input.getWidth(), input.getHeight(), input.getConfig());
+            Allocation outAlloc = Allocation.createFromBitmap(rsScript, result);
+            blur.forEach(outAlloc);
+            outAlloc.copyTo(result);
+            rsScript.destroy();
+            return result;
+        }
+    }*/
         selectLocationRecycle.setAdapter(new SelectLocationViewAdapter());
 
         tbDone.setOnClickListener(new View.OnClickListener() {
@@ -117,7 +148,6 @@ public class SelectLocationDialogFragment extends DialogFragment {
         });
         return view;
     }
-
     public class SelectLocationViewAdapter
             extends RecyclerView.Adapter<SelectLocationViewAdapter.ViewHolder> {
 

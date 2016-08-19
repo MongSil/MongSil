@@ -93,7 +93,7 @@ public class PostingActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posting);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
 
         final Intent intent = getIntent();
 
@@ -158,7 +158,11 @@ public class PostingActivity extends BaseActivity
         });
 
         // 미리보기
-        area1 = PropertyManager.getInstance().getLocation();
+        if(intent.hasExtra("area1")) {
+            area1 = intent.getStringExtra("area1");
+        } else {
+            area1 = PropertyManager.getInstance().getLocation();
+        }
         imgPreview = (ImageView) findViewById(R.id.img_preview);
         imgPreview.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -41,7 +41,8 @@ import static android.util.Log.e;
 
 public class PostDetailActivity extends BaseActivity
         implements BottomEditDialogFragment.OnBottomEditDialogListener,
-                MiddleSelectDialogFragment.OnMiddleSelectDialogListener{
+                MiddleSelectDialogFragment.OnMiddleSelectDialogListener,
+        ReplyAdapterCallback {
     private static final String POST = "post";
     private static final String POSTID = "postid";
 
@@ -61,6 +62,7 @@ public class PostDetailActivity extends BaseActivity
     boolean isReplyContainer;
 
     // 댓글 필드
+    ReplyData data;
     LinearLayout replyContainer;
     RecyclerView replyRecycler;
     ReplyRecyclerViewAdapter replyAdapter;
@@ -78,6 +80,7 @@ public class PostDetailActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_detail);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
 
         appBar = (AppBarLayout) findViewById(R.id.appbar_post_detail);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -100,7 +103,7 @@ public class PostDetailActivity extends BaseActivity
                 (LinearLayout) findViewById(R.id.comment_bottom_sheet);
         replyContainer.setVisibility(View.GONE);
 
-        replyAdapter = new ReplyRecyclerViewAdapter();
+        replyAdapter = new ReplyRecyclerViewAdapter(this);
         replyRecycler = (RecyclerView) findViewById(R.id.reply_recycler);
         imgNoneReply = (ImageView) findViewById(R.id.img_none_reply_icon);
         noneReply = (TextView) findViewById(R.id.text_none_reply);
@@ -159,7 +162,7 @@ public class PostDetailActivity extends BaseActivity
         // 날씨 아이콘
         imgWeatherIcon.setImageResource(
                 WeatherData.imgFromWeatherCode(
-                        String.valueOf(post.weatherCode), 0));
+                        String.valueOf(post.weatherCode-1), 0));
         imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
                 R.anim.bounce_interpolator, new LinearInterpolator()));
         if(imgWeatherIcon.isShown()) {
@@ -186,6 +189,7 @@ public class PostDetailActivity extends BaseActivity
         // 댓글
         replyRecycler.setLayoutManager(
                 new LinearLayoutManager(MongSilApplication.getMongSilContext()));
+        replyRecycler.setAdapter(replyAdapter);
         postReplyCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -245,10 +249,18 @@ public class PostDetailActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 if (!editReply.getText().toString().isEmpty()) {
-                    new AsyncReplingRequest().execute(
-                            PropertyManager.getInstance().getUserId(),
-                            editReply.getText().toString()
-                    );
+                    if(data == null) {
+                        new AsyncReplingRequest().execute(
+                                PropertyManager.getInstance().getUserId(),
+                                editReply.getText().toString()
+                        );
+                    } else {
+                        new AsyncModifyReplyRequest().execute(
+                                PropertyManager.getInstance().getUserId(),
+                                editReply.getText().toString(),
+                                String.valueOf(data.replyId)
+                        );
+                    }
                     editReply.setText("");
                 }
             }
@@ -355,10 +367,14 @@ public class PostDetailActivity extends BaseActivity
                 replyRecycler.setVisibility(View.VISIBLE);
                 imgNoneReply.setVisibility(View.GONE);
                 noneReply.setVisibility(View.GONE);
-
                 replyAdapter.add(result);
-                replyRecycler.setAdapter(replyAdapter);
                 replyRecycler.smoothScrollToPosition(result.size()-1);
+            } else {
+                data = null;
+                replyRecycler.setVisibility(View.GONE);
+                imgNoneReply.setVisibility(View.VISIBLE);
+                noneReply.setVisibility(View.VISIBLE);
+                replyAdapter.notifyDataSetChanged();
             }
         }
     }
@@ -425,6 +441,68 @@ public class PostDetailActivity extends BaseActivity
         }
     }
 
+    // 댓글수정
+    public class AsyncModifyReplyRequest extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... args) {
+            Response response = null;
+            try {
+                //업로드는 타임 및 리드타임을 넉넉히 준다.
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                //요청 Body 세팅==> 그전 Query Parameter세팅과 같은 개념
+                RequestBody formBody = new FormBody.Builder()
+                        .add("userId", args[0])
+                        .add("content", args[1])
+                        .add("date", TimeData.getNow())
+                        .build();
+                //요청 세팅
+                Request request = new Request.Builder()
+                        .url(String.format(NetworkDefineConstant.PUT_SERVER_REPLY,
+                                postId, args[2]))
+                        .put(formBody)
+                        .build();
+                response = client.newCall(request).execute();
+                boolean flag = response.isSuccessful();
+                //응답 코드 200등등
+                int responseCode = response.code();
+                if (flag) {
+                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
+                    Log.e("response응답바디", response.body().string()); //json으로 변신
+                    return "success";
+                }
+            } catch (UnknownHostException une) {
+                Log.e("aa", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                Log.e("bb", uee.toString());
+            } catch (Exception e) {
+                Log.e("cc", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+
+            return "fail";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result.equals("success")) {
+                new AsyncPostDetailReplyJSONList().execute(
+                        postId);
+                Integer replyCount = Integer.valueOf(postReplyCount.getText().toString());
+                postReplyCount.setText(String.valueOf(replyCount-1));
+            } else if (result.equals("fail")) {
+                // 실패
+            }
+        }
+    }
+
     // 글 삭제
     public class AsyncPostRemoveRequest extends AsyncTask<String, String, String> {
         @Override
@@ -482,9 +560,63 @@ public class PostDetailActivity extends BaseActivity
         }
     }
 
-    // 글 수정과 글 삭제 하단 다이어로그
+    // 댓글 삭제
+    public class AsyncReplyRemoveRequest extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... args) {
+            Response response = null;
+            try {
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url(String.format(NetworkDefineConstant.DELETE_SERVER_REPLY_REMOVE,
+                                args[0], args[1]))
+                        .delete()
+                        .build();
+
+                response = client.newCall(request).execute();
+                boolean flag = response.isSuccessful();
+                //응답 코드 200등등
+                int responseCode = response.code();
+                if (flag) {
+                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
+                    Log.e("response응답바디", response.body().string()); //json으로 변신
+                    return "success";
+                }
+            } catch (UnknownHostException une) {
+                Log.e("aa", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                Log.e("bb", uee.toString());
+            } catch (Exception e) {
+                Log.e("cc", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+
+            return "fail";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result.equals("success")) {
+                data = null;
+                new AsyncPostDetailReplyJSONList().execute(postId);
+            } else if(result.equals("fail")) {
+                getSupportFragmentManager().beginTransaction().
+                        add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();
+            }
+        }
+    }
+
+    // 글 수정과 글 삭제, 댓글 수정과 댓글 삭제 하단 다이어로그
     @Override
-    public void onSelectBottomEdit(int select, Post post) {
+    public void onSelectBottomEdit(int select, Post post, ReplyData data) {
         switch (select) {
             case 0:
                 Intent intent = new Intent(getApplicationContext(), PostingActivity.class);
@@ -496,16 +628,38 @@ public class PostDetailActivity extends BaseActivity
                         .add(MiddleSelectDialogFragment.newInstance(0),
                                 "middle_post_remove").commit();
                 break;
+            case 2:
+                this.data = data;
+                editReply.setText(data.content);
+                editReply.requestFocus();
+                break;
+            case 3:
+                getSupportFragmentManager().beginTransaction()
+                        .add(MiddleSelectDialogFragment.newInstance(1),
+                                "middle_reply_remove").commit();
+                break;
         }
     }
 
-    // 글 삭제 다이어로그
+    // 글 삭제, 댓글 삭제 다이어로그
     @Override
     public void onMiddleSelect(int select) {
         switch (select) {
             case 0 :
                 new AsyncPostRemoveRequest().execute(postId);
+                break;
+            case 1 :
+                new AsyncReplyRemoveRequest().execute(postId, String.valueOf(data.replyId));
+                break;
         }
+    }
+
+    @Override
+    public void onLongSelectCallback(ReplyData data) {
+        this.data = data;
+        getSupportFragmentManager().beginTransaction()
+                .add(BottomEditDialogFragment.newInstance(data),
+                        "bottom_reply_edit").commit();
     }
 
     @Override

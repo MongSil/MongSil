@@ -13,7 +13,7 @@ public class NetworkDefineConstant {
             = "https://apis.skplanetx.com/tmap/pois?searchKeyword=%s&resCoordType=WGS84GEO&version=1";
     public static final String SK_REVERSE_GEOCOING
             = "https://apis.skplanetx.com/tmap/geo/reversegeocoding?" +
-                            "lon=%s&lat=%s&coordType=WGS84GEO&version=1";
+                            "lat=" + "%s" + "&lon=" + "%s" + "&coordType=WGS84GEO&version=1";
     public static final String SK_WEATHER_LAT_LON
             = "http://apis.skplanetx.com/weather/current/"
             + "minutely?version=1&lat=%s&lon=%s";
@@ -48,12 +48,16 @@ public class NetworkDefineConstant {
     // PUT
     public static final String PUT_SERVER_POST
             = "http://" + HOST_URL + PORT_NUMBER + "/post/%s";
+    public static final String PUT_SERVER_REPLY
+            = "http://" + HOST_URL + PORT_NUMBER + "/post/%s/reply/%s";
     public static final String PUT_SERVER_USER_EDIT
             = "http://" + HOST_URL + PORT_NUMBER + "/users/%s";
 
     // DELETE
     public static final String DELETE_SERVER_POST_REMOVE
             = "http://" + HOST_URL + PORT_NUMBER + "/post/%s";
+    public static final String DELETE_SERVER_REPLY_REMOVE
+            = "http://" + HOST_URL + PORT_NUMBER + "/post/%s/reply/%s";
     public static final String DELETE_SERVER_USER_REMOVE
             = "http://" + HOST_URL + PORT_NUMBER + "/users/%s";
 }

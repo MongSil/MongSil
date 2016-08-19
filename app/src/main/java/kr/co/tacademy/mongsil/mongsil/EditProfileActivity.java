@@ -303,7 +303,7 @@ public class EditProfileActivity extends BaseActivity
 
     private  void  cropIntent(Uri cropUri){
 
-        Intent intent = new Intent(Intent.ACTION_EDIT);
+        Intent intent = new Intent(Intent.ACTION_INSERT_OR_EDIT);
         intent.setDataAndType(cropUri, "image/*");
         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(Intent.createChooser(intent, null));

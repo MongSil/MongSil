@@ -2,13 +2,21 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Context;
 import android.content.Intent;
+import android.icu.util.ValueIterator;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -78,9 +86,11 @@ public class PostRecyclerViewAdapter
         }
     }
 
+    int lastPosition = -1;
     // 글목록을 표시하는 뷰홀더
     public class PostViewHolder extends RecyclerView.ViewHolder {
         final View view;
+        CardView cardviewPost;
         CircleImageView imgPostProfile;
         ImageView imgPostProfileIcon;
         final TextView postName, postContent, postTime;
@@ -90,6 +100,7 @@ public class PostRecyclerViewAdapter
         public PostViewHolder(View view) {
             super(view);
             this.view = view;
+            cardviewPost = (CardView) view.findViewById(R.id.cardview_post_item);
             imgPostProfile = (CircleImageView) view.findViewById(R.id.img_post_profile);
             imgPostProfileIcon = (ImageView) view.findViewById(R.id.img_post_profile_icon);
             postName = (TextView) view.findViewById(R.id.text_post_name);
@@ -99,7 +110,7 @@ public class PostRecyclerViewAdapter
             btnNext = (Button) view.findViewById(R.id.btn_next);
         }
 
-        public void setData(final Post post) {
+        public void setData(final Post post, int position) {
             if(!post.profileImg.equals("null")) {
                 Glide.with(MongSilApplication.getMongSilContext())
                         .load(post.profileImg).into(imgPostProfile);
@@ -130,8 +141,48 @@ public class PostRecyclerViewAdapter
                     context.startActivity(intent);
                 }
             });
+            setAnimation(cardviewPost, position);
         }
+
+        /**
+         * Here is the key method to apply the animation
+         */
+        private void setAnimation(View viewToAnimate, int position)
+        {
+            // If the bound view wasn't previously displayed on screen, it's animated
+            if (position > lastPosition)
+            {
+                Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.fade_in);
+                viewToAnimate.startAnimation(animation);
+                lastPosition = position;
+            }
+        }
+
+/*
+
+        private void startTransition(View view, ValueIterator.Element element) {
+            Intent i = new Intent(getActivity(), PostDetailActivity.class);
+            i.putExtra("ITEM_ID", element.getId());
+
+            Pair<View, String>[] transitionPairs = new Pair[4];
+            transitionPairs[0] = Pair.create(findViewById(R.id.toolbar), "toolbar"); // Transition the Toolbar
+            transitionPairs[1] = Pair.create(view, "content_area"); // Transition the content_area (This will be the content area on the detail screen)
+
+            // We also want to transition the status and navigation bar barckground. Otherwise they will flicker
+            transitionPairs[2] = Pair.create(findViewById(android.R.id.statusBarBackground), Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME);
+            transitionPairs[3] = Pair.create(findViewById(android.R.id.navigationBarBackground), Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME);
+            Bundle b = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this, transitionPairs).toBundle();
+
+            ActivityCompat.startActivity(MainActivity.this, i, b);
+        }
+        // if we transition the status and navigation bar we have to wait till everything is available
+        TransitionHelper.fixSharedElementTransitionForStatusAndNavigationBar(getActivity());
+        // set a custom shared element enter transition
+        TransitionHelper.setSharedElementEnterTransition(getActivity(), R.transition.detail_activity_shared_element_enter_transition);
+        */
     }
+
+
 
     // 나의 이야기 날짜를 표시하는 뷰홀더
     public class MyDateViewHolder extends RecyclerView.ViewHolder {
@@ -228,7 +279,7 @@ public class PostRecyclerViewAdapter
                 ((DateViewHolder) holder).setData(items.get(position));
                 break;
             case LAYOUT_POST:
-                ((PostViewHolder) holder).setData(items.get(position));
+                ((PostViewHolder) holder).setData(items.get(position), position);
                 break;
             case LAYOUT_MY_DATE:
                 ((MyDateViewHolder) holder).setData(items.get(position));
@@ -259,62 +310,4 @@ public class PostRecyclerViewAdapter
     public int getItemCount() {
         return items.size();
     }
-
-    // 글 삭제
-    public class AsyncPostRemoveRequest extends AsyncTask<String, String, String> {
-
-        @Override
-        protected String doInBackground(String... args) {
-            Response response = null;
-            try {
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
-
-                Request request = new Request.Builder()
-                        .url(String.format(NetworkDefineConstant.DELETE_SERVER_POST_REMOVE,
-                                args[0]))
-                        .delete()
-                        .build();
-
-                response = client.newCall(request).execute();
-                boolean flag = response.isSuccessful();
-                //응답 코드 200등등
-                int responseCode = response.code();
-                if (flag) {
-                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
-                    Log.e("response응답바디", response.body().string()); //json으로 변신
-                    return "success";
-                }
-            } catch (UnknownHostException une) {
-                Log.e("aa", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                Log.e("bb", uee.toString());
-            } catch (Exception e) {
-                Log.e("cc", e.toString());
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-
-            return "fail";
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (s.equals("success")) {
-                Intent intent = new Intent(context, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("post_remove", true);
-                context.startActivity(intent);
-            } else if(s.equals("fail")) {
-                /*fragmentManager.beginTransaction().
-                        add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();*/
-            }
-        }
-    }
-
 }

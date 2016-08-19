@@ -4,6 +4,7 @@
 <android.support.v7.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/post_recycler"
+    android:layout_marginTop="10dp"
     android:paddingTop="6dp"
     android:paddingLeft="@dimen/activity_horizontal_padding"
     android:paddingRight="@dimen/activity_horizontal_padding"

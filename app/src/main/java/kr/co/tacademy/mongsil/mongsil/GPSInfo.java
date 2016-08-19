@@ -18,6 +18,7 @@ import android.widget.Toast;
 /**
  * Created by http://mainia.tistory.com/1153
  */
+@Deprecated
 public class GPSInfo extends Service implements LocationListener {
 
     private final Context context;

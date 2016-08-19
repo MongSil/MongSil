@@ -44,7 +44,7 @@ import static android.util.Log.e;
  * POI 검색 -> 지역 선택 -> 위도경도 불러옴 -> 날씨 API
  */
 public class SearchPOIDialogFragment extends DialogFragment
-        implements AdapterCallback {
+        implements POIAdapterCallback {
     public static interface OnPOISearchListener {
         public abstract void onPOISearch(POIData POIData);
     }
@@ -152,7 +152,6 @@ public class SearchPOIDialogFragment extends DialogFragment
     }
 
     private void markChange(boolean select, POIData poiData) {
-        markedList = userMarkList();
         /*int totalCount = PropertyManager.getInstance().getMarkCount();
 
         if (datas.get(0).typeCode != 0) {

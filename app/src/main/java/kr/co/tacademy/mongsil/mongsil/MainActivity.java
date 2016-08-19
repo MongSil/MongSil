@@ -1,14 +1,14 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
+import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -35,6 +35,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.io.UnsupportedEncodingException;
@@ -51,8 +53,9 @@ import okhttp3.ResponseBody;
 import static android.util.Log.e;
 
 public class MainActivity extends BaseActivity
-        implements SearchPOIDialogFragment.OnPOISearchListener {
-        //MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
+        implements SearchPOIDialogFragment.OnPOISearchListener,
+                GPSManager.LocationCallback {
+    //MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
     public static final int RESULT_MAP = 1;
 
     // 툴바 필드
@@ -79,8 +82,22 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (PropertyManager.getInstance().getUseGPS()) {
+        int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (result != ConnectionResult.SUCCESS)
+        {//실패
+            GooglePlayServicesUtil.getErrorDialog(result, this, 0, new DialogInterface.OnCancelListener()
+            {
+                @Override
+                public void onCancel(DialogInterface dialog)
+                {
+                    finish();
+                }
+            }).show();
+        }
+        else
+        {
             requestGPSPermission();
+            // 성공
         }
     }
 
@@ -96,7 +113,7 @@ public class MainActivity extends BaseActivity
         }
 
         // 글 작성 프레그먼트와 슬라이딩메뉴 프레그먼트를 선언
-        if (savedInstanceState == null) {
+        if (!PropertyManager.getInstance().getUseGPS()) {
             mainPostFragment = MainPostFragment.newInstance(
                     PropertyManager.getInstance().getLocation());
             getSupportFragmentManager().beginTransaction()
@@ -153,24 +170,11 @@ public class MainActivity extends BaseActivity
         btnCapturePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), PostingActivity.class));
+                Intent intent = new Intent(getApplicationContext(), PostingActivity.class);
+                intent.putExtra("area1", tbTitle.getText().toString());
+                startActivity(intent);
             }
         });
-        tbTitle.setText(PropertyManager.getInstance().getLocation());
-
-        if (!getIntent().hasExtra("area1")) {
-            new AsyncLatLonWeatherJSONList().execute(
-                    PropertyManager.getInstance().getLatLocation(),
-                    PropertyManager.getInstance().getLonLocation());
-        } else if(PropertyManager.getInstance().getUseGPS()) {
-            new AsyncLatLonWeatherJSONList().execute(
-                    gpsManager.getLatitude(),
-                    gpsManager.getLongitude());
-        } else {
-            // 글을 작성하고 난 후의 지역 설정
-            new AsyncLatLonWeatherJSONList().execute(
-                    LocationData.ChangeToLatLon(getIntent().getStringExtra("area1")));
-        }
     }
 
     // 애니메이션 인터폴레이터 적용
@@ -315,7 +319,10 @@ public class MainActivity extends BaseActivity
                 // First tab is the selected tab, so if i==0 then set BOLD typeface
                 if (i == 0) {
                     tabTextView.setTypeface(boldFont);
+                } else if (i == 1) {
+                    tabTextView.setTypeface(normalFont);
                 }
+
             }
         }
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -422,7 +429,6 @@ public class MainActivity extends BaseActivity
 
                 boolean flag = response.isSuccessful();
                 int responseCode = response.code();
-                Log.e("dd", responseCode + " ");
                 if (responseCode >= 400) return null;
                 if (flag) {
                     return ParseDataParseHandler.getJSONWeatherList(
@@ -460,7 +466,7 @@ public class MainActivity extends BaseActivity
     }
 
     // 역지오코딩 AsyncTask
-    public class AsyncReGeoJSONList extends AsyncTask<String, Integer, String> {
+    public class AsyncReGeoJSONList extends AsyncTask<String, String, String> {
 
         @Override
         protected String doInBackground(String... args) {
@@ -483,6 +489,7 @@ public class MainActivity extends BaseActivity
 
                 boolean flag = response.isSuccessful();
                 int responseCode = response.code();
+                Log.e("응답 코드 : ", responseCode + "");
                 if (responseCode >= 400) return null;
                 if (flag) {
                     return ParseDataParseHandler.getJSONResGeo(
@@ -504,8 +511,10 @@ public class MainActivity extends BaseActivity
 
         @Override
         protected void onPostExecute(String result) {
+            Log.e("역지오코딩 결과 :", result+"");
             if (result != null) {
                 String GPSlocation = LocationData.ChangeToShortName(result);
+                Log.e("GPSlocation 결과 :", GPSlocation);
                 tbTitle.setText(GPSlocation);
                 mainPostFragment = MainPostFragment.newInstance(GPSlocation);
                 getSupportFragmentManager().beginTransaction()
@@ -519,49 +528,32 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onStop() {
         super.onStop();
-        if( gpsManager != null) {
+        if (gpsManager != null) {
             gpsManager.GPSstop();
-        }
-        /*if (gpsInfo != null) {
-            gpsInfo.stopGPS();
-        }*/
-    }
-
-    /*private void getLocation() {
-        if (PropertyManager.getInstance().getUseGPS()) {
-            if (gpsInfo == null) {
-                gpsInfo = new GPSInfo(getApplicationContext());
-            }
-            if (gpsInfo.isGetLocation()) {
-                String lat = String.valueOf(gpsInfo.getLat());
-                String lon = String.valueOf(gpsInfo.getLng());
-                Log.e("locaiton info:", lat + ", " + lon);
-                if (!(lat.equals("0.0") || lon.equals("0.0"))) {
-                    new AsyncLatLonWeatherJSONList().execute(lat, lon);
-                    new AsyncReGeoJSONList().execute(lat, lon);
-                }
-            } else {
-                if (!(gpsInfo.isGPSEnabled || gpsInfo.isNetworkEnabled)) {
-                    getSupportFragmentManager().beginTransaction()
-                            .add(MiddleSelectDialogFragment.newInstance(10),
-                                    "middle_gps_setting_request").commitAllowingStateLoss();
-                }
-            }
         }
     }
 
     @Override
-    public void onMiddleSelect(int select) {
-        switch (select) {
-            case 10:
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-                break;
-        }
-    }*/
+    public void handleNewLocation(Location location) {
+        String lat = String.valueOf(location.getLatitude());
+        String lng = String.valueOf(location.getLongitude());
+        Log.e("handleNewLocation 실행 : ", lat +" "+ lng);
+        new AsyncReGeoJSONList().execute(lat, lng);
+        new AsyncLatLonWeatherJSONList().execute(lat, lng);
+    }
 
     public void requestGPSPermission() {
         if (!PropertyManager.getInstance().getUseGPS()) {
+            if (!getIntent().hasExtra("area1")) {
+                tbTitle.setText(PropertyManager.getInstance().getLocation());
+                new AsyncLatLonWeatherJSONList().execute(
+                        PropertyManager.getInstance().getLatLocation(),
+                        PropertyManager.getInstance().getLonLocation());
+            } else {
+                // 글을 작성하고 난 후의 지역 설정
+                new AsyncLatLonWeatherJSONList().execute(
+                        LocationData.ChangeToLatLon(getIntent().getStringExtra("area1")));
+            }
             return;
         }
 
@@ -569,21 +561,27 @@ public class MainActivity extends BaseActivity
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.e("GPS 퍼미션 체크 중.. ", "dasf");
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                Log.e("GPS 퍼미션 체크 중", "슈드 쇼 리퀘스트 들어옴");
                 requestPermission();
-                return;
             }
-            requestPermission();
-        } else {
-            return;
+            Log.e("GPS 퍼미션 체크..", "슈드쇼 넘어감");
         }
-        gpsManager = new GPSManager(this);
-        gpsManager.googleApiStart();
-        gpsManager.getLastKnownLocation();
-        new AsyncLatLonWeatherJSONList().execute(
-                gpsManager.getLatitude(),
-                gpsManager.getLongitude());
+        Log.e("GPS 퍼미션 들어옴!", "ddd");
+        if(gpsManager == null) {
+            gpsManager = new GPSManager(this, this);
+            gpsManager.connect();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(gpsManager != null) {
+            gpsManager.GPSstop();
+        }
     }
 
     private static final int RC_FINE_LOCATION = 100;

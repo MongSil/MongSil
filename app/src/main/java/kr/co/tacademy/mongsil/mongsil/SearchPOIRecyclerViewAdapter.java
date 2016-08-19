@@ -18,11 +18,11 @@ public class SearchPOIRecyclerViewAdapter
     private static final int LAYOUT_TYPE_HEADER = 100;
     private static final int LAYOUT_TYPE_ITEM = 111;
 
-    private AdapterCallback callback;
+    private POIAdapterCallback callback;
 
     ArrayList<POIData> items;
-    SearchPOIRecyclerViewAdapter(AdapterCallback callback) {
-            this.callback = callback;
+    SearchPOIRecyclerViewAdapter(POIAdapterCallback callback) {
+        this.callback = callback;
         items = new ArrayList<POIData>();
     }
 

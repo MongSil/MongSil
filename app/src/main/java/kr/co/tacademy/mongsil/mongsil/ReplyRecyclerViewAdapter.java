@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -26,15 +27,18 @@ public class ReplyRecyclerViewAdapter
     public static final int POST_REPLY = 4000;
     public static final int USERS_REPLY = 5000;
 
+    ReplyAdapterCallback callback;
     FragmentManager fragmentManager;
     List<ReplyData> items;
 
-    ReplyRecyclerViewAdapter() {
+    ReplyRecyclerViewAdapter(ReplyAdapterCallback callback) {
+        this.callback = callback;
         items = new ArrayList<ReplyData>();
     }
+
     ReplyRecyclerViewAdapter(FragmentManager fragmentManager) {
-        this();
         this.fragmentManager = fragmentManager;
+        items = new ArrayList<ReplyData>();
     }
 
     public void add(ArrayList<ReplyData> replyItems) {
@@ -50,6 +54,7 @@ public class ReplyRecyclerViewAdapter
         final View view;
         CircleImageView imgProfile;
         ImageView imgProfileIcon;
+        RelativeLayout contentContainer;
         final TextView textName, textCommentContent;
 
         public PostReplyViewHolder(View view) {
@@ -57,6 +62,7 @@ public class ReplyRecyclerViewAdapter
             this.view = view;
             imgProfile = (CircleImageView) view.findViewById(R.id.img_profile);
             imgProfileIcon = (ImageView) view.findViewById(R.id.img_none_profile_icon);
+            contentContainer = (RelativeLayout) view.findViewById(R.id.reply_content_container);
             textName = (TextView) view.findViewById(R.id.text_name);
             textCommentContent =
                     (TextView) view.findViewById(R.id.text_comment_content);
@@ -82,6 +88,15 @@ public class ReplyRecyclerViewAdapter
                     MongSilApplication.getMongSilContext().startActivity(intent);
                 }
             });
+
+            if(PropertyManager.getInstance().getUserId().equals(String.valueOf(data.userId))) {
+                contentContainer.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        callback.onLongSelectCallback(data);
+                    }
+                });
+            }
             textName.setText(data.username);
             textCommentContent.setText(data.content);
         }

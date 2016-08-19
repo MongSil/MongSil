@@ -5,6 +5,10 @@
     android:theme="@style/SignupSelectLocationDialogBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/img_select_location_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:background="@color/invisible"

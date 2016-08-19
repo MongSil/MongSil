@@ -2,14 +2,14 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:paddingBottom="7dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <TextView
         android:id="@+id/text_post_date"
-        android:paddingTop="30dp"
         android:text="@string/post_date"
         android:textSize="12sp"
+        android:paddingTop="20dp"
+        android:paddingBottom="3dp"
         android:gravity="start"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
