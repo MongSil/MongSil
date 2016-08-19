@@ -4,6 +4,9 @@ package kr.co.tacademy.mongsil.mongsil;
  * Created by ccei on 2016-08-14.
  */
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.view.SurfaceView;
+import android.view.View;
 
 /**
  * BitmapUtil Class
@@ -13,6 +16,24 @@ import android.graphics.Bitmap;
  * @Version : 1.0.0
  */
 public class BitmapUtil {
+
+    // 현재 보이는 view를 surfaceView를 이용해서 비트맵으로 전환
+    public static Bitmap viewToBitmap(View view) {
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        if (view instanceof SurfaceView) {
+            SurfaceView surfaceView = (SurfaceView) view;
+            surfaceView.setZOrderOnTop(true);
+            surfaceView.draw(canvas);
+            surfaceView.setZOrderOnTop(false);
+            return bitmap;
+        } else {
+            //For ViewGroup & View
+            view.draw(canvas);
+            return bitmap;
+        }
+    }
+
     /**
      * Bitmap을 ratio에 맞춰서 max값 만큼 resize한다.
      *

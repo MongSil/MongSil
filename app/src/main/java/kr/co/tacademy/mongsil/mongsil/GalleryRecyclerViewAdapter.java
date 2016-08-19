@@ -9,6 +9,7 @@ import android.widget.ImageView;
 /**
  * Created by Han on 2016-07-30.
  */
+@Deprecated
 public class GalleryRecyclerViewAdapter extends RecyclerView.Adapter<GalleryRecyclerViewAdapter.GalleryImageViewHolder> {
 
     GalleryRecyclerViewAdapter() { }

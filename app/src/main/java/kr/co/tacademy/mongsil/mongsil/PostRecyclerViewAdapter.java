@@ -141,21 +141,6 @@ public class PostRecyclerViewAdapter
                     context.startActivity(intent);
                 }
             });
-            setAnimation(cardviewPost, position);
-        }
-
-        /**
-         * Here is the key method to apply the animation
-         */
-        private void setAnimation(View viewToAnimate, int position)
-        {
-            // If the bound view wasn't previously displayed on screen, it's animated
-            if (position > lastPosition)
-            {
-                Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.fade_in);
-                viewToAnimate.startAnimation(animation);
-                lastPosition = position;
-            }
         }
 
 /*

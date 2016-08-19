@@ -1,6 +1,7 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
@@ -26,6 +28,8 @@ import okhttp3.ResponseBody;
 public class SignUpActivity extends BaseActivity
         implements SelectLocationDialogFragment.OnSelectLocationListener{
 
+    RelativeLayout signUpContainer;
+
     // 이름, 지역 부분
     EditText editName;
     TextView location, nameFail, locationFail;
@@ -37,6 +41,8 @@ public class SignUpActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+
+        signUpContainer = (RelativeLayout) findViewById(R.id.signup_container);
 
         editName = (EditText) findViewById(R.id.edit_name);
         /*editName.setOnClickListener(new View.OnClickListener() {
@@ -89,8 +95,10 @@ public class SignUpActivity extends BaseActivity
                 if(editName.getText().toString().isEmpty()) {
                     editName.setHint(getResources().getText(R.string.name));
                 }
+                signUpContainer.buildDrawingCache();
+                Bitmap b = signUpContainer.getDrawingCache();
                 getSupportFragmentManager().beginTransaction()
-                        .add(SelectLocationDialogFragment.newInstance(),
+                        .add(SelectLocationDialogFragment.newInstance(BitmapUtil.resizeBitmap(b, 600)),
                                 "select_location").commit();
             }
         });
@@ -177,7 +185,7 @@ public class SignUpActivity extends BaseActivity
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            Log.e("회원가입 결과", result);
+            Log.e("회원가입 결과", result+"");
             if (!result.isEmpty() | !result.equals("null")) {
                 PropertyManager.getInstance().setNickname(editName.getText().toString());
                 PropertyManager.getInstance().setLocation(location.getText().toString());

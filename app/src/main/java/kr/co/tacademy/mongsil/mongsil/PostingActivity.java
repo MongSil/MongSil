@@ -41,6 +41,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -50,8 +51,8 @@ import okhttp3.Response;
 
 public class PostingActivity extends BaseActivity
         implements SearchPOIDialogFragment.OnPOISearchListener,
-                BottomPicDialogFragment.OnBottomPicDialogListener,
-                SelectWeatherFragment.OnSelectWeatherListener {
+        BottomPicDialogFragment.OnBottomPicDialogListener,
+        SelectWeatherFragment.OnSelectWeatherListener {
     private static final int PAGER_MAGIC_COUNT = 131072;
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
@@ -89,6 +90,7 @@ public class PostingActivity extends BaseActivity
             this.tempFiles = tempFiles;
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,7 +160,7 @@ public class PostingActivity extends BaseActivity
         });
 
         // 미리보기
-        if(intent.hasExtra("area1")) {
+        if (intent.hasExtra("area1")) {
             area1 = intent.getStringExtra("area1");
         } else {
             area1 = PropertyManager.getInstance().getLocation();
@@ -167,7 +169,7 @@ public class PostingActivity extends BaseActivity
         imgPreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(upLoadFile == null) {
+                if (upLoadFile == null) {
                     getSupportFragmentManager().beginTransaction()
                             .add(PostPreviewDialogFragment.newInstance(
                                     area1,
@@ -188,7 +190,7 @@ public class PostingActivity extends BaseActivity
                 return true;
             }
         });
-        imgPostingBackground = (ImageView)findViewById(R.id.img_posting_background);
+        imgPostingBackground = (ImageView) findViewById(R.id.img_posting_background);
         // TODO : 누나한테 글 쓰기 기본 배경 달라고해야함
 
         // 날씨 선택
@@ -371,7 +373,7 @@ public class PostingActivity extends BaseActivity
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 4;
         Matrix matrix = new Matrix();
-        if(divider.equals("camera")) {
+        if (divider.equals("camera")) {
             matrix.postRotate(90);
         }
         Bitmap orgImage = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
@@ -386,7 +388,7 @@ public class PostingActivity extends BaseActivity
             fe.printStackTrace();
         } finally {
             try {
-                if(out != null) {
+                if (out != null) {
                     out.close();
                 }
             } catch (IOException e) {
@@ -473,13 +475,13 @@ public class PostingActivity extends BaseActivity
     @Override
     public void onSelectBottomPic(int select) {
         switch (select) {
-            case 0 :
+            case 0:
                 doTakePhotoAction();
                 break;
-            case 1 :
+            case 1:
                 doTakeAlbumAction();
                 break;
-            case 2 :
+            case 2:
                 imgPostingBackground.setImageResource(0);
                 break;
         }
@@ -515,30 +517,50 @@ public class PostingActivity extends BaseActivity
                 if (object == null) {
                     uploadCode = "0";
                 }
+
+                Request request = null;
                 Log.e("업로드코드", uploadCode);
+                // 이미지가 있을 경우 MultipartBody
+                if (uploadCode.equals("1")) {
+                    MultipartBody.Builder builder = new MultipartBody.Builder();
+                    builder.setType(MultipartBody.FORM);
+                    builder.addFormDataPart("uploadCode", uploadCode);
+                    builder.addFormDataPart("area1", args[0]);
+                    builder.addFormDataPart("area2", args[1]);
+                    builder.addFormDataPart("userId", args[2]);
+                    builder.addFormDataPart("weatherCode", args[3]);
+                    builder.addFormDataPart("iconCode", args[4]);
+                    builder.addFormDataPart("content", args[5]);
+                    builder.addFormDataPart("date", TimeData.getNow());
+                    if (object != null) {
+                        File file = object.file;
+                        builder.addFormDataPart("bgImg", file.getName(), RequestBody.create(IMAGE_MIME_TYPE, file));
+                    }
 
-                MultipartBody.Builder builder = new MultipartBody.Builder();
-                builder.setType(MultipartBody.FORM);
-                builder.addFormDataPart("uploadCode", uploadCode);
-                builder.addFormDataPart("area1", args[0]);
-                builder.addFormDataPart("area2", args[1]);
-                builder.addFormDataPart("userId", args[2]);
-                builder.addFormDataPart("weatherCode", args[3]);
-                builder.addFormDataPart("iconCode", args[4]);
-                builder.addFormDataPart("content", args[5]);
-                builder.addFormDataPart("date", TimeData.getNow());
-                if(object != null) {
-                    File file = object.file;
-                    builder.addFormDataPart("bgImg", file.getName(), RequestBody.create(IMAGE_MIME_TYPE, file));
+                    RequestBody requestBody = builder.build();
+
+                    //요청 세팅
+                    request = new Request.Builder()
+                            .url(NetworkDefineConstant.POST_SERVER_POST)
+                            .post(requestBody)
+                            .build();
+                } else { // 이미지가 없을 경우 formBody
+                    RequestBody formBody = new FormBody.Builder()
+                            .add("uploadCode", uploadCode)
+                            .add("area1", args[0])
+                            .add("area2", args[1])
+                            .add("userId", args[2])
+                            .add("weatherCode", args[3])
+                            .add("iconCode", args[4])
+                            .add("content", args[5])
+                            .add("date", TimeData.getNow())
+                            .build();
+                    //요청 세팅
+                    request = new Request.Builder()
+                            .url(NetworkDefineConstant.POST_SERVER_POST)
+                            .post(formBody)
+                            .build();
                 }
-
-                RequestBody requestBody = builder.build();
-
-                //요청 세팅
-                Request request = new Request.Builder()
-                        .url(NetworkDefineConstant.POST_SERVER_POST)
-                        .post(requestBody) //반드시 post로
-                        .build();
 
                 response = toServer.newCall(request).execute();
                 boolean flag = response.isSuccessful();
@@ -569,7 +591,7 @@ public class PostingActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equalsIgnoreCase("success")) {
                 Intent intent = new Intent(PostingActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.putExtra("area1", area1);
                 startActivity(intent);
                 finish();
@@ -589,10 +611,11 @@ public class PostingActivity extends BaseActivity
         String beforeBgImg = null;
         UpLoadValueObject object;
 
-        AsyncModifyPostingRequest() { }
+        AsyncModifyPostingRequest() {
+        }
 
         AsyncModifyPostingRequest(String beforeBgImg, UpLoadValueObject object) {
-            if(beforeBgImg != null) {
+            if (beforeBgImg != null) {
                 this.beforeBgImg = beforeBgImg;
             }
             this.object = object;
@@ -611,39 +634,58 @@ public class PostingActivity extends BaseActivity
 
                 String uploadCode;
 
-                if(!beforeBgImg.isEmpty()) {
+                if (!beforeBgImg.isEmpty()) {
                     uploadCode = "2";
-                    if(object == null) {
+                    if (object == null) {
                         uploadCode = "3";
                     }
                 } else {
                     uploadCode = "1";
-                    if(object == null) {
+                    if (object == null) {
                         uploadCode = "0";
                     }
                 }
+
+                Request request = null;
                 Log.e("업로드코드", uploadCode);
-                MultipartBody.Builder builder = new MultipartBody.Builder();
-                builder.setType(MultipartBody.FORM);
+                // 이미지가 있을 경우 MultipartBody
+                if (uploadCode.equals("3") || uploadCode.equals("0")) {
+                    MultipartBody.Builder builder = new MultipartBody.Builder();
+                    builder.setType(MultipartBody.FORM);
                     builder.addFormDataPart("uploadCode", uploadCode);
                     builder.addFormDataPart("userId", args[0]);
                     builder.addFormDataPart("weatherCode", args[1]);
                     builder.addFormDataPart("iconCode", args[2]);
                     builder.addFormDataPart("content", args[3]);
                     builder.addFormDataPart("date", TimeData.getNow());
-                if(object != null) {
-                    File file = object.file;
-                    builder.addFormDataPart("bgImg", file.getName(), RequestBody.create(IMAGE_MIME_TYPE, file));
+                    if (object != null) {
+                        File file = object.file;
+                        builder.addFormDataPart("bgImg", file.getName(), RequestBody.create(IMAGE_MIME_TYPE, file));
+                    }
+
+                    RequestBody requestBody = builder.build();
+
+                    //요청 세팅
+                    request = new Request.Builder()
+                            .url(String.format(NetworkDefineConstant.PUT_SERVER_POST,
+                                    modifyPostId))
+                            .put(requestBody)
+                            .build();
+                } else { // 이미지가 없을 경우 formBody
+                    RequestBody formBody = new FormBody.Builder()
+                            .add("uploadCode", uploadCode)
+                            .add("userId", args[0])
+                            .add("weatherCode", args[1])
+                            .add("iconCode", args[2])
+                            .add("content", args[3])
+                            .add("date", TimeData.getNow())
+                            .build();
+                    //요청 세팅
+                    request = new Request.Builder()
+                            .url(NetworkDefineConstant.POST_SERVER_POST)
+                            .post(formBody)
+                            .build();
                 }
-
-                RequestBody requestBody = builder.build();
-
-                //요청 세팅
-                Request request = new Request.Builder()
-                        .url(String.format(NetworkDefineConstant.PUT_SERVER_POST,
-                                modifyPostId))
-                        .put(requestBody)
-                        .build();
 
                 response = toServer.newCall(request).execute();
                 boolean flag = response.isSuccessful();
@@ -674,7 +716,7 @@ public class PostingActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equalsIgnoreCase("success")) {
                 Intent intent = new Intent(PostingActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.putExtra("area1", area1);
                 startActivity(intent);
                 finish();
@@ -709,7 +751,7 @@ public class PostingActivity extends BaseActivity
 
     private void toMainActivityFromthis() {
         Intent intent = new Intent(PostingActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
     }

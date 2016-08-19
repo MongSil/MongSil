@@ -2,26 +2,18 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.os.Build;
 import android.os.Bundle;
-import android.renderscript.Allocation;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -32,6 +24,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by ccei on 2016-08-09.
  */
 public class SelectLocationDialogFragment extends DialogFragment {
+    private static final String BACKGROUND_IMG = "background_img";
     public interface OnSelectLocationListener {
         void onSelectLocation(String selectLocation);
     }
@@ -62,18 +55,26 @@ public class SelectLocationDialogFragment extends DialogFragment {
     RecyclerView selectLocationRecycle;
     private int selectedPos = 0;
 
-    public static SelectLocationDialogFragment newInstance() {
+    Bitmap backgroundImg;
+
+    public static SelectLocationDialogFragment newInstance(Bitmap bitmap) {
         SelectLocationDialogFragment fragment =
                 new SelectLocationDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(BACKGROUND_IMG, bitmap);
+        fragment.setArguments(bundle);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
         locationNames = new ArrayList<String>();
         locationImgs = new ArrayList<Integer>();
+        if(getArguments() != null) {
+            backgroundImg = getArguments().getParcelable(BACKGROUND_IMG);
+        }
+        setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
     }
 
     @Override
@@ -98,12 +99,8 @@ public class SelectLocationDialogFragment extends DialogFragment {
 
         selectLocationBackground =
                 (ImageView) view.findViewById(R.id.img_select_location_background);
-        //selectLocationBackground.setAlpha(0.5f);
-        WindowManager wm;
-        wm = (WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
-        Bitmap emptyBitmap = Bitmap.createBitmap(display.getWidth(), display.getHeight(), null);
-        selectLocationBackground.setImageBitmap(BlurBuilder.blur(emptyBitmap, 15));
+        selectLocationBackground.setImageBitmap(BlurBuilder.blur(backgroundImg, 5));
+
         selectLocationRecycle =
                 (RecyclerView) view.findViewById(R.id.signup_location_recycler);
         selectLocationRecycle.setLayoutManager(
@@ -122,21 +119,6 @@ public class SelectLocationDialogFragment extends DialogFragment {
             locationImgs.add(imgLocations[i]);
         }
 
-        /*private Bitmap BlurImage(Bitmap input) {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
-            RenderScript rsScript = RenderScript.create(getActivity());
-            Allocation alloc = Allocation.createFromBitmap(rsScript, input);
-            ScriptIntrinsicBlur blur = ScriptIntrinsicBlur.create(rsScript, alloc.getElement());
-            blur.setRadius(12);
-            blur.setInput(alloc);
-            Bitmap result = Bitmap.createBitmap(input.getWidth(), input.getHeight(), input.getConfig());
-            Allocation outAlloc = Allocation.createFromBitmap(rsScript, result);
-            blur.forEach(outAlloc);
-            outAlloc.copyTo(result);
-            rsScript.destroy();
-            return result;
-        }
-    }*/
         selectLocationRecycle.setAdapter(new SelectLocationViewAdapter());
 
         tbDone.setOnClickListener(new View.OnClickListener() {
@@ -148,6 +130,7 @@ public class SelectLocationDialogFragment extends DialogFragment {
         });
         return view;
     }
+
     public class SelectLocationViewAdapter
             extends RecyclerView.Adapter<SelectLocationViewAdapter.ViewHolder> {
 

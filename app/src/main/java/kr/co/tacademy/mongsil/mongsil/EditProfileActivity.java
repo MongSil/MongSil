@@ -13,7 +13,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -28,7 +27,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -36,10 +34,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -58,6 +56,8 @@ public class EditProfileActivity extends BaseActivity
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
     private static final int CROP_FROM_CAMERA = 2;
+
+    LinearLayout editProfileContainer;
 
     // 툴바
     TextView tbCancel, tbDone;
@@ -91,6 +91,8 @@ public class EditProfileActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
+        editProfileContainer = (LinearLayout) findViewById(R.id.edit_profile_container);
+
         // 툴바 추가
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -111,14 +113,10 @@ public class EditProfileActivity extends BaseActivity
             public void onClick(View view) {
                 PropertyManager.getInstance().setNickname(editName.getText().toString());
                 PropertyManager.getInstance().setLocation(editLocation.getText().toString());
-                if(upLoadFile != null) {
-                    new FileUpLoadAsyncTask(
-                            PropertyManager.getInstance().getNickname(),
-                            PropertyManager.getInstance().getLocation())
-                            .execute(upLoadFile);
-                } else {
-                    toMainActivityFromthis();
-                }
+                new ProfileUpdateAsyncTask(
+                        PropertyManager.getInstance().getNickname(),
+                        PropertyManager.getInstance().getLocation())
+                        .execute(upLoadFile);
             }
         });
 
@@ -180,8 +178,9 @@ public class EditProfileActivity extends BaseActivity
         editLocationContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Bitmap bitmap = BitmapUtil.viewToBitmap(editProfileContainer);
                 getSupportFragmentManager().beginTransaction()
-                        .add(SelectLocationDialogFragment.newInstance(),
+                        .add(SelectLocationDialogFragment.newInstance(BitmapUtil.resizeBitmap(bitmap, 600)),
                                 "select_location").commit();
             }
         });
@@ -411,18 +410,14 @@ public class EditProfileActivity extends BaseActivity
     }
 
     // 프로필 업로드
-    private class FileUpLoadAsyncTask extends AsyncTask<UpLoadValueObject, Void, UserData> {
+    private class ProfileUpdateAsyncTask extends AsyncTask<UpLoadValueObject, Void, UserData> {
         private String username;
         private String area;
         private String uploadCode;
         //업로드할 Mime Type 설정
         private final MediaType IMAGE_MIME_TYPE = MediaType.parse("image/*");
 
-
-        public FileUpLoadAsyncTask() {
-        }
-
-        public FileUpLoadAsyncTask(String username, String area) {
+        public ProfileUpdateAsyncTask(String username, String area) {
             this.username = username;
             this.area = area;
         }
@@ -450,25 +445,42 @@ public class EditProfileActivity extends BaseActivity
                         uploadCode = "0";
                     }
                 }
+
+                Request request = null;
                 Log.e("업로드코드", uploadCode);
-                MultipartBody.Builder builder = new MultipartBody.Builder();
-                builder.setType(MultipartBody.FORM);
-                builder.addFormDataPart("uploadCode", uploadCode);
-                builder.addFormDataPart("username", username);
-                builder.addFormDataPart("area", area);
-                if(objects != null) {
-                    File file = objects[0].file;
-                    builder.addFormDataPart("profileImg", file.getName(), RequestBody.create(IMAGE_MIME_TYPE, file));
+                // 이미지가 있을 경우 MultipartBody
+                if(uploadCode.equals("3") || uploadCode.equals("0")) {
+                    MultipartBody.Builder builder = new MultipartBody.Builder();
+                    builder.setType(MultipartBody.FORM);
+                    builder.addFormDataPart("uploadCode", uploadCode);
+                    builder.addFormDataPart("username", username);
+                    builder.addFormDataPart("area", area);
+                    if (objects != null) {
+                        File file = objects[0].file;
+                        builder.addFormDataPart("profileImg", file.getName(), RequestBody.create(IMAGE_MIME_TYPE, file));
+                    }
+                    RequestBody fileUploadBody = builder.build();
+
+                    //요청 세팅
+                    request = new Request.Builder()
+                            .url(String.format(NetworkDefineConstant.PUT_SERVER_USER_EDIT,
+                                    PropertyManager.getInstance().getUserId()))
+                            .put(fileUploadBody)
+                            .build();
+                } else { // 이미지가 없을 경우 formBody
+                    RequestBody formBody = new FormBody.Builder()
+                            .add("uploadCode", uploadCode)
+                            .add("username", username)
+                            .add("area", area)
+                            .build();
+                    //요청 세팅
+                    request = new Request.Builder()
+                            .url(String.format(NetworkDefineConstant.PUT_SERVER_USER_EDIT,
+                                    PropertyManager.getInstance().getUserId()))
+                            .put(formBody)
+                            .build();
                 }
 
-                RequestBody fileUploadBody = builder.build();
-
-                //요청 세팅
-                Request request = new Request.Builder()
-                        .url(String.format(NetworkDefineConstant.PUT_SERVER_USER_EDIT,
-                                PropertyManager.getInstance().getUserId()))
-                        .put(fileUploadBody)
-                        .build();
                 response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
 
