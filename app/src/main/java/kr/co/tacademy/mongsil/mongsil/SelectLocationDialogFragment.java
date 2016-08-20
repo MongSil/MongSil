@@ -190,7 +190,6 @@ public class SelectLocationDialogFragment extends DialogFragment {
         super.onActivityCreated(savedInstanceState);
         Window window = getDialog().getWindow();
         WindowManager.LayoutParams wlp = new WindowManager.LayoutParams();
-        // TODO : 블러 배경
         wlp.copyFrom(window.getAttributes());
         wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
         wlp.height = WindowManager.LayoutParams.WRAP_CONTENT;

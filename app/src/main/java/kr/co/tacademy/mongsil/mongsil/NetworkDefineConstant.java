@@ -21,6 +21,9 @@ public class NetworkDefineConstant {
             = "http://apis.skplanetx.com/weather/current/"
             + "minutely?version=1&city=%s&county=%s&village=%s";
 
+    // SOCKET
+    public static final String SOCKET_SERVER_POST
+            = "http://" + HOST_URL + PORT_NUMBER + "/post";
     // GET
     public static final String GET_SERVER_POST
             = "http://" + HOST_URL + PORT_NUMBER + "/post?area1=%s&skip=%s";

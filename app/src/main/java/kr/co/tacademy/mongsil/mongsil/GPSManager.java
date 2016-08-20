@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -72,6 +73,25 @@ public class GPSManager implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
+    private static final int RC_FINE_LOCATION = 100;
+
+    public void requestGPSPermission() {
+        if (ActivityCompat.checkSelfPermission(activity,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(activity,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.e("GPS 퍼미션 체크 중.. ", "dasf");
+            requestPermission();
+        }
+        Log.e("GPS 퍼미션 들어옴!", "ddd");
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(activity,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                RC_FINE_LOCATION);
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         locationCallback.handleNewLocation(location);
@@ -82,32 +102,30 @@ public class GPSManager implements GoogleApiClient.ConnectionCallbacks,
         if(ContextCompat.checkSelfPermission(
                 activity.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_DENIED){
+            requestPermission();
             // 권한 없음
             Log.e("GPS 권한 체크 : ", "권한 없음");
-            return;
-        }
-
-        Log.i(TAG, "Location services connected.");
-        Location location =
-                LocationServices.FusedLocationApi
-                        .getLastLocation(googleApiClient);
-
-        if (location == null) {
-            LocationServices.FusedLocationApi
-                    .requestLocationUpdates(
-                            googleApiClient, locationRequest, this);
-
-            latitude = String.valueOf(location.getLatitude());
-            longitude = String.valueOf(location.getLongitude());
-
-            Log.d("Location : Latitude", latitude);
-            Log.d("Location : Longitude", longitude);
-            Log.d("Location : Accuracy", String.valueOf(location.getAccuracy()));
         } else {
-            locationCallback.handleNewLocation(location);
+            Log.i(TAG, "Location services connected.");
+            Location location =
+                    LocationServices.FusedLocationApi
+                            .getLastLocation(googleApiClient);
+
+            if (location == null) {
+                LocationServices.FusedLocationApi
+                        .requestLocationUpdates(
+                                googleApiClient, locationRequest, this);
+
+                latitude = String.valueOf(location.getLatitude());
+                longitude = String.valueOf(location.getLongitude());
+
+                Log.d("Location : Latitude", latitude);
+                Log.d("Location : Longitude", longitude);
+                Log.d("Location : Accuracy", String.valueOf(location.getAccuracy()));
+            } else {
+                locationCallback.handleNewLocation(location);
+            }
         }
-
-
     }
     @Override
     public void onConnectionSuspended(int i) {

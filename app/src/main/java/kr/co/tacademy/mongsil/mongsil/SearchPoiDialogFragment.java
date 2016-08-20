@@ -184,7 +184,7 @@ public class SearchPOIDialogFragment extends DialogFragment
         Display display = wm.getDefaultDisplay();
         wlp.windowAnimations = R.style.LocationDialogAnimation;
         wlp.gravity = Gravity.BOTTOM;
-        wlp.height = (int) (display.getHeight() * 0.925f);
+        wlp.height = (int) (display.getHeight() * 0.89f);
         getDialog().getWindow().setDimAmount(0);
         window.setAttributes(wlp);
     }

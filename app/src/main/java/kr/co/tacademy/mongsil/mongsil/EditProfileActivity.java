@@ -606,6 +606,7 @@ public class EditProfileActivity extends BaseActivity
         @Override
         protected void onPostExecute(UserData result) {
             super.onPostExecute(result);
+            // TODO : 완료할 때 result를 받지 못하는 거 수정
             Log.e("Result value : ", "> " + result);
             if (result != null) {
                 if(upLoadFile != null) {

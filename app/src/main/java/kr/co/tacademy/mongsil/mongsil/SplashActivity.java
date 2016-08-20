@@ -1,17 +1,11 @@
 package kr.co.tacademy.mongsil.mongsil;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -36,13 +30,6 @@ public class SplashActivity extends BaseActivity {
     ImageView imgSplashHere, imgSplashTitle;
     ImageView imgSplashMongsil, imgSplashShadow;
     Handler handler = new Handler();
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        requestGPSPermission();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,37 +192,5 @@ public class SplashActivity extends BaseActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
-    }
-
-    private static final int RC_FINE_LOCATION = 100;
-
-    public void requestGPSPermission() {
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("GPS 퍼미션 체크 중.. ", "dasf");
-            requestPermission();
-        }
-        Log.e("GPS 퍼미션 들어옴!", "ddd");
-    }
-
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                RC_FINE_LOCATION);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == RC_FINE_LOCATION) {
-            if (permissions != null && permissions.length > 0) {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    PropertyManager.getInstance().setUseGps(true);
-                }
-            }
-        }
     }
 }

@@ -59,7 +59,7 @@ public class AlarmActivity extends BaseActivity {
                 new LinearLayoutManager(getApplicationContext());
         alarmRecycler.setLayoutManager(layoutManager);
         alarmRecycler.setAdapter(new AlarmRecyclerViewAdapter());
-        // TODO : 서버에서 댓글 목록을 받아온다
+        // TODO : 서버에서 댓글 목록을 받아온다 - GCM 사용
     }
 
     // 툴바 메뉴 선택

@@ -2,6 +2,7 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -28,8 +29,10 @@ import okhttp3.ResponseBody;
 import static android.util.Log.e;
 
 public class SignUpActivity extends BaseActivity
-        implements SelectLocationDialogFragment.OnSelectLocationListener{
+        implements SelectLocationDialogFragment.OnSelectLocationListener,
+                GPSManager.LocationCallback{
 
+    GPSManager gpsManager;
     RelativeLayout signUpContainer;
 
     // 이름, 지역 부분
@@ -39,12 +42,26 @@ public class SignUpActivity extends BaseActivity
     // 완료
     ImageView imgDone;
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        gpsManager = new GPSManager(this, this);
+        gpsManager.googleApiStart();
+    }
+
+    @Override
+    public void handleNewLocation(Location location) {
+        String lat = String.valueOf(location.getLatitude());
+        String lng = String.valueOf(location.getLongitude());
+        Log.e("handleNewLocation 실행 : ", lat +" "+ lng);
+
+    }
+
     // TODO : GPS가 켜져 있으면 지역이 자동으로 바뀌게 해야함
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-
         signUpContainer = (RelativeLayout) findViewById(R.id.signup_container);
 
         editName = (EditText) findViewById(R.id.edit_name);
@@ -98,6 +115,9 @@ public class SignUpActivity extends BaseActivity
                 if(editName.getText().toString().isEmpty()) {
                     editName.setHint(getResources().getText(R.string.name));
                 }
+                if (gpsManager != null) {
+                    gpsManager.connect();
+                }
                 signUpContainer.buildDrawingCache();
                 Bitmap b = signUpContainer.getDrawingCache();
                 getSupportFragmentManager().beginTransaction()
@@ -140,7 +160,6 @@ public class SignUpActivity extends BaseActivity
 
     // 역지오코딩 AsyncTask
     public class AsyncReGeoJSONList extends AsyncTask<String, String, String> {
-
         @Override
         protected String doInBackground(String... args) {
             Response response = null;

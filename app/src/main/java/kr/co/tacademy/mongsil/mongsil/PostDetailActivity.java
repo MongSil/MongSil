@@ -80,7 +80,6 @@ public class PostDetailActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_detail);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
 
         appBar = (AppBarLayout) findViewById(R.id.appbar_post_detail);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
