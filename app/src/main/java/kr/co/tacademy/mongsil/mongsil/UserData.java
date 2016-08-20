@@ -8,6 +8,5 @@ public class UserData {
     String  username;
     String  profileImg;
     String  area;
-    int     replyAlarm;
     String  date;
 }

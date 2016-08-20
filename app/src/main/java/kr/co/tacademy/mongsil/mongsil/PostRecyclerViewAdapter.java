@@ -1,5 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.icu.util.ValueIterator;
@@ -54,6 +55,10 @@ public class PostRecyclerViewAdapter
     PostRecyclerViewAdapter(Context context) {
         this.context = context;
         items = new ArrayList<Post>();
+    }
+    PostRecyclerViewAdapter(Activity activity, List<Post> items) {
+        this.context = activity;
+        this.items = items;
     }
 
     public void add(ArrayList<Post> postItems) {

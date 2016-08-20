@@ -5,11 +5,11 @@ package kr.co.tacademy.mongsil.mongsil;
  */
 public class POIData {
     public static final int TYPE_MARK_HEADER = 0;
-    public static final int TYPE_MARK_ITEM = 1;
-    public static final int TYPE_CONTENT_HEADER = 2;
-    public static final int TYPE_CONTENT_ITEM = 3;
+    public static final int TYPE_CONTENT_HEADER = 1;
+    public static final int TYPE_CONTENT_ITEM = 2;
 
-    int typeCode = 3;
+    int typeCode = 2;
+    boolean isMarked = false;
     long id;
     String name;
     String noorLat;

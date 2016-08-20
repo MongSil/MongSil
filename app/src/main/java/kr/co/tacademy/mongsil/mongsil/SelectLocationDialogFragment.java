@@ -39,8 +39,6 @@ public class SelectLocationDialogFragment extends DialogFragment {
         }
     }
 
-
-
     public SelectLocationDialogFragment() {
     }
 

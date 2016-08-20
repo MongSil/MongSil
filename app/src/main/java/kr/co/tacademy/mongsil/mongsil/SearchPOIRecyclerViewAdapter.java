@@ -65,28 +65,26 @@ public class SearchPOIRecyclerViewAdapter
         }
 
         private void setData(final POIData poiData, final int position) {
-            if (poiData.typeCode == 1) {
-                imgStar.setImageResource(R.drawable.yellow_star);
-                imgStar.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        imgStar.setImageResource(R.drawable.gray_star);
-                        callback.onMarkCallback(false, poiData);
-                    }
-                });
-                locationItem.setText(poiData.name);
-            } else if (poiData.typeCode == 3) {
-                imgStar.setImageResource(R.drawable.gray_star);
-                locationItem.setText(poiData.name);
-                imgStar.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        items.get(position);
-                        imgStar.setImageResource(R.drawable.yellow_star);
-                        callback.onMarkCallback(true, poiData);
-                    }
-                });
-            }
+            imgStar.setImageResource(R.drawable.yellow_star);
+            imgStar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    imgStar.setImageResource(R.drawable.gray_star);
+                    callback.onMarkCallback(false, poiData);
+                }
+            });
+            locationItem.setText(poiData.name);
+            imgStar.setImageResource(R.drawable.gray_star);
+            locationItem.setText(poiData.name);
+            imgStar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    items.get(position);
+                    imgStar.setImageResource(R.drawable.yellow_star);
+                    callback.onMarkCallback(true, poiData);
+                }
+            });
+
             locationItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -132,8 +130,6 @@ public class SearchPOIRecyclerViewAdapter
                 return LAYOUT_TYPE_HEADER;
             case POIData.TYPE_CONTENT_HEADER:
                 return LAYOUT_TYPE_HEADER;
-            case POIData.TYPE_MARK_ITEM :
-                return LAYOUT_TYPE_ITEM;
             case POIData.TYPE_CONTENT_ITEM:
                 return LAYOUT_TYPE_ITEM;
         }

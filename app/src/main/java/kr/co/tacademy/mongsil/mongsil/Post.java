@@ -20,7 +20,6 @@ public class Post implements Parcelable{
     String content;
     String bgImg;
     int    weatherCode;
-    int    iconCode;
     String area1;
     String area2;
     String date;
@@ -40,7 +39,6 @@ public class Post implements Parcelable{
         content = in.readString();
         bgImg = in.readString();
         weatherCode = in.readInt();
-        iconCode = in.readInt();
         area1 = in.readString();
         area2 = in.readString();
         date = in.readString();
@@ -71,7 +69,6 @@ public class Post implements Parcelable{
         parcel.writeString(content);
         parcel.writeString(bgImg);
         parcel.writeInt(weatherCode);
-        parcel.writeInt(iconCode);
         parcel.writeString(area1);
         parcel.writeString(area2);
         parcel.writeString(date);

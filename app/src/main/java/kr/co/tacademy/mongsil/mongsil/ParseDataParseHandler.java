@@ -37,7 +37,6 @@ public class ParseDataParseHandler {
                 post.content = jData.getString("content");
                 post.bgImg = jData.getString("bgImg");
                 post.weatherCode = jData.getInt("weatherCode");
-                post.iconCode = jData.getInt("iconCode");
                 post.area1 = jData.getString("area1");
                 post.area2 = jData.getString("area2");
                 post.date = jData.getString("date");
@@ -74,7 +73,6 @@ public class ParseDataParseHandler {
                 post.content = jsonData.getString("content");
                 post.bgImg = jsonData.getString("bgImg");
                 post.weatherCode = jsonData.getInt("weatherCode");
-                post.iconCode = jsonData.getInt("iconCode");
                 post.area1 = jsonData.getString("area1");
                 post.area2 = jsonData.getString("area2");
                 post.date = jsonData.getString("date");
@@ -271,7 +269,6 @@ public class ParseDataParseHandler {
             data.username = jsonObject.getString("username");
             data.profileImg = jsonObject.getString("profileImg");
             data.area = jsonObject.getString("area");
-            data.replyAlarm = jsonObject.getInt("replyAlarm");
             data.date = jsonObject.getString("date");
 
             return data;
