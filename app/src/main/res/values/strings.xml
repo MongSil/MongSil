@@ -111,7 +111,7 @@
     <string name="none_user_info">선택하신 유저의 정보가 존재하지 않습니다.</string>
     <string name="Apache_license">Apache license 2.0</string>
     <string name="MIT_license">MIT license</string>
-    <string name="gps_setting_request">GPS 셋팅이 되지 않았을수도 있습니다.   설정창으로 가시겠습니까?</string>
+    <string name="gps_setting_request">몽실몽실은 GPS 사용을 권장합니다.\nGPS를 켜시겠습니까?</string>
     <string name="google_api_connection_fail">위치 선정 네트워크 연결에 실패했습니다!</string>
     <string name="reply_remove_question">댓글을 삭제하시겠어요?</string>
     <string name="reply_modify">댓글 수정</string>

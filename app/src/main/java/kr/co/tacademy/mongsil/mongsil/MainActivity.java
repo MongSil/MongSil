@@ -1,6 +1,7 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -54,8 +56,8 @@ import static android.util.Log.e;
 
 public class MainActivity extends BaseActivity
         implements SearchPOIDialogFragment.OnPOISearchListener,
-                GPSManager.LocationCallback {
-    //MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
+                GPSManager.LocationCallback,
+    MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
     public static final int RESULT_MAP = 1;
 
     // 툴바 필드
@@ -96,8 +98,10 @@ public class MainActivity extends BaseActivity
         }
         else
         {
-            requestGPSPermission();
             // 성공
+            if (!PropertyManager.getInstance().getUseGPS()) {
+                locationProviderCheck();
+            }
         }
     }
 
@@ -175,6 +179,17 @@ public class MainActivity extends BaseActivity
                 startActivity(intent);
             }
         });
+
+        if (!getIntent().hasExtra("area1")) {
+            tbTitle.setText(PropertyManager.getInstance().getLocation());
+            new AsyncLatLonWeatherJSONList().execute(
+                    PropertyManager.getInstance().getLatLocation(),
+                    PropertyManager.getInstance().getLonLocation());
+        } else {
+            // 글을 작성하고 난 후의 지역 설정
+            new AsyncLatLonWeatherJSONList().execute(
+                    LocationData.ChangeToLatLon(getIntent().getStringExtra("area1")));
+        }
     }
 
     // 애니메이션 인터폴레이터 적용
@@ -542,66 +557,34 @@ public class MainActivity extends BaseActivity
         new AsyncLatLonWeatherJSONList().execute(lat, lng);
     }
 
-    public void requestGPSPermission() {
-        if (!PropertyManager.getInstance().getUseGPS()) {
-            if (!getIntent().hasExtra("area1")) {
-                tbTitle.setText(PropertyManager.getInstance().getLocation());
-                new AsyncLatLonWeatherJSONList().execute(
-                        PropertyManager.getInstance().getLatLocation(),
-                        PropertyManager.getInstance().getLonLocation());
-            } else {
-                // 글을 작성하고 난 후의 지역 설정
-                new AsyncLatLonWeatherJSONList().execute(
-                        LocationData.ChangeToLatLon(getIntent().getStringExtra("area1")));
-            }
-            return;
+    LocationManager locationManager;
+    private void locationProviderCheck() {
+        if(locationManager == null) {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         }
-
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("GPS 퍼미션 체크 중.. ", "dasf");
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                Log.e("GPS 퍼미션 체크 중", "슈드 쇼 리퀘스트 들어옴");
-                requestPermission();
+        // TODO : 환경설정에서 GPS가 꺼져있을 경우를 구현
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(MiddleSelectDialogFragment.newInstance(10),
+                            "middle_gps_check").commit();
+        } else {
+            if (gpsManager == null) {
+                gpsManager = new GPSManager(this, this);
+                gpsManager.connect();
             }
-            Log.e("GPS 퍼미션 체크..", "슈드쇼 넘어감");
-        }
-        Log.e("GPS 퍼미션 들어옴!", "ddd");
-        if(gpsManager == null) {
-            gpsManager = new GPSManager(this, this);
-            gpsManager.connect();
         }
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        if(gpsManager != null) {
-            gpsManager.GPSstop();
-        }
-    }
-
-    private static final int RC_FINE_LOCATION = 100;
-
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                RC_FINE_LOCATION);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == RC_FINE_LOCATION) {
-            if (permissions != null && permissions.length > 0) {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //getLocation();
-                }
-            }
+    public void onMiddleSelect(int select) {
+        switch (select) {
+            case 100 :
+                PropertyManager.getInstance().setUseGps(false);
+                break;
+            case 101 :
+                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                PropertyManager.getInstance().setUseGps(true);
+                break;
         }
     }
 }

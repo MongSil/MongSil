@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -78,10 +79,9 @@ public class GPSManager implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        int permissionCheck = ContextCompat.checkSelfPermission(
-                activity.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
-
-        if(permissionCheck== PackageManager.PERMISSION_DENIED){
+        if(ContextCompat.checkSelfPermission(
+                activity.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_DENIED){
             // 권한 없음
             Log.e("GPS 권한 체크 : ", "권한 없음");
             return;
@@ -109,7 +109,6 @@ public class GPSManager implements GoogleApiClient.ConnectionCallbacks,
 
 
     }
-
     @Override
     public void onConnectionSuspended(int i) {
 

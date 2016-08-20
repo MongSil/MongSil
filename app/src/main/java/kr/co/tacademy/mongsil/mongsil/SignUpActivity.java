@@ -25,6 +25,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import static android.util.Log.e;
+
 public class SignUpActivity extends BaseActivity
         implements SelectLocationDialogFragment.OnSelectLocationListener{
 
@@ -37,6 +39,7 @@ public class SignUpActivity extends BaseActivity
     // 완료
     ImageView imgDone;
 
+    // TODO : GPS가 켜져 있으면 지역이 자동으로 바뀌게 해야함
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,6 +136,61 @@ public class SignUpActivity extends BaseActivity
                 }
             }
         });
+    }
+
+    // 역지오코딩 AsyncTask
+    public class AsyncReGeoJSONList extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... args) {
+            Response response = null;
+            try {
+                OkHttpClient toServer = new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .build();
+
+                Request request = new Request.Builder()
+                        .addHeader("Accept", "application/json")
+                        .addHeader("appKey", NetworkDefineConstant.SK_APP_KEY)
+                        .url(String.format(
+                                NetworkDefineConstant.SK_REVERSE_GEOCOING,
+                                args[0], args[1]))
+                        .build();
+                response = toServer.newCall(request).execute();
+                ResponseBody responseBody = response.body();
+
+                boolean flag = response.isSuccessful();
+                int responseCode = response.code();
+                Log.e("응답 코드 : ", responseCode + "");
+                if (responseCode >= 400) return null;
+                if (flag) {
+                    return ParseDataParseHandler.getJSONResGeo(
+                            new StringBuilder(responseBody.string()));
+                }
+            } catch (UnknownHostException une) {
+                e("connectionFail", une.toString());
+            } catch (UnsupportedEncodingException uee) {
+                e("connectionFail", uee.toString());
+            } catch (Exception e) {
+                e("connectionFail", e.toString());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.e("역지오코딩 결과 :", result+"");
+            if (result != null) {
+                String GPSlocation = LocationData.ChangeToShortName(result);
+                Log.e("GPSlocation 결과 :", GPSlocation);
+                location.setText(GPSlocation);
+            }
+        }
     }
 
     // 가입 요청

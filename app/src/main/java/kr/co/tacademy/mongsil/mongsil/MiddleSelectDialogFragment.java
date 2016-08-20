@@ -105,13 +105,14 @@ public class MiddleSelectDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(View view) {
                         dismiss();
+                        onMiddleSelectDialogListener.onMiddleSelect(100);
                     }
                 });
                 positive.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         dismiss();
-                        onMiddleSelectDialogListener.onMiddleSelect(10);
+                        onMiddleSelectDialogListener.onMiddleSelect(101);
                     }
                 });
                 break;
