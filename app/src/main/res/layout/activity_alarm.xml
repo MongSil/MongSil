@@ -21,12 +21,16 @@
             android:layout_height="wrap_content"/>
     </android.support.v7.widget.Toolbar>
 
-    <!-- RecyclerView 내용 : layout_alarm_item.xml -->
-
-    <kr.co.tacademy.mongsil.mongsil.RefreshRecyclerView
-        android:id="@+id/alarm_recycler"
-        android:background="@android:color/white"
+    <!-- ListView 내용 : layout_alarm_item.xml -->
+    <com.dinuscxj.refresh.RecyclerRefreshLayout
+        android:id="@+id/alarm_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </kr.co.tacademy.mongsil.mongsil.RefreshRecyclerView>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/alarm_recycler"
+            android:background="@android:color/white"
+            android:clickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.dinuscxj.refresh.RecyclerRefreshLayout>
 </LinearLayout>

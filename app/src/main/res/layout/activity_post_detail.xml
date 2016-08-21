@@ -8,7 +8,7 @@
     app:theme="@style/Theme.AppCompat.Light.NoActionBar"
     tools:context="kr.co.tacademy.mongsil.mongsil.PostDetailActivity">
     <ScrollView
-        android:id="@+id/scroll_posting"
+        android:id="@+id/scroll_posting_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none">

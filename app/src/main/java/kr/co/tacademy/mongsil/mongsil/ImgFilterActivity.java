@@ -80,7 +80,6 @@ public class ImgFilterActivity extends BaseActivity {
         tbDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO : 완료 누를 시 동작(비트맵을 인텐트로 보내야함)
                 Intent intent = new Intent();
                 intent.putExtra("data", imgFiltering);
                 setResult(FILTER_PHOTO);
@@ -88,9 +87,8 @@ public class ImgFilterActivity extends BaseActivity {
             }
         });
 
-        Bitmap resizedImg = Bitmap
-                .createScaledBitmap(BitmapUtil.resize(
-                        imgFiltering, 640, false), 640, 640, false);
+        Bitmap resizedImg = BitmapUtil.resize(
+                        imgFiltering, 640, false);
 
         imgImport.setImageBitmap(resizedImg);
 
@@ -111,9 +109,8 @@ public class ImgFilterActivity extends BaseActivity {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Bitmap filteredImg = Bitmap
-                        .createScaledBitmap(BitmapUtil.resize(
-                                imgFiltering, 640, false), 640, 640, false);
+                Bitmap filteredImg = BitmapUtil.resize(
+                        imgFiltering, 640, false);
                 ThumbnailItem imgOriginal = new ThumbnailItem(filteredImg);
                 ThumbnailItem imgClear = new ThumbnailItem(filteredImg);
                 ThumbnailItem imgWarm = new ThumbnailItem(filteredImg);
@@ -198,8 +195,8 @@ public class ImgFilterActivity extends BaseActivity {
                 @Override
                 public void onClick(View view) {
                     Filter imgFiltered = thumnailItems.get(position).filter;
-                    imgFiltering = imgFiltered.processFilter(Bitmap.createScaledBitmap(
-                            BitmapUtil.resize(imgFiltering, 640, false), 640, 640, false));
+                    imgFiltering = imgFiltered.processFilter(BitmapUtil.resize(
+                            imgFiltering, 640, false));
                     imgImport.setImageBitmap(imgFiltering);
                 }
             });

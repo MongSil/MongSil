@@ -143,8 +143,11 @@ public class SearchPOIDialogFragment extends DialogFragment
         markedList = userMarkList();
         if (!(markedList == null || markedList.size() == 0)) {
             for (POIData poiData : markedList) {
-                datas.add(poiData);
+                if(poiData.name != null) {
+                    datas.add(poiData);
+                }
                 poiData.isMarked = true;
+
             }
             datas.add(0, new POIData(0));
         }
@@ -172,12 +175,11 @@ public class SearchPOIDialogFragment extends DialogFragment
             // 별을 누른 항목과 같은 항목이 있는지 검사
             for (int i = 0; i < datas.size(); i++) {
                 // 확인한 후 같은 항목이 존재하고
-                if (poiData.name.equals(datas.get(i).name)
-                        && poiData.noorLat.equals(datas.get(i).noorLat)
-                        && poiData.noorLon.equals(datas.get(i).noorLon)) {
+                if (poiData.name.equals(datas.get(i).name)) {
                     // 찾는 부분이 즐겨찾기 부분 사이즈보다 작으면 삭제
                     if (i < markedList.size()+1) {
                         datas.remove(i);
+                        break;
                     }
                 }
             }
@@ -185,7 +187,7 @@ public class SearchPOIDialogFragment extends DialogFragment
                 PropertyManager.getInstance().setMarkCount(markCount - 1);
             }
             // 즐겨찾기 수가 0이면
-            if(markCount == 0) {
+            if(markCount < 1) {
                 // 즐겨찾기 헤더 삭제
                 datas.remove(0);
             }
@@ -232,14 +234,14 @@ public class SearchPOIDialogFragment extends DialogFragment
                 String markName = poiData.name;
                 dbHandler.beginTransaction();
                 // 이름이 등록되었는지 확인해 보는 쿼리 빌더
-                queryBuilder.appendWhere(UserDB.UserMark.USER_MARK_LOCATION + "='" + markName + "'");
+                queryBuilder.appendWhere(UserDB.UserMark.USER_MARK_LOCATION_NAME + "='" + markName + "'");
                 // 빌드된 쿼리로 결과집합을 알아 본다
                 // 쿼리빌더를 사용 할 때는 첫번째 인자에 SQLiteDatabase객체를 등록함
                 resultExist = queryBuilder.query(dbHandler, null, null, null, null, null, null);
                 ContentValues markNameValues = new ContentValues();
                 if (resultExist.getCount() == 0) {
                     // 이름이 존재 하지 않는다면 추가 한다.
-                    markNameValues.put(UserDB.UserMark.USER_MARK_LOCATION, markName);
+                    markNameValues.put(UserDB.UserMark.USER_MARK_LOCATION_NAME, markName);
                 } else { // 이름이 존재 한다면 처음으로 돌아가버렷
                     resultExist.moveToFirst();
                 }
@@ -267,8 +269,8 @@ public class SearchPOIDialogFragment extends DialogFragment
             markChange(select, poiData);
             dbHandler.execSQL("DELETE FROM " +
                     UserDB.UserMark.TABLE_MARK_NAME
-                    + " WHERE " + UserDB.UserMark._ID +
-                    "=" + poiData.id + ";");
+                    + " WHERE " + UserDB.UserMark.USER_MARK_LOCATION_NAME +
+                    "= '" + poiData.name + "';");
             dbHandler.close();
         }
     }
@@ -290,7 +292,7 @@ public class SearchPOIDialogFragment extends DialogFragment
         //결과 집합으로 가져올 컬럼의 이름들(2개 이상 테이블로 빌드시 풀네임을 주어야 함)
         String columnsToReturn[] = {
                 UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark._ID,
-                UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_LOCATION,
+                UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_LOCATION_NAME,
                 UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_UPPER,
                 UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_LAT,
                 UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_LON
@@ -308,7 +310,7 @@ public class SearchPOIDialogFragment extends DialogFragment
                         joinResultSet.getLong(
                                 joinResultSet.getColumnIndex(UserDB.UserMark._ID)),
                         joinResultSet.getString(
-                                joinResultSet.getColumnIndex(UserDB.UserMark.USER_MARK_LOCATION)),
+                                joinResultSet.getColumnIndex(UserDB.UserMark.USER_MARK_LOCATION_NAME)),
                         joinResultSet.getString(
                                 joinResultSet.getColumnIndex(UserDB.UserMark.USER_MARK_UPPER)),
                         joinResultSet.getString(

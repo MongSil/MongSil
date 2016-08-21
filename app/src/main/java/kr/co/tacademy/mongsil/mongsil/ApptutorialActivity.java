@@ -125,7 +125,7 @@ public class AppTutorialActivity extends BaseActivity {
     }
 
     public class CrossFadePageTransformer implements ViewPager.PageTransformer {
-
+        // TODO : 앱 설명 조정하고 애니메이션 설정해야함
         @Override
         public void transformPage(View page, float position) {
             int pageWidth = page.getWidth();

@@ -2,12 +2,12 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:padding="16dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/img_filter_item"
-        android:src="@drawable/deagu"
         android:scaleType="fitXY"
         android:background="@drawable/shape_radius"
         android:layout_width="match_parent"
@@ -15,8 +15,7 @@
         android:layout_weight="5"/>
     <TextView
         android:id="@+id/text_filter_title"
-        android:text="나는 필터다"
-        android:textSize="12dp"
+        android:textSize="12sp"
         android:textColor="@android:color/white"
         android:background="@color/invisible"
         android:gravity="center"

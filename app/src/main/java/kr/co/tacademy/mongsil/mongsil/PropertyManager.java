@@ -133,7 +133,7 @@ public class PropertyManager {
 
     // GPS 사용설정
     public Boolean getUseGPS() {
-        return preferences.getBoolean(KEY_USE_GPS, false);
+        return preferences.getBoolean(KEY_USE_GPS, true);
     }
 
     public void setUseGps(Boolean useGPS) {

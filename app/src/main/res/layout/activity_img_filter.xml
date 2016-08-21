@@ -40,7 +40,6 @@
     <!-- recyclerview 내용 : layout_filter_img.xml -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/filter_recycler"
-        android:padding="16dp"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="123dp" />

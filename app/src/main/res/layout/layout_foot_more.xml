@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <ProgressBar
-        android:id="@+id/load_progress"
+        android:id="@+id/refresh_progress"
         style="?android:attr/progressBarStyle"
         android:layout_gravity="center"
         android:layout_width="wrap_content"

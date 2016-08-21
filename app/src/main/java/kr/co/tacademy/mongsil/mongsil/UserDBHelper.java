@@ -3,9 +3,6 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
-import java.sql.SQLData;
 
 public class UserDBHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "UserDB.db";
@@ -25,7 +22,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
                 .append(" ( ")
                 .append(UserDB.UserMark._ID)
                 .append(" INTEGER PRIMARY KEY AUTOINCREMENT ,")
-                .append(UserDB.UserMark.USER_MARK_LOCATION)
+                .append(UserDB.UserMark.USER_MARK_LOCATION_NAME)
                 .append(" TEXT ,")
                 .append(UserDB.UserMark.USER_MARK_UPPER)
                 .append(" TEXT ,")
@@ -43,7 +40,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
                 .append("SELECT * FROM ")
                 .append(UserDB.UserMark.TABLE_MARK_NAME)
                 .append(" WHERE ")
-                .append(UserDB.UserMark.USER_MARK_LOCATION)
+                .append(UserDB.UserMark.USER_MARK_LOCATION_NAME)
                 .append(" ; ");
         database.execSQL(markTBLSQL.toString());
     }*/

@@ -14,13 +14,6 @@
         android:scaleType="fitXY" />
 
     <ImageView
-        android:id="@+id/img_tutorial_sunny"
-        android:src="@drawable/tutorial_sunny"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|top" />
-
-    <ImageView
         android:id="@+id/img_two_cloud02_cut"
         android:src="@drawable/cloud02_cut_02"
         android:layout_width="match_parent"

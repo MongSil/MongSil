@@ -100,7 +100,6 @@ public class PostRecyclerViewAdapter
         ImageView imgPostProfileIcon;
         final TextView postName, postContent, postTime;
         final RelativeLayout postContainer;
-        final Button btnNext;
 
         public PostViewHolder(View view) {
             super(view);
@@ -112,7 +111,6 @@ public class PostRecyclerViewAdapter
             postContainer = (RelativeLayout) view.findViewById(R.id.post_content_container);
             postContent = (TextView) view.findViewById(R.id.text_post_content);
             postTime = (TextView) view.findViewById(R.id.text_post_time);
-            btnNext = (Button) view.findViewById(R.id.btn_next);
         }
 
         public void setData(final Post post, int position) {

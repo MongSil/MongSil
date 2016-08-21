@@ -60,6 +60,7 @@
         <activity android:name=".CameraGalleryActivity" />
         <activity android:name=".OtherUserProfileActivity" />
         <activity android:name=".PhotoViewActivity" />
+        <activity android:name=".ImgFilterActivity" />
 
         <receiver android:name=".CheckNetwork">
             <intent-filter>

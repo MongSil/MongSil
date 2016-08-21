@@ -55,7 +55,8 @@ public class MainActivity extends BaseActivity
         implements SearchPOIDialogFragment.OnPOISearchListener,
                 GPSManager.LocationCallback,
     MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
-    public static final int RESULT_MAP = 1;
+    private static final int RESULT_MAP = 30;
+    private static final int RESULT_EDIT_PROFILE = 31;
 
     // 툴바 필드
     TextView tbTitle;
@@ -198,7 +199,7 @@ public class MainActivity extends BaseActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case RESULT_MAP:
+                case RESULT_MAP :
                     String location = data.getStringExtra("name");
                     tbTitle.setText(location);
                     new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(location));
@@ -207,6 +208,11 @@ public class MainActivity extends BaseActivity
                             .replace(R.id.main_post_fragment_container, mainSocketPostFragment)
                             .commit();
                     break;
+                case RESULT_EDIT_PROFILE :
+                    finish();
+                    startActivity(getIntent());
+                    break;
+                //case RESULT_POSTING :
             }
         }
     }
@@ -262,7 +268,7 @@ public class MainActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 Log.e("UserProfile : ", PropertyManager.getInstance().getUserProfileImg());
-                startActivity(new Intent(MainActivity.this, EditProfileActivity.class));
+                startActivityForResult(new Intent(MainActivity.this, EditProfileActivity.class), RESULT_EDIT_PROFILE);
             }
         });
         textMyName = (TextView) menu.findViewById(R.id.text_my_name);
@@ -390,27 +396,6 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    // 툴바 메뉴 선택
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                slidingMenu.showMenu();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    // 백 버튼 눌렀을 때
-    @Override
-    public void onBackPressed() {
-        if (slidingMenu.isMenuShowing()) {
-            slidingMenu.toggle();
-            return;
-        }
-        super.onBackPressed();
-    }
-
     // 위도, 경도 날씨 AsyncTask
     public class AsyncLatLonWeatherJSONList extends AsyncTask<String, Integer, WeatherData> {
 
@@ -530,6 +515,27 @@ public class MainActivity extends BaseActivity
                         .commit();
             }
         }
+    }
+
+    // 툴바 메뉴 선택
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                slidingMenu.showMenu();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    // 백 버튼 눌렀을 때
+    @Override
+    public void onBackPressed() {
+        if (slidingMenu.isMenuShowing()) {
+            slidingMenu.toggle();
+            return;
+        }
+        super.onBackPressed();
     }
 
     // 아래 전부 GPS 기능 관련

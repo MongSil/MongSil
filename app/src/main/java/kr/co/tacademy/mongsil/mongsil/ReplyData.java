@@ -23,6 +23,13 @@ public class ReplyData implements Parcelable {
     String postContent;
 
     ReplyData() { }
+
+    // 알람을 위한 테스트 생성자
+    ReplyData(String content, String date) {
+        this.content = content;
+        this.date = date;
+    }
+    //
     private ReplyData(Parcel in) {
         totalCount = in.readInt();
         replyId = in.readInt();

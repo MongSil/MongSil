@@ -10,17 +10,17 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.dinuscxj.refresh.RecyclerRefreshLayout;
+
 /**
  * Created by Han on 2016-08-05.
  */
 public class AlarmActivity extends BaseActivity {
 
-    RefreshRecyclerView alarmRecycler;
-    Handler handler = new Handler(){
-        public void handleMessage(Message msg){
-            alarmRecycler.notifyDataSetChanged();
-        }
-    };
+    RecyclerRefreshLayout recyclerRefreshLayout;
+    RecyclerView alarmRecycler;
+    AlarmRecyclerViewAdapter adapter;
+    Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,30 +35,32 @@ public class AlarmActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
         }
-
-        alarmRecycler = (RefreshRecyclerView) findViewById(R.id.alarm_recycler);
-        alarmRecycler.setMode(Mode.REFRESH);
-        alarmRecycler.setRereshListener(new RefreshListener() {
+        adapter = new AlarmRecyclerViewAdapter();
+        recyclerRefreshLayout = (RecyclerRefreshLayout) findViewById(R.id.alarm_refresh_layout);
+        recyclerRefreshLayout.setOnRefreshListener(new RecyclerRefreshLayout.OnRefreshListener() {
             @Override
-            public void pullToReresh() {
+            public void onRefresh() {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-
-                        handler.sendEmptyMessage(1);
+                        // TODO : 위로 올릴 때
+                        recyclerRefreshLayout.setRefreshing(false);
                     }
                 }, 2000);
             }
-
-            @Override
-            public void loadMore() {
-                // none
-            }
         });
+        alarmRecycler = (RecyclerView) findViewById(R.id.alarm_recycler);
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(getApplicationContext());
         alarmRecycler.setLayoutManager(layoutManager);
-        alarmRecycler.setAdapter(new AlarmRecyclerViewAdapter());
+        alarmRecycler.setOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                // TODO : 밑으로 내릴 때
+            }
+        });
+        adapter = new AlarmRecyclerViewAdapter();
+        alarmRecycler.setAdapter(adapter);
         // TODO : 서버에서 댓글 목록을 받아온다 - GCM 사용
     }
 

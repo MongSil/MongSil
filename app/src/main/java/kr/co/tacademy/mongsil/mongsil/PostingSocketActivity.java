@@ -173,7 +173,7 @@ public class PostingSocketActivity extends BaseActivity
                                     area1,
                                     editPosting.getText().toString(),
                                     pagerPos,
-                                    0), "preview").commit();
+                                    null), "preview").commit();
                 } else {
 
                 }
@@ -189,7 +189,6 @@ public class PostingSocketActivity extends BaseActivity
             }
         });
         imgPostingBackground = (ImageView) findViewById(R.id.img_posting_background);
-        // TODO : 누나한테 글 쓰기 기본 배경 달라고해야함
 
         // 날씨 선택
         selectWeatherPager =

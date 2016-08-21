@@ -264,7 +264,6 @@ public class MainSocketPostFragment extends Fragment {
     }
 
     private void LoadMore() {
-        // TODO : LoadMore 동작 추가 필요
         showPostList(loadOnResult);
     }
 }

@@ -1,5 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -24,20 +25,20 @@ public class PostPreviewDialogFragment extends DialogFragment {
     private String location;
     private String content;
     private int weatherPos;
-    private int photo;
+    private Bitmap photo;
 
 
     public PostPreviewDialogFragment() {
     }
 
     public static PostPreviewDialogFragment newInstance(
-            String location, String content, int weatherPos, int photo) {
+            String location, String content, int weatherPos, Bitmap photo) {
         PostPreviewDialogFragment fragment = new PostPreviewDialogFragment();
         Bundle args = new Bundle();
         args.putString(LOCATION, location);
         args.putString(CONTENT, content);
         args.putInt(WEATHER_POS, weatherPos);
-        args.putInt(PHOTO, photo);
+        args.putParcelable(PHOTO, photo);
         fragment.setArguments(args);
         return fragment;
     }
@@ -49,7 +50,7 @@ public class PostPreviewDialogFragment extends DialogFragment {
             location = getArguments().getString(LOCATION);
             content = getArguments().getString(CONTENT);
             weatherPos = getArguments().getInt(WEATHER_POS);
-            photo = getArguments().getInt(PHOTO);
+            photo = getArguments().getParcelable(PHOTO);
         }
         setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
     }
@@ -72,11 +73,12 @@ public class PostPreviewDialogFragment extends DialogFragment {
 
         imgBackground = (ImageView) view.findViewById(R.id.img_preview_background);
         imgBackground.setBackgroundResource(R.drawable.sign_up_background);
-        /*if(photo != 0) {
+        if(photo != null) {
             imgBackground.setBackgroundResource(
-            WeatherData.imgFromWeatherCode(String.valueOf(weatherPos), 3));
+                    WeatherData.imgFromWeatherCode(String.valueOf(weatherPos), 3));
         } else {
-        }*/
+
+        }
 
         postContent = (TextView) view.findViewById(R.id.text_post_content);
         postContent.setText(content);

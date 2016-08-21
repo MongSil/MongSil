@@ -52,7 +52,7 @@ public class PostingActivity extends BaseActivity
         implements SearchPOIDialogFragment.OnPOISearchListener,
         BottomPicDialogFragment.OnBottomPicDialogListener,
         SelectWeatherFragment.OnSelectWeatherListener {
-    private static final int PAGER_MAGIC_COUNT = 131072;
+    private static final int PAGER_MAGIC_COUNT = 41472;
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
     private static final int FILTER_PHOTO = 2;
@@ -173,8 +173,15 @@ public class PostingActivity extends BaseActivity
                                     area1,
                                     editPosting.getText().toString(),
                                     pagerPos,
-                                    0), "preview").commit();
+                                    null), "preview").commit();
                 } else {
+                    Bitmap imgPreview = BitmapFactory.decodeFile(upLoadFile.file.getAbsolutePath());
+                    getSupportFragmentManager().beginTransaction()
+                            .add(PostPreviewDialogFragment.newInstance(
+                                    area1,
+                                    editPosting.getText().toString(),
+                                    pagerPos,
+                                    imgPreview), "preview").commit();
 
                 }
             }
@@ -189,14 +196,12 @@ public class PostingActivity extends BaseActivity
             }
         });
         imgPostingBackground = (ImageView) findViewById(R.id.img_posting_background);
-        // TODO : 누나한테 글 쓰기 기본 배경 달라고해야함
 
         // 날씨 선택
         selectWeatherPager =
                 (ViewPager) findViewById(R.id.viewpager_posting_select_weather);
         selectWeatherPager.setAdapter(
                 new WeatherPagerAdapter(getSupportFragmentManager()));
-        selectWeatherPager.setCurrentItem(((PAGER_MAGIC_COUNT / 2) - 4), false);
         leftWeather = (ImageView) findViewById(R.id.img_left_weather);
         leftWeather.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -270,6 +275,7 @@ public class PostingActivity extends BaseActivity
     }
 
     // 날씨 뷰페이저 어뎁터
+    // TODO : 프레그먼트를 그냥 옮기기로 함.. 욕심내지 말자
     private class WeatherPagerAdapter extends FragmentStatePagerAdapter {
 
         WeatherPagerAdapter(FragmentManager fragmentManager) {
@@ -278,17 +284,20 @@ public class PostingActivity extends BaseActivity
 
         @Override
         public int getCount() {
-            return PAGER_MAGIC_COUNT;
+            return 12;
         }
 
         @Override
         public Fragment getItem(int position) {
+            imgPostingBackground.setImageResource(
+                    WeatherData.imgFromWeatherCode(String.valueOf(position), 4));
             return SelectWeatherFragment.newInstance(position);
         }
     }
 
     @Override
     public void onSelectWeather(int position) {
+        Log.e("현재 포지션 : ", position + "");
         pagerPos = position;
     }
 

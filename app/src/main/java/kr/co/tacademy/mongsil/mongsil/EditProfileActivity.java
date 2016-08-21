@@ -54,6 +54,7 @@ public class EditProfileActivity extends BaseActivity
         implements BottomPicDialogFragment.OnBottomPicDialogListener,
                 MiddleSelectDialogFragment.OnMiddleSelectDialogListener,
                 SelectLocationDialogFragment.OnSelectLocationListener {
+    private static final int RESULT_EDIT_PROFILE = 31;
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
     private static final int CROP_FROM_CAMERA = 2;
@@ -104,7 +105,7 @@ public class EditProfileActivity extends BaseActivity
         tbCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toMainActivityFromthis();
+                finish();
             }
         });
         tbDone = (TextView) toolbar.findViewById(R.id.toolbar_done);
@@ -492,7 +493,7 @@ public class EditProfileActivity extends BaseActivity
                     }
                     PropertyManager.getInstance().setUserProfileImg(result.profileImg);
                 }
-                toMainActivityFromthis();
+                setResult(RESULT_EDIT_PROFILE);
             } else {
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(2),
@@ -566,16 +567,9 @@ public class EditProfileActivity extends BaseActivity
         return false;
     }
 
-    private void toMainActivityFromthis() {
-        Intent intent = new Intent(EditProfileActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        startActivity(intent);
-        finish();
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        toMainActivityFromthis();
+        finish();
     }
 }

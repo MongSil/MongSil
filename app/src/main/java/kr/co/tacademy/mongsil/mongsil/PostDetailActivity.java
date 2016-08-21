@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -21,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -47,6 +49,9 @@ public class PostDetailActivity extends BaseActivity
     private static final String POSTID = "postid";
 
     String postId;
+
+    ScrollView scrollPostingBackground;
+
     // 툴바 필드
     AppBarLayout appBar;
     Toolbar toolbar;
@@ -58,12 +63,11 @@ public class PostDetailActivity extends BaseActivity
     TextView postContent, postLocation, postTime, postName, postReplyCount;
     Post post;
 
-    RelativeLayout replyEditContainer;
-    boolean isReplyContainer;
-
     // 댓글 필드
     ReplyData data;
     LinearLayout replyContainer;
+    RelativeLayout replyEditContainer;
+    boolean isReplyContainer;
     RecyclerView replyRecycler;
     ReplyRecyclerViewAdapter replyAdapter;
     ImageView imgNoneReply;
@@ -86,6 +90,7 @@ public class PostDetailActivity extends BaseActivity
         tbTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         tbThreeDot = (ImageView) toolbar.findViewById(R.id.img_threeDot);
 
+        scrollPostingBackground = (ScrollView) findViewById(R.id.scroll_posting_background);
         imgBackground = (ImageView) findViewById(R.id.img_post_detail_background);
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
 
@@ -138,12 +143,17 @@ public class PostDetailActivity extends BaseActivity
         }
 
         // background 이미지
+        scrollPostingBackground.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
         if (!post.bgImg.isEmpty()) {
             Glide.with(this).load(post.bgImg).into(imgBackground);
         } else {
-            // TODO : weatherCode에 맞는 테마 배경을 넣어야함
-            // WeatherData.imgFromWeatherCode(String.valueOf(post.weatherCode), 1));
-            imgBackground.setImageResource(R.drawable.splash_background);
+            imgBackground.setImageResource(
+                    WeatherData.imgFromWeatherCode(String.valueOf(post.weatherCode), 4));
         }
 
         if(PropertyManager.getInstance().getUserId().equals(String.valueOf(post.userId))) {

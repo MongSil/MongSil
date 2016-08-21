@@ -26,7 +26,7 @@ public final class ThumbnailsManager {
         for (ThumbnailItem thumb : filterThumbs) {
             // scaling down the image
             float size = context.getResources().getDimension(R.dimen.thumbnail_size);
-            thumb.image = Bitmap.createScaledBitmap(thumb.image, (int) size, (int) size, false);
+            thumb.image = BitmapUtil.resizeSquare(thumb.image, (int)size);
             thumb.image = thumb.filter.processFilter(thumb.image);
             processedThumbs.add(thumb);
         }

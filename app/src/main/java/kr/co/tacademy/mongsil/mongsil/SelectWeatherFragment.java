@@ -18,7 +18,6 @@ import android.widget.ImageView;
  */
 public class SelectWeatherFragment extends Fragment {
     private static final String POSITION = "position";
-    private static final int WEATHER_COUNT = 12;
 
     public interface OnSelectWeatherListener {
         public void onSelectWeather(int position);
@@ -49,12 +48,11 @@ public class SelectWeatherFragment extends Fragment {
         View view =
                 inflater.inflate(R.layout.layout_posting_select_weather, container, false);
         int position = getArguments().getInt("position");
-        int currentPos = position % WEATHER_COUNT;
-        selectWeatherListener.onSelectWeather(currentPos);
+        selectWeatherListener.onSelectWeather(position);
 
         imgWeatherIcon = (ImageView) view.findViewById(R.id.img_weather_icon);
         imgWeatherIcon.setImageResource(
-                WeatherData.imgFromWeatherCode(String.valueOf(currentPos), 0));
+                WeatherData.imgFromWeatherCode(String.valueOf(position), 0));
         imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
                 R.anim.bounce_interpolator, new LinearInterpolator()));
         if(imgWeatherIcon.isShown()) {
