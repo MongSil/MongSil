@@ -65,25 +65,27 @@ public class SearchPOIRecyclerViewAdapter
         }
 
         private void setData(final POIData poiData, final int position) {
-            imgStar.setImageResource(R.drawable.yellow_star);
-            imgStar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    imgStar.setImageResource(R.drawable.gray_star);
-                    callback.onMarkCallback(false, poiData);
-                }
-            });
-            locationItem.setText(poiData.name);
-            imgStar.setImageResource(R.drawable.gray_star);
-            locationItem.setText(poiData.name);
-            imgStar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    items.get(position);
-                    imgStar.setImageResource(R.drawable.yellow_star);
-                    callback.onMarkCallback(true, poiData);
-                }
-            });
+            if(poiData.isMarked) {
+                imgStar.setImageResource(R.drawable.yellow_star);
+                imgStar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        imgStar.setImageResource(R.drawable.gray_star);
+                        callback.onMarkCallback(!poiData.isMarked, poiData);
+                    }
+                });
+            } else {
+                locationItem.setText(poiData.name);
+                imgStar.setImageResource(R.drawable.gray_star);
+                locationItem.setText(poiData.name);
+                imgStar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        imgStar.setImageResource(R.drawable.yellow_star);
+                        callback.onMarkCallback(!poiData.isMarked, poiData);
+                    }
+                });
+            }
 
             locationItem.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -533,12 +533,12 @@ public class EditProfileActivity extends BaseActivity
                 // 이미지 업로드 코드 설정
                 if(!PropertyManager.getInstance().getUserProfileImg().isEmpty()) {
                     uploadCode = "2";
-                    if(objects == null) {
+                    if(upLoadFile == null) {
                         uploadCode = "3";
                     }
                 } else {
                     uploadCode = "1";
-                    if(objects == null) {
+                    if(upLoadFile == null) {
                         uploadCode = "0";
                     }
                 }
@@ -619,7 +619,7 @@ public class EditProfileActivity extends BaseActivity
                 toMainActivityFromthis();
             } else {
                 getSupportFragmentManager().beginTransaction()
-                        .add(MiddleAloneDialogFragment.newInstance(3),
+                        .add(MiddleAloneDialogFragment.newInstance(2),
                                 "middle_edit_profile_fail").commit();
             }
             tbDone.setEnabled(true);

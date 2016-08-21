@@ -102,7 +102,6 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private Socket socket;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
