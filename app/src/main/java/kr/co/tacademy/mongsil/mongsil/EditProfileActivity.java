@@ -68,7 +68,6 @@ public class EditProfileActivity extends BaseActivity
     CircleImageView imgProfile;
 
     // 기본정보
-    LinearLayout editNameContainer, editLocationContainer;
     EditText editName;
     TextView editLocation;
 
@@ -148,35 +147,13 @@ public class EditProfileActivity extends BaseActivity
         });
 
         // 이름 편집 부분
-        editNameContainer =
-                (LinearLayout) findViewById(R.id.edit_name_container);
         editName = (EditText) findViewById(R.id.edit_name);
-        editName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if(b) {
-                    editName.setHint("");
-                } else {
-                    editName.setHint(getResources().getText(R.string.posting));
-                }
-            }
-        });
         editName.setText(PropertyManager.getInstance().getNickname());
-        editNameContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                InputMethodManager imm =
-                        (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(editName, 0);
-            }
-        });
 
         // 지역 편집 부분
-        editLocationContainer =
-                (LinearLayout) findViewById(R.id.edit_location_container);
         editLocation = (TextView) findViewById(R.id.edit_location);
         editLocation.setText(PropertyManager.getInstance().getLocation());
-        editLocationContainer.setOnClickListener(new View.OnClickListener() {
+        editLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Bitmap bitmap = BitmapUtil.viewToBitmap(editProfileContainer);
@@ -300,107 +277,6 @@ public class EditProfileActivity extends BaseActivity
         }
         return file;
     }
-    /*public synchronized static int getExifOrientation(String filepath)
-    {
-        int degree = 0;
-        ExifInterface exif = null;
-
-        try
-        {
-            exif = new ExifInterface(filepath);
-        }
-        catch (IOException e)
-        {
-            Log.e(TAG, "cannot read exif");
-            e.printStackTrace();
-        }
-
-        if (exif != null)
-        {
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
-
-            if (orientation != -1)
-            {
-                // We only recognize a subset of orientation tag values.
-                switch(orientation)
-                {
-                    case ExifInterface.ORIENTATION_ROTATE_90:
-                        degree = 90;
-                        break;
-
-                    case ExifInterface.ORIENTATION_ROTATE_180:
-                        degree = 180;
-                        break;
-
-                    case ExifInterface.ORIENTATION_ROTATE_270:
-                        degree = 270;
-                        break;
-                }
-
-            }
-        }
-
-        return degree;
-    }
-    public synchronized static Bitmap getRotatedBitmap(Bitmap bitmap, int degrees)
-    {
-        if ( degrees != 0 && bitmap != null )
-        {
-            Matrix m = new Matrix();
-            m.setRotate(degrees, (float) bitmap.getWidth() / 2, (float) bitmap.getHeight() / 2 );
-            try
-            {
-                Bitmap b2 = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
-                if (bitmap != b2)
-                {
-                    bitmap.recycle();
-                    bitmap = b2;
-                }
-            }
-            catch (OutOfMemoryError ex)
-            {
-                // We have no memory to rotate. Return the original bitmap.
-            }
-        }
-
-        return bitmap;
-    }
-
-    public synchronized static Bitmap safeDecodeBitmapFile(File file)
-    {
-        try
-        {
-            if (file.exists() == false)
-            {
-                return null;
-            }
-
-            // Max image size
-            final int IMAGE_MAX_SIZE 	= 1080;
-            BitmapFactory.Options bfo 	= new BitmapFactory.Options();
-            bfo.inJustDecodeBounds 		= true;
-
-            BitmapFactory.decodeFile(file.getAbsolutePath(), bfo);
-
-            if(bfo.outHeight * bfo.outWidth >= IMAGE_MAX_SIZE * IMAGE_MAX_SIZE)
-            {
-                bfo.inSampleSize = (int)Math.pow(2, (int)Math.round(Math.log(IMAGE_MAX_SIZE
-                        / (double) Math.max(bfo.outHeight, bfo.outWidth)) / Math.log(0.5)));
-            }
-            bfo.inJustDecodeBounds = false;
-            final Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), bfo);
-
-            int degree = getExifOrientation(file.getAbsolutePath());
-
-            return getRotatedBitmap(bitmap, degree);
-        }
-        catch(OutOfMemoryError ex)
-        {
-            ex.printStackTrace();
-
-            return null;
-        }
-    }*/
 
     private  void  cropIntent(Uri cropUri){
         Intent intent = new Intent("com.android.camera.action.CROP");
@@ -546,7 +422,7 @@ public class EditProfileActivity extends BaseActivity
                 Request request = null;
                 Log.e("업로드코드", uploadCode);
                 // 이미지가 있을 경우 MultipartBody
-                if(uploadCode.equals("3") || uploadCode.equals("0")) {
+                if(uploadCode.equals("1") || uploadCode.equals("2")) {
                     MultipartBody.Builder builder = new MultipartBody.Builder();
                     builder.setType(MultipartBody.FORM);
                     builder.addFormDataPart("uploadCode", uploadCode);

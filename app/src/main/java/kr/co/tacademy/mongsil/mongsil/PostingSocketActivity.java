@@ -404,7 +404,7 @@ public class PostingSocketActivity extends BaseActivity
     }*/
 
     private void filterIntent(Uri filterUri) {
-        Intent intent = new Intent(Intent.ACTION_EDIT);
+        Intent intent = new Intent(PostingSocketActivity.this, ImgFilterActivity.class);
         intent.setDataAndType(filterUri, "image/*");
         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(Intent.createChooser(intent, null));
@@ -632,7 +632,7 @@ public class PostingSocketActivity extends BaseActivity
                 Request request = null;
                 Log.e("업로드코드", uploadCode);
                 // 이미지가 있을 경우 MultipartBody
-                if (uploadCode.equals("3") || uploadCode.equals("0")) {
+                if (uploadCode.equals("1") || uploadCode.equals("2")) {
                     MultipartBody.Builder builder = new MultipartBody.Builder();
                     builder.setType(MultipartBody.FORM);
                     builder.addFormDataPart("uploadCode", uploadCode);

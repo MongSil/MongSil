@@ -37,6 +37,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import static android.util.Log.d;
 import static android.util.Log.e;
 
 /**
@@ -143,7 +144,7 @@ public class SearchPOIDialogFragment extends DialogFragment
         if (!(markedList == null || markedList.size() == 0)) {
             for (POIData poiData : markedList) {
                 datas.add(poiData);
-                poiData.typeCode = 1;
+                poiData.isMarked = true;
             }
             datas.add(0, new POIData(0));
         }
@@ -152,17 +153,47 @@ public class SearchPOIDialogFragment extends DialogFragment
     }
 
     private void markChange(boolean select, POIData poiData) {
-        /*int totalCount = PropertyManager.getInstance().getMarkCount();
+        int markCount = PropertyManager.getInstance().getMarkCount();
+        if(select) { // 추가할 때
+            // 노란색 별로 만든다
+            poiData.isMarked = true;
 
-        if (datas.get(0).typeCode != 0) {
-            datas.add(0, new POIData(0));
-        }
-        if (select) {
-        } else {
+            // 즐겨찾기 헤더가 없으면 추가
+            if(datas.get(0).typeCode != 0) {
+                datas.add(0, new POIData(0));
             }
+
+            // 데이터에 추가한다
+            datas.add(markCount+1, poiData);
+            if(markCount < 11) {
+                PropertyManager.getInstance().setMarkCount(markCount + 1);
+            }
+        } else { // 삭제할 때
+            // 별을 누른 항목과 같은 항목이 있는지 검사
+            for (int i = 0; i < datas.size(); i++) {
+                // 확인한 후 같은 항목이 존재하고
+                if (poiData.name.equals(datas.get(i).name)
+                        && poiData.noorLat.equals(datas.get(i).noorLat)
+                        && poiData.noorLon.equals(datas.get(i).noorLon)) {
+                    // 찾는 부분이 즐겨찾기 부분 사이즈보다 작으면 삭제
+                    if (i < markedList.size()+1) {
+                        datas.remove(i);
+                    }
+                }
+            }
+            if(markCount > 0) {
+                PropertyManager.getInstance().setMarkCount(markCount - 1);
+            }
+            // 즐겨찾기 수가 0이면
+            if(markCount == 0) {
+                // 즐겨찾기 헤더 삭제
+                datas.remove(0);
+            }
+
+            poiData.isMarked = false;
         }
+
         poiAdapter.add(datas);
-        poiAdapter.notifyDataSetChanged();*/
     }
 
     private void cancelSearch() {
@@ -200,28 +231,30 @@ public class SearchPOIDialogFragment extends DialogFragment
             try {
                 String markName = poiData.name;
                 dbHandler.beginTransaction();
-                //이름이 등록되었는지 확인해 보는 쿼리 빌더
+                // 이름이 등록되었는지 확인해 보는 쿼리 빌더
                 queryBuilder.appendWhere(UserDB.UserMark.USER_MARK_LOCATION + "='" + markName + "'");
-                //빌드된 쿼리로 결과집합을 알아 본다
-                //쿼리빌더를 사용 할 때는 첫번째 인자에 SQLiteDatabase객체를 등록함
+                // 빌드된 쿼리로 결과집합을 알아 본다
+                // 쿼리빌더를 사용 할 때는 첫번째 인자에 SQLiteDatabase객체를 등록함
                 resultExist = queryBuilder.query(dbHandler, null, null, null, null, null, null);
                 ContentValues markNameValues = new ContentValues();
                 if (resultExist.getCount() == 0) {
-                    //이름이 존재 하지 않는다면 걸그룹을 추가 한다.
+                    // 이름이 존재 하지 않는다면 추가 한다.
                     markNameValues.put(UserDB.UserMark.USER_MARK_LOCATION, markName);
-                } else { //이름이 존재 한다면 처음으로 돌아가버렷
+                } else { // 이름이 존재 한다면 처음으로 돌아가버렷
                     resultExist.moveToFirst();
                 }
-                markNameValues.put(UserDB.UserMark._ID, poiData.id);
+                //markNameValues.put(UserDB.UserMark._ID, poiData.id);
                 markNameValues.put(UserDB.UserMark.USER_MARK_UPPER, poiData.upperAddrName);
                 markNameValues.put(UserDB.UserMark.USER_MARK_LAT, poiData.noorLat);
                 markNameValues.put(UserDB.UserMark.USER_MARK_LON, poiData.noorLon);
-                dbHandler.insert(UserDB.UserMark.TABLE_MARK_NAME, "NODATA",
-                        markNameValues);
-                markChange(select, poiData);
+                dbHandler.insert(UserDB.UserMark.TABLE_MARK_NAME, "NODATA", markNameValues);
                 dbHandler.setTransactionSuccessful();
+                markChange(select, poiData);
             } catch (SQLiteException sqle) {
                 Log.e("SearchPOIDBError", sqle.toString());
+                if(markedList.size() > 0) {
+                    PropertyManager.getInstance().setMarkCount(0);
+                }
             } finally {
                 dbHandler.endTransaction();
                 if (resultExist != null) {
@@ -336,17 +369,36 @@ public class SearchPOIDialogFragment extends DialogFragment
         protected void onPostExecute(SearchPOIInfo result) {
             if (result != null && result.POIData.size() > 0) {
                 datas.clear();
+
+                // 즐겨찾기한 데이터를 넣음
                 markInit();
+
+                // 검색한 데이터 삽입
                 for (POIData poiData : result.POIData) {
                     datas.add(poiData);
                 }
-                if(markedList != null && markedList.size() > 0) {
-                    datas.add(markedList.size() + 1, new POIData(2));
-                } else {
-                    datas.add(0, new POIData(2));
+
+                // 즐겨찾기가 있을 경우
+                if( markedList != null && markedList.size() > 0) {
+                    // 검색 목록에서 즐겨찾기와 같은 항목이 있는지 확인
+                    for (int i = 1; i < markedList.size(); i++) {
+                        for (int j = 1; j < result.POIData.size(); j++) {
+                            // 확인한 후 같은 항목이 존재하면 즐겨찾기 마크로 바꿈
+                            if (markedList.get(i).name.equals(result.POIData.get(j).name)
+                                    && markedList.get(i).noorLat.equals(result.POIData.get(j).noorLat)
+                                    && markedList.get(i).noorLon.equals(result.POIData.get(j).noorLon)) {
+                                result.POIData.get(j).isMarked = true;
+                                result.POIData.get(j).id = markedList.get(i).id;
+                            }
+                        }
+                    }
+                    // 즐겨찾기 항목 크기의 다음에 검색내역 추가
+                    datas.add(markedList.size() + 1, new POIData(1));
+                } else { // 즐겨찾기가 없을 경우 검색내역 추가
+                    datas.add(0, new POIData(1));
                 }
+
                 poiAdapter.add(datas);
-                poiAdapter.notifyDataSetChanged();
             }
         }
     }

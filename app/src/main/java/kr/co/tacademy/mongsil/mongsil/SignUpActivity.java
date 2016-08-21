@@ -115,9 +115,9 @@ public class SignUpActivity extends BaseActivity
                 if(editName.getText().toString().isEmpty()) {
                     editName.setHint(getResources().getText(R.string.name));
                 }
-                if (gpsManager != null) {
+                /*if (gpsManager != null) {
                     gpsManager.connect();
-                }
+                }*/
                 signUpContainer.buildDrawingCache();
                 Bitmap b = signUpContainer.getDrawingCache();
                 getSupportFragmentManager().beginTransaction()

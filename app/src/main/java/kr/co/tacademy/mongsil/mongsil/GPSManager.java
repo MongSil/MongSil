@@ -99,33 +99,34 @@ public class GPSManager implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        requestGPSPermission();
+
         if(ContextCompat.checkSelfPermission(
                 activity.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_DENIED){
-            requestPermission();
-            // 권한 없음
-            Log.e("GPS 권한 체크 : ", "권한 없음");
-        } else {
-            Log.i(TAG, "Location services connected.");
-            Location location =
+                != PackageManager.PERMISSION_DENIED){
+            if(googleApiClient != null) {
+                Log.i(TAG, "Location services connected.");
+                Location location =
+                        LocationServices.FusedLocationApi
+                                .getLastLocation(googleApiClient);
+
+                if (location == null) {
                     LocationServices.FusedLocationApi
-                            .getLastLocation(googleApiClient);
+                            .requestLocationUpdates(
+                                    googleApiClient, locationRequest, this);
 
-            if (location == null) {
-                LocationServices.FusedLocationApi
-                        .requestLocationUpdates(
-                                googleApiClient, locationRequest, this);
+                    latitude = String.valueOf(location.getLatitude());
+                    longitude = String.valueOf(location.getLongitude());
 
-                latitude = String.valueOf(location.getLatitude());
-                longitude = String.valueOf(location.getLongitude());
-
-                Log.d("Location : Latitude", latitude);
-                Log.d("Location : Longitude", longitude);
-                Log.d("Location : Accuracy", String.valueOf(location.getAccuracy()));
-            } else {
-                locationCallback.handleNewLocation(location);
+                    Log.d("Location : Latitude", latitude);
+                    Log.d("Location : Longitude", longitude);
+                    Log.d("Location : Accuracy", String.valueOf(location.getAccuracy()));
+                } else {
+                    locationCallback.handleNewLocation(location);
+                }
             }
         }
+
     }
     @Override
     public void onConnectionSuspended(int i) {

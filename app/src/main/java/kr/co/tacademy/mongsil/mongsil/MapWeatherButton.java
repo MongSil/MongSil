@@ -60,7 +60,7 @@ public class MapWeatherButton extends RelativeLayout {
         int imgLocationBackground_resID = typedArray
                 .getResourceId(
                         R.styleable.WeatherButton_imgLocationBackground,
-                        R.drawable.circle_sunny);
+                        0);
         imgLocationBackground.setBackgroundResource(imgLocationBackground_resID);
 
         int imgLocationWeatherIcon_resID = typedArray
@@ -74,11 +74,6 @@ public class MapWeatherButton extends RelativeLayout {
 
         typedArray.recycle();
 
-    }
-
-
-    void setLocationName(String text_string) {
-        locationName.setText(text_string);
     }
 
     String getLocationName() {

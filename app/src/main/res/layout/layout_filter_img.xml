@@ -6,9 +6,22 @@
     android:layout_height="match_parent">
 
     <ImageView
+        android:id="@+id/img_filter_item"
+        android:src="@drawable/deagu"
+        android:scaleType="fitXY"
         android:background="@drawable/shape_radius"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"/>
+    <TextView
+        android:id="@+id/text_filter_title"
+        android:text="나는 필터다"
+        android:textSize="12dp"
+        android:textColor="@android:color/white"
+        android:background="@color/invisible"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 </LinearLayout>

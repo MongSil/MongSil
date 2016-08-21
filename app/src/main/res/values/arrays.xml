@@ -5,9 +5,17 @@
         <item>내가 쓴 댓글</item>
     </string-array>
     <string-array name="other_user_tab_title">
-    <item>당신의 이야기</item>
-    <item>당신이 쓴 댓글</item>
-</string-array>
+        <item>당신의 이야기</item>
+        <item>당신이 쓴 댓글</item>
+    </string-array>
+    <string-array name="filter_title">
+        <item>원본</item>
+        <item>선명하게</item>
+        <item>따뜻함</item>
+        <item>차가움</item>
+        <item>뽀샤시</item>
+        <item>흑백</item>
+    </string-array>
     <string-array name="locaitons">
         <item>인천</item>
         <item>서울</item>

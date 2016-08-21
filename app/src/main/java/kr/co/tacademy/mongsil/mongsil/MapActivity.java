@@ -153,8 +153,8 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
             if (result != null) {
                 if(order < weatherId.length) {
                     if( order == 0) {
-                        mapIncheon.setImgLocationBackground(WeatherData.imgFromWeatherCode(result.code, 0));
-                        mapIncheon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(result.code, 3));
+                        mapIncheon.setImgLocationBackground(WeatherData.imgFromWeatherCode(result.code, 3));
+                        mapIncheon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(result.code, 0));
                         order++;
                         new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapSeoul.getLocationName()));
                         return;
@@ -167,44 +167,44 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
 
     private void initButton(String weatherCode) {
         if (order == 1) {
-            mapSeoul.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
-            mapSeoul.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapSeoul.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapSeoul.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapGangwon.getLocationName()));
         } else if (order == 2) {
-            mapGangwon.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
-            mapGangwon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapGangwon.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapGangwon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapChungju.getLocationName()));
         } else if (order == 3) {
-            mapChungju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
-            mapChungju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapChungju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapChungju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapJunju.getLocationName()));
         } else if (order == 4) {
-            mapJunju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
-            mapJunju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapJunju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapJunju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapDaejeon.getLocationName()));
         } else if (order == 5) {
-            mapDaejeon.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
-            mapDaejeon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapDaejeon.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapDaejeon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapGwangju.getLocationName()));
         } else if (order == 6) {
-            mapGwangju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
-            mapGwangju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapGwangju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapGwangju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapDaegu.getLocationName()));
         } else if (order == 7) {
-            mapDaegu.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
-            mapDaegu.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapDaegu.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapDaegu.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapUlsan.getLocationName()));
         } else if (order == 8) {
-            mapUlsan.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
-            mapUlsan.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapUlsan.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapUlsan.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapBusan.getLocationName()));
         } else if (order == 9) {
-            mapBusan.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
-            mapBusan.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapBusan.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapBusan.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapJeju.getLocationName()));
         } else if (order == 10) {
-            mapJeju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 0));
-            mapJeju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapJeju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
+            mapJeju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
         }
         order++;
     }

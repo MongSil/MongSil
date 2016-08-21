@@ -96,7 +96,7 @@ public class MainActivity extends BaseActivity
         else
         {
             // 성공
-            if (!PropertyManager.getInstance().getUseGPS()) {
+            if (PropertyManager.getInstance().getUseGPS()) {
                 locationProviderCheck();
             }
         }

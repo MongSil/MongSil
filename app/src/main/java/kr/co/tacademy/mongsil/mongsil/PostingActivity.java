@@ -23,7 +23,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -56,7 +55,7 @@ public class PostingActivity extends BaseActivity
     private static final int PAGER_MAGIC_COUNT = 131072;
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
-    private static final int FILTER_FROM_CAMERA = 2;
+    private static final int FILTER_PHOTO = 2;
 
     // 툴바 필드
     TextView tbLocation, tbSave;
@@ -326,11 +325,12 @@ public class PostingActivity extends BaseActivity
         }
 
         switch (requestCode) {
-            case FILTER_FROM_CAMERA: {
+            case FILTER_PHOTO: {
                 // 크롭된 이미지를 세팅
                 final Bundle extras = data.getExtras();
                 if (extras != null) {
                     Bitmap photo = extras.getParcelable("data");
+                    tempSavedBitmapFile(photo);
                     imgPostingBackground.setImageBitmap(photo);
                 }
                 break;
@@ -405,10 +405,14 @@ public class PostingActivity extends BaseActivity
     }*/
 
     private void filterIntent(Uri filterUri) {
-        Intent intent = new Intent(Intent.ACTION_EDIT);
-        intent.setDataAndType(filterUri, "image/*");
-        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(Intent.createChooser(intent, null));
+        Intent intent = new Intent(PostingActivity.this, ImgFilterActivity.class);
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), filterUri);
+            intent.putExtra("photo", bitmap);
+        } catch (IOException ie) {
+            ie.printStackTrace();
+        }
+        startActivityForResult(intent, FILTER_PHOTO);
     }
 
     private boolean tempSavedBitmapFile(Bitmap tempBitmap) {
@@ -648,7 +652,7 @@ public class PostingActivity extends BaseActivity
                 Request request = null;
                 Log.e("업로드코드", uploadCode);
                 // 이미지가 있을 경우 MultipartBody
-                if (uploadCode.equals("3") || uploadCode.equals("0")) {
+                if (uploadCode.equals("1") || uploadCode.equals("2")) {
                     MultipartBody.Builder builder = new MultipartBody.Builder();
                     builder.setType(MultipartBody.FORM);
                     builder.addFormDataPart("uploadCode", uploadCode);

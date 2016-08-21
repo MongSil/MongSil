@@ -45,7 +45,7 @@ public class SearchPOIRecyclerViewAdapter
         private void setData(int select) {
             if (select == 0) {
                 headTitle.setText(R.string.search_location_mark_header);
-            } else if (select == 2) {
+            } else if (select == 1) {
                 headTitle.setText(R.string.search_location_content_header);
             }
         }
@@ -64,9 +64,10 @@ public class SearchPOIRecyclerViewAdapter
                     (TextView) view.findViewById(R.id.text_location_item);
         }
 
-        private void setData(final POIData poiData, final int position) {
+        private void setData(final POIData poiData) {
             if(poiData.isMarked) {
                 imgStar.setImageResource(R.drawable.yellow_star);
+                locationItem.setText(poiData.name);
                 imgStar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -75,7 +76,6 @@ public class SearchPOIRecyclerViewAdapter
                     }
                 });
             } else {
-                locationItem.setText(poiData.name);
                 imgStar.setImageResource(R.drawable.gray_star);
                 locationItem.setText(poiData.name);
                 imgStar.setOnClickListener(new View.OnClickListener() {
@@ -119,7 +119,7 @@ public class SearchPOIRecyclerViewAdapter
                 ((HeaderViewHolder) holder).setData(items.get(position).typeCode);
                 break;
             case LAYOUT_TYPE_ITEM:
-                ((ItemViewHolder) holder).setData(items.get(position), position);
+                ((ItemViewHolder) holder).setData(items.get(position));
                 break;
         }
     }

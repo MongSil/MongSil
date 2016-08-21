@@ -116,4 +116,5 @@
     <string name="reply_remove_question">댓글을 삭제하시겠어요?</string>
     <string name="reply_modify">댓글 수정</string>
     <string name="reply_remove">댓글 삭제</string>
+    <string name="img_filter_original">원본</string>
 </resources>
