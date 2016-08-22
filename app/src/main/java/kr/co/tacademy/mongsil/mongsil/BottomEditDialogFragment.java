@@ -16,10 +16,9 @@ import android.widget.Button;
  * Created by ccei on 2016-08-12.
  */
 public class BottomEditDialogFragment extends DialogFragment {
-    private static final String POST = "post";
     private static final String REPLY = "reply";
     public interface OnBottomEditDialogListener {
-        void onSelectBottomEdit(int select, Post post, ReplyData data);
+        void onSelectBottomEdit(int select, ReplyData data);
     }
 
     OnBottomEditDialogListener onBottomEditDialogListener;
@@ -32,17 +31,13 @@ public class BottomEditDialogFragment extends DialogFragment {
         }
     }
 
-    Post post;
     ReplyData replyData;
 
     public BottomEditDialogFragment() {
     }
 
-    public static BottomEditDialogFragment newInstance(Post post) {
+    public static BottomEditDialogFragment newInstance() {
         BottomEditDialogFragment fragment = new BottomEditDialogFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(POST, post);
-        fragment.setArguments(bundle);
         return fragment;
     }
     public static BottomEditDialogFragment newInstance(ReplyData data) {
@@ -57,9 +52,7 @@ public class BottomEditDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            if(getArguments().getParcelable(POST) != null) {
-                this.post = getArguments().getParcelable(POST);
-            } else {
+            if(getArguments().getParcelable(REPLY) != null) {
                 this.replyData = getArguments().getParcelable(REPLY);
             }
         }
@@ -74,14 +67,14 @@ public class BottomEditDialogFragment extends DialogFragment {
         Button btnSecond = (Button) view.findViewById(R.id.btn_second);
         Button btnClose = (Button) view.findViewById(R.id.btn_close);
 
-        if(post != null) {
+        if(replyData == null) {
             // 글 수정
             btnFirst.setText(getResources().getString(R.string.post_modify));
             btnFirst.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     dismiss();
-                    onBottomEditDialogListener.onSelectBottomEdit(0, post, null);
+                    onBottomEditDialogListener.onSelectBottomEdit(0, null);
                 }
             });
 
@@ -91,17 +84,17 @@ public class BottomEditDialogFragment extends DialogFragment {
                 @Override
                 public void onClick(View view) {
                     dismiss();
-                    onBottomEditDialogListener.onSelectBottomEdit(1, post, null);
+                    onBottomEditDialogListener.onSelectBottomEdit(1, null);
                 }
             });
-        } else if(replyData != null) {
+        } else {
             // 댓글 수정
             btnFirst.setText(getResources().getString(R.string.reply_modify));
             btnFirst.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     dismiss();
-                    onBottomEditDialogListener.onSelectBottomEdit(2, null, replyData);
+                    onBottomEditDialogListener.onSelectBottomEdit(2, replyData);
                 }
             });
 
@@ -111,7 +104,7 @@ public class BottomEditDialogFragment extends DialogFragment {
                 @Override
                 public void onClick(View view) {
                     dismiss();
-                    onBottomEditDialogListener.onSelectBottomEdit(3, null, replyData);
+                    onBottomEditDialogListener.onSelectBottomEdit(3, replyData);
                 }
             });
 

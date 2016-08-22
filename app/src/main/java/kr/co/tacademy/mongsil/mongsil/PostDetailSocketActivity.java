@@ -3,9 +3,9 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.ActionBar;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
@@ -27,28 +26,35 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.FormBody;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
-import static android.util.Log.e;
-
-public class PostDetailActivity extends BaseActivity
+@Deprecated
+public class PostDetailSocketActivity extends BaseActivity
         implements BottomEditDialogFragment.OnBottomEditDialogListener,
         MiddleSelectDialogFragment.OnMiddleSelectDialogListener,
         ReplyAdapterCallback {
+
+
     private static final String POST = "post";
     private static final String POSTID = "postid";
 
     String postId;
+    String writerId;
 
     ScrollView scrollPostingBackground;
 
@@ -73,6 +79,18 @@ public class PostDetailActivity extends BaseActivity
     ImageView imgNoneReply;
     TextView share, noneReply, replySend;
     EditText editReply;
+
+    private boolean isModify = false;
+    private boolean isDelete = false;
+
+    private Socket socket;
+    {
+        try {
+            socket = IO.socket(NetworkDefineConstant.SOCKET_SERVER_POST);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     protected void onResume() {
@@ -115,16 +133,18 @@ public class PostDetailActivity extends BaseActivity
         replySend = (TextView) findViewById(R.id.text_reply_send);
 
         Intent intent = getIntent();
-        if(intent.hasExtra(POST)) {
+        if (intent.hasExtra(POST)) {
             // 글 목록, 나의 이야기 목록
             post = intent.getParcelableExtra(POST);
             postId = String.valueOf(post.postId);
+            writerId = String.valueOf(post.userId);
             init();
-        } else if(intent.hasExtra(POSTID)){
+        } else if (intent.hasExtra(POSTID)) {
             // 내가 쓴 댓글 목록
             postId = intent.getStringExtra(POSTID);
-            new AsyncPostDetailJSONList().execute(postId);
+            showPostDetail();
         }
+        socketInit();
     }
 
     private void init() {
@@ -156,7 +176,7 @@ public class PostDetailActivity extends BaseActivity
                     WeatherData.imgFromWeatherCode(String.valueOf(post.weatherCode), 4));
         }
 
-        if(PropertyManager.getInstance().getUserId().equals(String.valueOf(post.userId))) {
+        if (PropertyManager.getInstance().getUserId().equals(String.valueOf(post.userId))) {
             tbThreeDot.setVisibility(View.VISIBLE);
             tbThreeDot.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -171,10 +191,10 @@ public class PostDetailActivity extends BaseActivity
         // 날씨 아이콘
         imgWeatherIcon.setImageResource(
                 WeatherData.imgFromWeatherCode(
-                        String.valueOf(post.weatherCode-1), 0));
+                        String.valueOf(post.weatherCode), 0));
         imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
                 R.anim.bounce_interpolator, new LinearInterpolator()));
-        if(imgWeatherIcon.isShown()) {
+        if (imgWeatherIcon.isShown() && imgWeatherIcon != null) {
             ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
         }
 
@@ -194,7 +214,7 @@ public class PostDetailActivity extends BaseActivity
         // 포스트 코멘트 수
         postReplyCount.setText(String.valueOf(post.replyCount));
 
-        new AsyncPostDetailReplyJSONList().execute(String.valueOf(post.postId));
+        //new AsyncPostDetailReplyJSONList().execute(String.valueOf(post.postId));
         // 댓글
         replyRecycler.setLayoutManager(
                 new LinearLayoutManager(MongSilApplication.getMongSilContext()));
@@ -203,6 +223,7 @@ public class PostDetailActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 if (!isReplyContainer) {
+                    appBar.setExpanded(false);
                     Animation upAnim = AnimationUtils.loadAnimation(
                             getApplicationContext(), R.anim.anim_slide_in_bottom);
                     upAnim.setFillAfter(true);
@@ -258,17 +279,10 @@ public class PostDetailActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 if (!editReply.getText().toString().isEmpty()) {
-                    if(data == null) {
-                        new AsyncReplingRequest().execute(
-                                PropertyManager.getInstance().getUserId(),
-                                editReply.getText().toString()
-                        );
+                    if (data == null) {
+                        writeReply(editReply.getText().toString());
                     } else {
-                        new AsyncModifyReplyRequest().execute(
-                                PropertyManager.getInstance().getUserId(),
-                                editReply.getText().toString(),
-                                String.valueOf(data.replyId)
-                        );
+                        modifyReply(data.replyId, editReply.getText().toString());
                     }
                     editReply.setText("");
                 }
@@ -283,234 +297,276 @@ public class PostDetailActivity extends BaseActivity
         animation.setInterpolator(interpolator);
         return animation;
     }
-    // 글 상세내용 가져오기
-    public class AsyncPostDetailJSONList extends AsyncTask<String, Integer, Post> {
-        @Override
-        protected Post doInBackground(String... args) {
-            Response response = null;
-            try {
-                OkHttpClient toServer = new OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
 
-                Request request = new Request.Builder()
-                        .url(String.format(
-                                NetworkDefineConstant.GET_SERVER_POST_DETAIL,
-                                args[0]))
-                        .build();
-                response = toServer.newCall(request).execute();
-                ResponseBody responseBody = response.body();
-                boolean flag = response.isSuccessful();
+    private void socketInit() {
+        socket.on("err", onErr);
+        socket.on("sendPostDetail", onPostDetail);
+        socket.on("sendReplyList", onReplyList);
+        socket.on("writeReplyOk", onWriteReplyOk);
+        socket.on("deleteReplyOk", onDeleteReplyOk);
+        socket.on("deletePostOk", onDeletePostOk);
+        socket.connect();
+        showReplyList(0);
+        replyAdapter.notifyDataSetChanged();
+    }
 
-                int responseCode = response.code();
-                if (responseCode >= 400) return null;
-                if (flag) {
-                    return ParseDataParseHandler.getJSONPostDetailRequestList(
-                            new StringBuilder(responseBody.string()));
-                }
-            } catch (UnknownHostException une) {
-                e("connectionFail", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                e("connectionFail", uee.toString());
-            } catch (Exception e) {
-                e("connectionFail", e.toString());
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Post result) {
-            post = result;
-            init();
+    private void showPostDetail() {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject
+                    .put("postId", postId);
+            socket.emit("showPostDetail", jsonObject);
+        } catch (JSONException je) {
+            je.printStackTrace();
         }
     }
 
-    // 댓글목록 가져오기
-    public class AsyncPostDetailReplyJSONList extends AsyncTask<String, Integer, ArrayList<ReplyData>> {
-        @Override
-        protected ArrayList<ReplyData> doInBackground(String... args) {
-            Response response = null;
-            try {
-                OkHttpClient toServer = new OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
-
-                Request request = new Request.Builder()
-                        .url(String.format(
-                                NetworkDefineConstant.GET_SERVER_POST_DETAIL_REPLY,
-                                args[0]))
-                        .build();
-                response = toServer.newCall(request).execute();
-                ResponseBody responseBody = response.body();
-                boolean flag = response.isSuccessful();
-
-                int responseCode = response.code();
-                if (responseCode >= 400) return null;
-                if (flag) {
-                    return ParseDataParseHandler.getJSONReplyRequestList(
-                            new StringBuilder(responseBody.string()));
-                }
-            } catch (UnknownHostException une) {
-                e("connectionFail", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                e("connectionFail", uee.toString());
-            } catch (Exception e) {
-                e("connectionFail", e.toString());
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<ReplyData> result) {
-            if (result != null && result.size() > 0) {
-                replyRecycler.setVisibility(View.VISIBLE);
-                imgNoneReply.setVisibility(View.GONE);
-                noneReply.setVisibility(View.GONE);
-                replyAdapter.add(result);
-                replyRecycler.smoothScrollToPosition(result.size()-1);
-            } else {
-                data = null;
-                replyRecycler.setVisibility(View.GONE);
-                imgNoneReply.setVisibility(View.VISIBLE);
-                noneReply.setVisibility(View.VISIBLE);
-                replyAdapter.notifyDataSetChanged();
-            }
+    private void showReplyList(int skip) {
+        final int COUNT = 20;
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject
+                    .put("postId", postId)
+                    .put("userId", PropertyManager.getInstance().getUserId())
+                    .put("skip", skip)
+                    .put("count", COUNT);
+            socket.emit("showReplyList", jsonObject);
+        } catch (JSONException je) {
+            je.printStackTrace();
         }
     }
 
-    // 댓글달기
-    public class AsyncReplingRequest extends AsyncTask<String, String, String> {
-        @Override
-        protected String doInBackground(String... args) {
-            Response response = null;
-            try {
-                //업로드는 타임 및 리드타임을 넉넉히 준다.
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
-
-                //요청 Body 세팅==> 그전 Query Parameter세팅과 같은 개념
-                RequestBody formBody = new FormBody.Builder()
-                        .add("userId", args[0])
-                        .add("content", args[1])
-                        .add("date", TimeData.getNow())
-                        .build();
-                //요청 세팅
-                Request request = new Request.Builder()
-                        .url(String.format(NetworkDefineConstant.POST_SERVER_POST_REPLY,
-                                postId))
-                        .post(formBody) //반드시 post로
-                        .build();
-                response = client.newCall(request).execute();
-                boolean flag = response.isSuccessful();
-                //응답 코드 200등등
-                int responseCode = response.code();
-                if (flag) {
-                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
-                    Log.e("response응답바디", response.body().string()); //json으로 변신
-                    return "success";
-                }
-            } catch (UnknownHostException une) {
-                Log.e("aa", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                Log.e("bb", uee.toString());
-            } catch (Exception e) {
-                Log.e("cc", e.toString());
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-
-            return "fail";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if (result.equals("success")) {
-                new AsyncPostDetailReplyJSONList().execute(
-                        postId);
-                Integer replyCountUp = Integer.valueOf(postReplyCount.getText().toString());
-                postReplyCount.setText(String.valueOf(replyCountUp+1));
-            } else if (result.equals("fail")) {
-                // 실패
-            }
+    private void writeReply(String content) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject
+                    .put("postId", postId)
+                    .put("userId", PropertyManager.getInstance().getUserId())
+                    .put("content", content)
+                    .put("date", TimeData.getNow())
+                    .put("writerId", writerId);
+            socket.emit("writeReply", jsonObject);
+        } catch (JSONException je) {
+            je.printStackTrace();
         }
     }
 
-    // 댓글수정
-    public class AsyncModifyReplyRequest extends AsyncTask<String, String, String> {
-        @Override
-        protected String doInBackground(String... args) {
-            Response response = null;
-            try {
-                //업로드는 타임 및 리드타임을 넉넉히 준다.
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
-
-                //요청 Body 세팅==> 그전 Query Parameter세팅과 같은 개념
-                RequestBody formBody = new FormBody.Builder()
-                        .add("userId", args[0])
-                        .add("content", args[1])
-                        .add("date", TimeData.getNow())
-                        .build();
-                //요청 세팅
-                Request request = new Request.Builder()
-                        .url(String.format(NetworkDefineConstant.PUT_SERVER_REPLY,
-                                postId, args[2]))
-                        .put(formBody)
-                        .build();
-                response = client.newCall(request).execute();
-                boolean flag = response.isSuccessful();
-                //응답 코드 200등등
-                int responseCode = response.code();
-                if (flag) {
-                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
-                    Log.e("response응답바디", response.body().string()); //json으로 변신
-                    return "success";
-                }
-            } catch (UnknownHostException une) {
-                Log.e("aa", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                Log.e("bb", uee.toString());
-            } catch (Exception e) {
-                Log.e("cc", e.toString());
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-
-            return "fail";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if (result.equals("success")) {
-                new AsyncPostDetailReplyJSONList().execute(
-                        postId);
-                Integer replyCount = Integer.valueOf(postReplyCount.getText().toString());
-                postReplyCount.setText(String.valueOf(replyCount-1));
-            } else if (result.equals("fail")) {
-                // 실패
-            }
+    private void modifyReply(int replyId, String content) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject
+                    .put("replyId", replyId)
+                    .put("content", content);
+            socket.emit("modifyReply", jsonObject);
+        } catch (JSONException je) {
+            je.printStackTrace();
         }
     }
+
+    private void deleteReply(int replyId) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject
+                    .put("replyId", replyId);
+            socket.emit("deleteReply", jsonObject);
+        } catch (JSONException je) {
+            je.printStackTrace();
+        }
+        isDelete = false;
+    }
+
+    private void deletePost() {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject
+                    .put("postId", postId);
+            socket.emit("deletePost", jsonObject);
+        } catch (JSONException je) {
+            je.printStackTrace();
+        }
+        isDelete = false;
+    }
+
+    private Emitter.Listener onErr = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    String err;
+                    try {
+                        err = data.getString("err");
+                        Log.e("err", " " + err);
+                    } catch (JSONException e) {
+                        return;
+                    }
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onPostDetail = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject jsonObject = (JSONObject) args[0];
+                    Post postData = null;
+                    try {
+                        JSONObject jsonData = jsonObject.getJSONObject("data");
+                        postData = new Post();
+
+                        postData.postId = jsonData.getInt("postId");
+                        postData.userId = jsonData.getInt("userId");
+                        postData.username = jsonData.getString("username");
+                        postData.content = jsonData.getString("content");
+                        postData.bgImg = jsonData.getString("bgImg");
+                        postData.weatherCode = jsonData.getInt("weatherCode");
+                        postData.area1 = jsonData.getString("area1");
+                        postData.area2 = jsonData.getString("area2");
+                        postData.date = jsonData.getString("date");
+                        postData.replyCount = jsonData.getInt("replyCount");
+
+                    } catch (JSONException je) {
+                        Log.e("Socket:PostDetail", "JSON파싱 중 에러발생", je);
+                    }
+
+                    if (postData != null) {
+                        post = postData;
+                        init();
+                    }
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onReplyList = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject jsonObject = (JSONObject) args[0];
+                    JSONArray jsonUsersReply = null;
+                    ArrayList<ReplyData> jsonReplyList = null;
+
+                    try {
+                        jsonUsersReply = jsonObject.getJSONArray("reply");
+                        jsonReplyList = new ArrayList<ReplyData>();
+                        int jsonArrSize = jsonUsersReply.length();
+                        for (int i = 0; i < jsonArrSize; i++) {
+                            JSONObject jData = jsonUsersReply.getJSONObject(i);
+                            ReplyData replyData = new ReplyData();
+                            if (i == 0) {
+                                replyData.totalCount = jsonObject.getInt("totalCount");
+                            }
+
+                            replyData.replyId = jData.getInt("replyId");
+                            replyData.userId = jData.getInt("userId");
+                            replyData.username = jData.getString("username");
+                            replyData.profileImg = jData.getString("profileImg");
+                            replyData.content = jData.getString("content");
+                            replyData.date = jData.getString("date");
+                            replyData.postId = jData.getInt("postId");
+
+                            jsonReplyList.add(replyData);
+                        }
+                    } catch (JSONException je) {
+                        Log.e("Socket:ReplyRequest", "JSON파싱 중 에러발생", je);
+                    }
+
+                    if (jsonReplyList != null && jsonReplyList.size() > 0) {
+                        replyRecycler.setVisibility(View.VISIBLE);
+                        imgNoneReply.setVisibility(View.GONE);
+                        noneReply.setVisibility(View.GONE);
+                        replyAdapter.add(jsonReplyList);
+                        replyRecycler.smoothScrollToPosition(jsonReplyList.size() - 1);
+                    } else {
+                        data = null;
+                        replyRecycler.setVisibility(View.GONE);
+                        imgNoneReply.setVisibility(View.VISIBLE);
+                        noneReply.setVisibility(View.VISIBLE);
+                        replyAdapter.notifyDataSetChanged();
+                    }
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onWriteReplyOk = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    showReplyList(0);
+                    replyAdapter.notifyDataSetChanged();
+                    if (!isModify) {
+                        Integer replyCountUp = Integer.valueOf(postReplyCount.getText().toString());
+                        postReplyCount.setText(String.valueOf(replyCountUp + 1));
+                    } else {
+                        isModify = false;
+                    }
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onDeleteReplyOk = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JSONObject jsonObject = (JSONObject)args[0];
+                        String msg = jsonObject.getString("msg");
+                        data = null;
+                        showReplyList(0);
+                        replyAdapter.notifyDataSetChanged();
+                    } catch (JSONException je) {
+                        je.printStackTrace();
+                    }
+
+                    Integer replyCountUp = Integer.valueOf(postReplyCount.getText().toString());
+                    postReplyCount.setText(String.valueOf(replyCountUp - 1));
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onDeletePostOk = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String msg = null;
+                    try {
+                        JSONObject jsonObject = (JSONObject)args[0];
+                        msg = jsonObject.getString("msg");
+                    } catch (JSONException je) {
+                        je.printStackTrace();
+                    }
+
+                    if (msg != null) {
+                        if (msg.equals("success")) {
+                            Intent intent = new Intent(PostDetailSocketActivity.this, MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            intent.putExtra("post_remove", true);
+                            startActivity(intent);
+                            finish();
+                        } else if (msg.equals("fail")) {
+                            getSupportFragmentManager().beginTransaction().
+                                    add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();
+                        }
+                    }
+                }
+            });
+        }
+    };
 
     // 글 삭제
     public class AsyncPostRemoveRequest extends AsyncTask<String, String, String> {
@@ -557,66 +613,12 @@ public class PostDetailActivity extends BaseActivity
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result.equals("success")) {
-                Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                Intent intent = new Intent(PostDetailSocketActivity.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.putExtra("post_remove", true);
                 startActivity(intent);
                 finish();
-            } else if(result.equals("fail")) {
-                getSupportFragmentManager().beginTransaction().
-                        add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();
-            }
-        }
-    }
-
-    // 댓글 삭제
-    public class AsyncReplyRemoveRequest extends AsyncTask<String, String, String> {
-        @Override
-        protected String doInBackground(String... args) {
-            Response response = null;
-            try {
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
-
-                Request request = new Request.Builder()
-                        .url(String.format(NetworkDefineConstant.DELETE_SERVER_REPLY_REMOVE,
-                                args[0], args[1]))
-                        .delete()
-                        .build();
-
-                response = client.newCall(request).execute();
-                boolean flag = response.isSuccessful();
-                //응답 코드 200등등
-                int responseCode = response.code();
-                if (flag) {
-                    Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
-                    Log.e("response응답바디", response.body().string()); //json으로 변신
-                    return "success";
-                }
-            } catch (UnknownHostException une) {
-                Log.e("aa", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                Log.e("bb", uee.toString());
-            } catch (Exception e) {
-                Log.e("cc", e.toString());
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-
-            return "fail";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if (result.equals("success")) {
-                data = null;
-                new AsyncPostDetailReplyJSONList().execute(postId);
-            } else if(result.equals("fail")) {
+            } else if (result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction().
                         add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();
             }
@@ -639,10 +641,12 @@ public class PostDetailActivity extends BaseActivity
                 break;
             case 2:
                 this.data = data;
+                isModify = true;
                 editReply.setText(data.content);
                 editReply.requestFocus();
                 break;
             case 3:
+                this.data = data;
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleSelectDialogFragment.newInstance(1),
                                 "middle_reply_remove").commit();
@@ -654,11 +658,15 @@ public class PostDetailActivity extends BaseActivity
     @Override
     public void onMiddleSelect(int select) {
         switch (select) {
-            case 0 :
-                new AsyncPostRemoveRequest().execute(postId);
+            case 0:
+                isDelete = true;
+                deletePost();
+                //new AsyncPostRemoveRequest().execute(postId);
                 break;
-            case 1 :
-                new AsyncReplyRemoveRequest().execute(postId, String.valueOf(data.replyId));
+            case 1:
+                isDelete = true;
+                deleteReply(data.replyId);
+                //new AsyncReplyRemoveRequest().execute(postId, String.valueOf(data.replyId));
                 break;
         }
     }
@@ -669,6 +677,17 @@ public class PostDetailActivity extends BaseActivity
         getSupportFragmentManager().beginTransaction()
                 .add(BottomEditDialogFragment.newInstance(data),
                         "bottom_reply_edit").commit();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        socket.off("err", onErr);
+        socket.off("sendPostDetail", onPostDetail);
+        socket.off("sendReplyList", onReplyList);
+        socket.off("writeReplyOk", onWriteReplyOk);
+        socket.off("deleteReplyOk", onDeleteReplyOk);
+        socket.off("deletePostOk", onDeletePostOk);
     }
 
     @Override
@@ -702,8 +721,8 @@ public class PostDetailActivity extends BaseActivity
     }
 
     private void toMainActivityFromthis() {
-        Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        Intent intent = new Intent(PostDetailSocketActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
     }

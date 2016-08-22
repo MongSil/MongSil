@@ -27,11 +27,11 @@ public class NetworkDefineConstant {
 
     // GET
     public static final String GET_SERVER_POST
-            = "http://" + HOST_URL + PORT_NUMBER + "/post?area1=%s" + "&skip=%s";
+            = "http://" + HOST_URL + PORT_NUMBER + "/post?area1=%s&skip=%s";
     public static final String GET_SERVER_POST_DETAIL
             = "http://" + HOST_URL + PORT_NUMBER + "/post/%s";
     public static final String GET_SERVER_POST_DETAIL_REPLY
-            = "http://" + HOST_URL + PORT_NUMBER + "/users/%s" + "/reply";
+            = "http://" + HOST_URL + PORT_NUMBER + "/post/%s" + "/reply";
     public static final String GET_SERVER_USER_POST
             = "http://" + HOST_URL + PORT_NUMBER + "/users/%s/post?skip=%s";
     public static final String GET_SERVER_USER_REPLY

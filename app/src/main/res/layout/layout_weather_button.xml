@@ -10,7 +10,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="5dp"
         android:text="@string/location"
-        android:textSize="16dp" />
+        android:textSize="12sp" />
 
     <FrameLayout
         android:id="@+id/weather_container"
@@ -22,8 +22,8 @@
 
         <ImageView
             android:id="@+id/img_location_weather_background"
-            android:layout_width="82dp"
-            android:layout_height="82dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:background="@drawable/circle_sunny" />
 
         <ImageView

@@ -73,11 +73,9 @@ public class PostPreviewDialogFragment extends DialogFragment {
 
         imgBackground = (ImageView) view.findViewById(R.id.img_preview_background);
         imgBackground.setBackgroundResource(R.drawable.sign_up_background);
-        if(photo != null) {
+        if(photo == null) {
             imgBackground.setBackgroundResource(
                     WeatherData.imgFromWeatherCode(String.valueOf(weatherPos), 3));
-        } else {
-
         }
 
         postContent = (TextView) view.findViewById(R.id.text_post_content);

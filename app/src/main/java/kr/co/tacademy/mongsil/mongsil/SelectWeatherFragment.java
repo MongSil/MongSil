@@ -16,6 +16,7 @@ import android.widget.ImageView;
 /**
  * Created by Han on 2016-08-15.
  */
+@Deprecated
 public class SelectWeatherFragment extends Fragment {
     private static final String POSITION = "position";
 

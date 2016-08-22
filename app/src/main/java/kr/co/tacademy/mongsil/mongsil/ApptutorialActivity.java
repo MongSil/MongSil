@@ -8,7 +8,6 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -141,7 +140,6 @@ public class AppTutorialActivity extends BaseActivity {
             View cloud2CutThree = page.findViewById(R.id.img_two_cloud03_cut);
 
             // 세번째
-
             View write = page.findViewById(R.id.img_tutorial_write);
             View cloud3CutTwo = page.findViewById(R.id.img_three_cloud02_cut);
             View cloud3CutThree = page.findViewById(R.id.img_three_cloud03_cut);*/

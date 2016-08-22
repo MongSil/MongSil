@@ -46,7 +46,7 @@ public class ImgFilterActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_img_filter);
 
-        imgFiltering = getIntent().getParcelableExtra("data");
+        imgFiltering = getIntent().getParcelableExtra("photo");
 
         // 툴바
         toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -57,13 +57,6 @@ public class ImgFilterActivity extends BaseActivity {
 
         // 필터 리스트
         filterRecycler = (RecyclerView) findViewById(R.id.filter_recycler);
-/*
-
-        Filter myFilter = new Filter();
-        myFilter.addSubFilter(new BrightnessSubFilter(30));
-        myFilter.addSubFilter(new ContrastSubFilter(1.1f));
-        Bitmap outputImage = myFilter.process(inputImage);
-*/
 
         init();
 
@@ -102,7 +95,6 @@ public class ImgFilterActivity extends BaseActivity {
         filterRecycler.setAdapter(adapter);
 
         imgInit();
-
     }
 
     private void imgInit() {

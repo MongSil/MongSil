@@ -98,7 +98,6 @@ public class OtherUserProfileActivity extends BaseActivity {
             Log.e("프로필이미지 value : ", " " + data.profileImg);
         } else {
             imgProfile.setImageResource(R.drawable.none_my_profile);
-            imgProfile.setClickable(false);
         }
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override

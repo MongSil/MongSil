@@ -57,6 +57,21 @@ public class MainActivity extends BaseActivity
     MiddleSelectDialogFragment.OnMiddleSelectDialogListener {
     private static final int RESULT_MAP = 30;
     private static final int RESULT_EDIT_PROFILE = 31;
+    private static final int RESULT_POSTING = 32;
+
+    public interface OnLocationChangeListener {
+        void onLocationChange(String location);
+    }
+
+    OnLocationChangeListener onLocationChangeListener;
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+        if (fragment instanceof OnLocationChangeListener) {
+            onLocationChangeListener = (OnLocationChangeListener) fragment;
+        }
+    }
 
     // 툴바 필드
     TextView tbTitle;
@@ -66,9 +81,6 @@ public class MainActivity extends BaseActivity
     RelativeLayout weatherContainer;
     ImageView animBackgroundWeather, imgWeatherIcon;
     TextView date, weatherName;
-
-    // 글목록 프레그먼트
-    MainSocketPostFragment mainSocketPostFragment;
 
     // 슬라이딩메뉴
     SlidingMenu slidingMenu;
@@ -107,13 +119,7 @@ public class MainActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // 글 삭제하고 난 후의 다이어로그 창
-        if (getIntent().getBooleanExtra("post_remove", false)) {
-            getSupportFragmentManager().beginTransaction().
-                    add(MiddleAloneDialogFragment.newInstance(0), "middle_done").commit();
-        }
-
-        // 글 작성 프레그먼트와 슬라이딩메뉴 프레그먼트를 선언
+        // 글 작성 프레그먼트 선언
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_post_fragment_container,
                         MainSocketPostFragment.newInstance(PropertyManager.getInstance().getLocation()))
@@ -170,20 +176,13 @@ public class MainActivity extends BaseActivity
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), PostingActivity.class);
                 intent.putExtra("area1", tbTitle.getText().toString());
-                startActivity(intent);
+                startActivityForResult(intent, RESULT_POSTING);
             }
         });
-
-        if (!getIntent().hasExtra("area1")) {
-            tbTitle.setText(PropertyManager.getInstance().getLocation());
-            new AsyncLatLonWeatherJSONList().execute(
-                    PropertyManager.getInstance().getLatLocation(),
-                    PropertyManager.getInstance().getLonLocation());
-        } else {
-            // 글을 작성하고 난 후의 지역 설정
-            new AsyncLatLonWeatherJSONList().execute(
-                    LocationData.ChangeToLatLon(getIntent().getStringExtra("area1")));
-        }
+        tbTitle.setText(PropertyManager.getInstance().getLocation());
+        new AsyncLatLonWeatherJSONList().execute(
+                PropertyManager.getInstance().getLatLocation(),
+                PropertyManager.getInstance().getLonLocation());
     }
 
     // 애니메이션 인터폴레이터 적용
@@ -203,16 +202,19 @@ public class MainActivity extends BaseActivity
                     String location = data.getStringExtra("name");
                     tbTitle.setText(location);
                     new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(location));
-                    mainSocketPostFragment = MainSocketPostFragment.newInstance(location);
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.main_post_fragment_container, mainSocketPostFragment)
-                            .commit();
+                    onLocationChangeListener.onLocationChange(location);
                     break;
                 case RESULT_EDIT_PROFILE :
                     finish();
                     startActivity(getIntent());
                     break;
-                //case RESULT_POSTING :
+                case RESULT_POSTING :
+                    String area1 = data.getStringExtra("area1");
+                    tbTitle.setText(area1);
+                    new AsyncLatLonWeatherJSONList().execute(
+                            LocationData.ChangeToLatLon(area1));
+                    onLocationChangeListener.onLocationChange(area1);
+                    break;
             }
         }
     }
@@ -224,10 +226,7 @@ public class MainActivity extends BaseActivity
             String location = POIData.upperAddrName;
             tbTitle.setText(location);
             new AsyncLatLonWeatherJSONList().execute(POIData.noorLat, POIData.noorLon);
-            mainSocketPostFragment = MainSocketPostFragment.newInstance(location);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_post_fragment_container, mainSocketPostFragment)
-                    .commit();
+            onLocationChangeListener.onLocationChange(location);
         }
     }
 
@@ -509,10 +508,7 @@ public class MainActivity extends BaseActivity
                 String GPSlocation = LocationData.ChangeToShortName(result);
                 Log.e("GPSlocation 결과 :", GPSlocation);
                 tbTitle.setText(GPSlocation);
-                mainSocketPostFragment = MainSocketPostFragment.newInstance(GPSlocation);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_post_fragment_container, mainSocketPostFragment)
-                        .commit();
+                onLocationChangeListener.onLocationChange(GPSlocation);
             }
         }
     }

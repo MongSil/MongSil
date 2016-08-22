@@ -17,7 +17,7 @@
         android:scrollbars="none">
         <ImageView
             android:id="@+id/img_posting_background"
-            android:background="@drawable/sign_up_background"
+            android:background="@drawable/background_sunny"
             android:scaleType="fitXY"
             android:fitsSystemWindows="true"
             android:layout_width="match_parent"

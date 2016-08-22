@@ -1,7 +1,9 @@
 package kr.co.tacademy.mongsil.mongsil;
 
-import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +28,8 @@ import io.socket.emitter.Emitter;
 /**
  * Created by ccei on 2016-08-19.
  */
-public class MainSocketPostFragment extends Fragment {
+public class MainSocketPostFragment extends Fragment
+        implements MainActivity.OnLocationChangeListener {
     public static final String AREA1 = "area1";
 
     private String area1 = null;
@@ -39,6 +42,8 @@ public class MainSocketPostFragment extends Fragment {
             throw new RuntimeException(e);
         }
     }
+
+    Handler handler = new Handler();
 
     public MainSocketPostFragment() {
         super();
@@ -62,24 +67,28 @@ public class MainSocketPostFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        //더미로 어댑터를 채운다.
-        postAdapter = new PostRecyclerViewAdapter(activity, Posts);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        postAdapter = new PostRecyclerViewAdapter((MainActivity)context, Posts);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getArguments() != null) {
-            area1 = getArguments().getString("area1");
+            area1 = getArguments().getString(AREA1);
         }
+
+        socket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
+        socket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
         socket.on("err", onErr);
         socket.on("loginCheck", onLogin);
         socket.on("sendPostList", onPostList);
         socket.connect();
+
         loginConfirm();
         showPostList(0);
+
         //postAdapter.items.clear();
         postAdapter.notifyDataSetChanged();
     }
@@ -131,15 +140,40 @@ public class MainSocketPostFragment extends Fragment {
         return postRecyclerView;
     }
 
+    private void LoadMore() {
+        showPostList(loadOnResult);
+    }
+
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDetach() {
+        super.onDetach();
         socket.disconnect();
 
+        socket.off(Socket.EVENT_CONNECT_ERROR, onConnectError);
+        socket.off(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
         socket.off("err", onErr);
         socket.off("login", onLogin);
         socket.off("sendPostList", onPostList);
     }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    private Emitter.Listener onConnectError = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ProgressDialog dialog = new ProgressDialog(getContext());
+                    dialog.setMessage("서버와의 연결에 실패했습니다.\n잠시만 기다려주세요...");
+                }
+            }, 2000);
+        }
+    };
 
     private Emitter.Listener onErr = new Emitter.Listener() {
         @Override
@@ -174,8 +208,6 @@ public class MainSocketPostFragment extends Fragment {
                         return;
                     }
                     if(msg == "success") {
-                        return;
-                    } else {
                     }
                 }
             });
@@ -246,6 +278,14 @@ public class MainSocketPostFragment extends Fragment {
         }
     };
 
+    @Override
+    public void onLocationChange(String location) {
+        area1 = location;
+        Posts.clear();
+        showPostList(0);
+        postAdapter.notifyDataSetChanged();
+    }
+
     private void addPostList(Post Post) {
         /*Posts.add(new Post.Builder()
                 .postId(Post.postId)
@@ -261,9 +301,5 @@ public class MainSocketPostFragment extends Fragment {
                 .replyCount(Post.replyCount)
                 .build());*/
         postAdapter.notifyItemInserted(1);
-    }
-
-    private void LoadMore() {
-        showPostList(loadOnResult);
     }
 }
