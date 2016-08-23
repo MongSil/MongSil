@@ -674,7 +674,7 @@ public class PostDetailSocketActivity extends BaseActivity
     }
 
     @Override
-    public void onLongSelectCallback(ReplyData data) {
+    public void onReplySelectCallback(ReplyData data) {
         this.data = data;
         getSupportFragmentManager().beginTransaction()
                 .add(BottomEditDialogFragment.newInstance(data),

@@ -74,10 +74,11 @@ public class PostingActivity extends BaseActivity
     // 카메라
     ImageView imgCamera;
 
+    Post modifingPost;
+
     private String area1 = "";
     private String area2 = "";
 
-    Intent intent;
     private UpLoadValueObject upLoadFile = null;
     private int currentPos = 0;
 
@@ -96,7 +97,7 @@ public class PostingActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posting);
 
-        intent = getIntent();
+        Intent intent = getIntent();
         // 툴바
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -170,7 +171,7 @@ public class PostingActivity extends BaseActivity
             @Override
             public void onPageSelected(int position) {
                 currentPos = position;
-                if(upLoadFile == null) {
+                if (upLoadFile == null) {
                     imgPostingBackground.setImageResource(
                             WeatherData.imgFromWeatherCode(String.valueOf(position), 4));
                 }
@@ -185,7 +186,7 @@ public class PostingActivity extends BaseActivity
         leftWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(currentPos > 0 && currentPos < 15) {
+                if (currentPos > 0 && currentPos < 15) {
                     selectWeatherPager.setCurrentItem(currentPos - 1);
                 }
             }
@@ -194,7 +195,7 @@ public class PostingActivity extends BaseActivity
         rightWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(currentPos >= 0 && currentPos <= 14) {
+                if (currentPos >= 0 && currentPos <= 14) {
                     selectWeatherPager.setCurrentItem(currentPos + 1);
                 }
             }
@@ -230,15 +231,15 @@ public class PostingActivity extends BaseActivity
         });
 
         if (intent.hasExtra("postdata")) {
-            Post postData = intent.getParcelableExtra("postdata");
-            currentPos = postData.weatherCode;
-            modifyPosting(postData);
+            modifingPost = intent.getParcelableExtra("postdata");
+            currentPos = modifingPost.weatherCode;
+            modifyPosting();
         }
     }
 
     private void savePost() {
         String postContent = editPosting.getText().toString();
-        if(tbLocation.getText().toString().isEmpty() ||
+        if (tbLocation.getText().toString().isEmpty() ||
                 tbLocation.getText().toString().equals
                         (getResources().getString(R.string.select_location))) {
             getSupportFragmentManager().beginTransaction()
@@ -252,23 +253,16 @@ public class PostingActivity extends BaseActivity
         } else {
             tbSave.setEnabled(false);
             // 글 쓸 때
-            if (!intent.hasExtra("postdata")) {
+            if (modifingPost == null) {
                 new AsyncPostingRequest(upLoadFile).execute(
                         area1,  // 지역1
-                        area2,  // 지역2
                         PropertyManager.getInstance().getUserId(), // 아이디
                         String.valueOf(currentPos), // 날씨 테마 코드
                         postContent    // 글 내용
                 );
             } else { // 글 수정할 때
                 tbLocation.setEnabled(false);
-                Post post = intent.getParcelableExtra("postdata");
-                if (!post.bgImg.isEmpty()) {
-                    Glide.with(getApplicationContext())
-                            .load(post.bgImg)
-                            .into(imgPostingBackground);
-                }
-                new AsyncModifyPostingRequest(intent.getStringExtra("bgImg"), upLoadFile).execute(
+                new AsyncModifyPostingRequest(modifingPost.bgImg, upLoadFile).execute(
                         PropertyManager.getInstance().getUserId(), // 아이디
                         String.valueOf(currentPos), // 날씨 테마 코드
                         postContent     // 글 내용
@@ -279,21 +273,20 @@ public class PostingActivity extends BaseActivity
 
     private String modifyPostId = null;
 
-    private void modifyPosting(Post postData) {
-        modifyPostId = String.valueOf(postData.postId);
+    private void modifyPosting() {
+        modifyPostId = String.valueOf(modifingPost.postId);
         tbLocation.setEnabled(false);
-        if (!postData.area2.isEmpty()) {
-            tbLocation.setText(String.valueOf(postData.area1 + ", " + postData.area2));
+        if (modifingPost.area2 == null) {
+            tbLocation.setText(String.valueOf(modifingPost.area1));
         } else {
-            tbLocation.setText(String.valueOf(postData.area1));
+            tbLocation.setText(String.valueOf(modifingPost.area1 + ", " + modifingPost.area2));
         }
 
-        if (!postData.bgImg.isEmpty()) {
-            Glide.with(this).load(postData.bgImg).into(imgPostingBackground);
+        if (modifingPost.bgImg != null) {
+            Glide.with(this).load(modifingPost.bgImg).into(imgPostingBackground);
         }
-
-        selectWeatherPager.setCurrentItem(postData.weatherCode);
-        editPosting.setText(postData.content);
+        selectWeatherPager.setCurrentItem(modifingPost.weatherCode);
+        editPosting.setText(modifingPost.content);
     }
 
     // 날씨 뷰페이저 어뎁터
@@ -304,7 +297,7 @@ public class PostingActivity extends BaseActivity
 
         @Override
         public boolean isViewFromObject(View view, Object object) {
-            return view==object;
+            return view == object;
         }
 
         @Override
@@ -326,7 +319,7 @@ public class PostingActivity extends BaseActivity
                     R.anim.bounce_interpolator, new LinearInterpolator()));
             AnimationDrawable animation =
                     (AnimationDrawable) imgWeatherIcon.getDrawable();
-            if(animation != null) {
+            if (animation != null) {
                 animation.start();
             }
 
@@ -337,7 +330,7 @@ public class PostingActivity extends BaseActivity
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            ((ViewPager) container).removeView((View)object);
+            ((ViewPager) container).removeView((View) object);
         }
 
         @Override
@@ -452,7 +445,7 @@ public class PostingActivity extends BaseActivity
             final FileOutputStream bitmapStream = new FileOutputStream(tempFile);
             tempBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bitmapStream);
             upLoadFile = new UpLoadValueObject(tempFile, true);
-            if(PropertyManager.getInstance().getSaveGallery()) {
+            if (PropertyManager.getInstance().getSaveGallery()) {
                 currentSelectedUri = Uri.fromFile(tempFile);
             }
             if (bitmapStream != null) {
@@ -554,11 +547,15 @@ public class PostingActivity extends BaseActivity
                     builder.setType(MultipartBody.FORM);
                     builder.addFormDataPart("uploadCode", uploadCode);
                     builder.addFormDataPart("area1", args[0]);
-                    builder.addFormDataPart("area2", args[1]);
-                    builder.addFormDataPart("userId", args[2]);
-                    builder.addFormDataPart("weatherCode", args[3]);
-                    builder.addFormDataPart("content", args[4]);
+                    builder.addFormDataPart("userId", args[1]);
+                    builder.addFormDataPart("weatherCode", args[2]);
+                    builder.addFormDataPart("content", args[3]);
                     builder.addFormDataPart("date", TimeData.getNow());
+                    if (area2 != null) {
+                        if (!area2.equals("null")) {
+                            builder.addFormDataPart("area2", area2);
+                        }
+                    }
                     if (object != null) {
                         File file = object.file;
                         builder.addFormDataPart("bgImg", file.getName(), RequestBody.create(IMAGE_MIME_TYPE, file));
@@ -572,15 +569,30 @@ public class PostingActivity extends BaseActivity
                             .post(requestBody)
                             .build();
                 } else { // 이미지가 없을 경우 formBody
-                    RequestBody formBody = new FormBody.Builder()
-                            .add("uploadCode", uploadCode)
-                            .add("area1", args[0])
-                            .add("area2", args[1])
-                            .add("userId", args[2])
-                            .add("weatherCode", args[3])
-                            .add("content", args[4])
-                            .add("date", TimeData.getNow())
-                            .build();
+                    // TODO : 형님께 area2가 있어야만 하는가 물어보자
+                    RequestBody formBody = null;
+                    if (area2 != null) {
+                        if (!area2.equals("null")) {
+                            formBody = new FormBody.Builder()
+                                    .add("uploadCode", uploadCode)
+                                    .add("area1", args[0])
+                                    .add("userId", args[1])
+                                    .add("weatherCode", args[2])
+                                    .add("content", args[3])
+                                    .add("area2", area2)
+                                    .add("date", TimeData.getNow())
+                                    .build();
+                        }
+                    }else {
+                            formBody = new FormBody.Builder()
+                                    .add("uploadCode", uploadCode)
+                                    .add("area1", args[0])
+                                    .add("userId", args[1])
+                                    .add("weatherCode", args[2])
+                                    .add("content", args[3])
+                                    .add("date", TimeData.getNow())
+                                    .build();
+                        }
                     //요청 세팅
                     request = new Request.Builder()
                             .url(NetworkDefineConstant.POST_SERVER_POST)
@@ -589,6 +601,7 @@ public class PostingActivity extends BaseActivity
                 }
 
                 response = toServer.newCall(request).execute();
+                Log.e("요청 보내기 완료", "");
                 boolean flag = response.isSuccessful();
                 //응답 코드 200등등
                 int responseCode = response.code();
@@ -737,9 +750,8 @@ public class PostingActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equalsIgnoreCase("success")) {
                 Intent intent = new Intent(PostingActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                intent.putExtra("area1", area1);
-                setResult(RESULT_OK, intent);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 finish();
             } else if (result.equalsIgnoreCase("fail")) {
                 getSupportFragmentManager().beginTransaction()
@@ -758,14 +770,16 @@ public class PostingActivity extends BaseActivity
     // POI 검색
     @Override
     public void onPOISearch(POIData poiData) {
-        if(poiData != null) {
+        if (poiData != null) {
             area1 = poiData.upperAddrName;
             area2 = poiData.middleAddrName;
 
             if (area2 != null) {
-                tbLocation.setText(String.valueOf(area1 + ", " + area2));
-            } else {
-                tbLocation.setText(area1);
+                if (!area2.equals("null")) {
+                    tbLocation.setText(String.valueOf(area1 + ", " + area2));
+                }
+            }else {
+                    tbLocation.setText(area1);
             }
         }
     }

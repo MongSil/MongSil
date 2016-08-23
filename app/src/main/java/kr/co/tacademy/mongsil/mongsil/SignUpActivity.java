@@ -60,11 +60,11 @@ public class SignUpActivity extends BaseActivity
         editName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-                if(b) {
+                if (b) {
                     editName.setHint("");
                     editName.setCursorVisible(true);
                 } else {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(editName.getWindowToken(), 0);
                     editName.setHint(getResources().getText(R.string.name));
                     editName.setCursorVisible(false);
@@ -83,7 +83,7 @@ public class SignUpActivity extends BaseActivity
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(!editable.toString().isEmpty()
+                if (!editable.toString().isEmpty()
                         && !location.getText().toString().equals("지역")) {
                     imgDone.setVisibility(View.VISIBLE);
                 } else {
@@ -98,12 +98,9 @@ public class SignUpActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 location.requestFocus();
-                if(editName.getText().toString().isEmpty()) {
+                if (editName.getText().toString().isEmpty()) {
                     editName.setHint(getResources().getText(R.string.name));
                 }
-                /*if (gpsManager != null) {
-                    gpsManager.connect();
-                }*/
                 signUpContainer.buildDrawingCache();
                 Bitmap b = signUpContainer.getDrawingCache();
                 getSupportFragmentManager().beginTransaction()
@@ -120,7 +117,7 @@ public class SignUpActivity extends BaseActivity
                 Boolean isDone = false;
                 nameFail.setVisibility(View.INVISIBLE);
                 locationFail.setVisibility(View.INVISIBLE);
-                if(editName.getText().toString().trim().isEmpty()) {
+                if (editName.getText().toString().trim().isEmpty()) {
                     // 이름을 입력하지 않았을 때
                     nameFail.setVisibility(View.VISIBLE);
                     editName.requestFocus();
@@ -128,13 +125,13 @@ public class SignUpActivity extends BaseActivity
                 } else {
                     isDone = true;
                 }
-                if(location.getText().toString().trim().isEmpty() ||
+                if (location.getText().toString().trim().isEmpty() ||
                         location.getText().toString().trim().equals("지역")) {
                     // 지역을 선택하지 않았을 때
                     locationFail.setVisibility(View.VISIBLE);
                     isDone = false;
                 }
-                if(isDone) {
+                if (isDone) {
                     imgDone.setEnabled(false);
                     String fcmToken = FirebaseInstanceId.getInstance().getToken();
                     if (!TextUtils.isEmpty(fcmToken) && !fcmToken.equals("")) {
@@ -202,15 +199,17 @@ public class SignUpActivity extends BaseActivity
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            Log.e("회원가입 결과", result+"");
-            if (!result.isEmpty() | !result.equals("null")) {
-                PropertyManager.getInstance().setNickname(editName.getText().toString());
-                PropertyManager.getInstance().setLocation(location.getText().toString());
-                PropertyManager.getInstance().setUserId(result);
-                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            } else if (result.equals("fail")) {
+            Log.e("회원가입 결과", result + "");
+            if (result != null) {
+                if (!result.equals("null")) {
+                    PropertyManager.getInstance().setNickname(editName.getText().toString());
+                    PropertyManager.getInstance().setLocation(location.getText().toString());
+                    PropertyManager.getInstance().setUserId(result);
+                    Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+            } else {
                 // 실패
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(90),
@@ -231,7 +230,7 @@ public class SignUpActivity extends BaseActivity
     @Override
     public void onSelectLocation(String selectLocation) {
         location.setText(selectLocation);
-        if(!editName.getText().toString().isEmpty()) {
+        if (!editName.getText().toString().isEmpty()) {
             imgDone.setVisibility(View.VISIBLE);
         }
     }

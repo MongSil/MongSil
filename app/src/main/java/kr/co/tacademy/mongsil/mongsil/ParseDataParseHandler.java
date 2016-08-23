@@ -294,8 +294,8 @@ public class ParseDataParseHandler {
         JSONObject jsonObject;
 
         try {
-            JSONObject object = new JSONObject(buf.toString());
-            String result = object.getString("userId");
+            jsonObject = new JSONObject(buf.toString());
+            String result = jsonObject.getString("userId");
             return result;
         } catch (JSONException je) {
             Log.e("POST:UserLogin", "JSON파싱 중 에러발생", je);

@@ -57,11 +57,11 @@ public class ProfileMenuTabFragment extends Fragment {
 
         userRecycler = (RecyclerView) view.findViewById(R.id.post_recycler);
         userRecycler.setLayoutManager(layoutManager);
-        userRecycler.setAdapter(postAdapter);
 
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
             postAdapter = new PostRecyclerViewAdapter(MongSilApplication.getMongSilContext());
+            userRecycler.setAdapter(postAdapter);
             userRecycler.setOnScrollListener(
                     new EndlessRecyclerOnScrollListener(layoutManager) {
                         @Override
@@ -77,6 +77,7 @@ public class ProfileMenuTabFragment extends Fragment {
         } else {
             // 내가 쓴 댓글 탭
             replyAdapter = new ReplyRecyclerViewAdapter(getActivity().getSupportFragmentManager());
+            userRecycler.setAdapter(replyAdapter);
             userRecycler.setOnScrollListener(
                     new EndlessRecyclerOnScrollListener(layoutManager) {
                         @Override

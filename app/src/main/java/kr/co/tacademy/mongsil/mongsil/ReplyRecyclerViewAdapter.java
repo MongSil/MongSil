@@ -93,7 +93,7 @@ public class ReplyRecyclerViewAdapter
                 contentContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        callback.onLongSelectCallback(data);
+                        callback.onReplySelectCallback(data);
                     }
                 });
             }

@@ -58,8 +58,6 @@ public class PostDetailActivity extends BaseActivity
     private String postId;
     private String userId;
 
-    ScrollView scrollPostingBackground;
-
     // 툴바 필드
     AppBarLayout appBar;
     Toolbar toolbar;
@@ -67,6 +65,7 @@ public class PostDetailActivity extends BaseActivity
     ImageView tbThreeDot;
 
     // 글 필드
+    ScrollView scrollPostingBackground;
     ImageView imgBackground, imgWeatherIcon;
     TextView postContent, postLocation, postTime, postName, postReplyCount;
     Post post;
@@ -85,12 +84,6 @@ public class PostDetailActivity extends BaseActivity
 
     private int loadOnResult = 0;
     private int maxLoadSize = 1;
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        post = new Post();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,7 +142,7 @@ public class PostDetailActivity extends BaseActivity
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
         }
-        if (!post.area2.isEmpty()) {
+        if (!post.area2.isEmpty() && !post.area2.equals("null")) {
             tbTitle.setText(String.valueOf(post.area1 + ", " + post.area2));
         } else {
             tbTitle.setText(String.valueOf(post.area1));
@@ -162,7 +155,6 @@ public class PostDetailActivity extends BaseActivity
                 return true;
             }
         });
-        Log.e("asdf", post.weatherCode+"");
         if (post.bgImg.isEmpty() || post.bgImg.equals("null")) {
             imgBackground.setImageResource(
                     WeatherData.imgFromWeatherCode(String.valueOf(post.weatherCode), 4));
@@ -644,8 +636,8 @@ public class PostDetailActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equals("success")) {
                 Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                setResult(RESULT_OK, intent);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 finish();
             } else if (result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction().
@@ -751,7 +743,7 @@ public class PostDetailActivity extends BaseActivity
     }
 
     @Override
-    public void onLongSelectCallback(ReplyData data) {
+    public void onReplySelectCallback(ReplyData data) {
         this.data = data;
         getSupportFragmentManager().beginTransaction()
                 .add(BottomEditDialogFragment.newInstance(data),

@@ -30,6 +30,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -214,7 +215,6 @@ public class MainActivity extends BaseActivity
                     break;
                 case RESULT_POSTING :
                     String area1Posting = data.getStringExtra("area1");
-                    Log.e("asdf", area1Posting+"");
                     tbTitle.setText(area1Posting);
                     new AsyncLatLonWeatherJSONList().execute(
                             LocationData.ChangeToLatLon(area1Posting));
@@ -222,10 +222,6 @@ public class MainActivity extends BaseActivity
                             .replace(R.id.main_post_fragment_container,
                                     MainPostFragment.newInstance(area1Posting))
                             .commit();
-                    break;
-                case RESULT_DELETE :
-                    finish();
-                    startActivity(getIntent());
                     break;
                 case RESULT_SETTING :
                     if(PropertyManager.getInstance().getUseGPS()) {
@@ -554,6 +550,9 @@ public class MainActivity extends BaseActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private final long FINISH_INTERVAL_TIME = 2000;
+    private long backPressedTime = 0;
+
     // 백 버튼 눌렀을 때
     @Override
     public void onBackPressed() {
@@ -561,7 +560,16 @@ public class MainActivity extends BaseActivity
             slidingMenu.toggle();
             return;
         }
-        super.onBackPressed();
+        long currentTime = System.currentTimeMillis();
+        long intervalTime = currentTime - backPressedTime;
+
+        if (0 <= intervalTime && FINISH_INTERVAL_TIME >= intervalTime) {
+            super.onBackPressed();
+        } else {
+            backPressedTime = currentTime;
+            Toast.makeText(getApplicationContext(),
+                    "뒤로가기 버튼을 한번 더 누르시면 종료합니다.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     // 아래 전부 GPS 기능 관련
