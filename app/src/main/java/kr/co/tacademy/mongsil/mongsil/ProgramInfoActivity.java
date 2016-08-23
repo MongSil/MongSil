@@ -7,9 +7,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-public class ProgramInfoActivity extends AppCompatActivity {
+public class ProgramInfoActivity extends BaseActivity {
+
 
     RelativeLayout apacheLicenseContainer, MITLicenseContainer;
     WebView webView;
@@ -60,7 +62,11 @@ public class ProgramInfoActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home :
-                finish();
+                if(webView.isShown()) {
+                    webView.setVisibility(View.GONE);
+                } else {
+                    finish();
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);

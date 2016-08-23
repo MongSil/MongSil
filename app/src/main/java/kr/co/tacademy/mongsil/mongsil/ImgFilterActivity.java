@@ -2,6 +2,7 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
@@ -74,8 +75,10 @@ public class ImgFilterActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                //Bitmap finalImg =;
                 intent.putExtra("data", imgFiltering);
-                setResult(FILTER_PHOTO);
+                setResult(RESULT_OK);
                 finish();
             }
         });

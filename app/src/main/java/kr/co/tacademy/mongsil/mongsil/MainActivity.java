@@ -3,6 +3,7 @@ package kr.co.tacademy.mongsil.mongsil;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
@@ -43,7 +44,6 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import io.socket.client.Socket;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -58,6 +58,8 @@ public class MainActivity extends BaseActivity
     private static final int RESULT_MAP = 30;
     private static final int RESULT_EDIT_PROFILE = 31;
     private static final int RESULT_POSTING = 32;
+    private static final int RESULT_SETTING = 33;
+    private static final int RESULT_DELETE = 39;
 
     public interface OnLocationChangeListener {
         void onLocationChange(String location);
@@ -122,7 +124,7 @@ public class MainActivity extends BaseActivity
         // 글 작성 프레그먼트 선언
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_post_fragment_container,
-                        MainSocketPostFragment.newInstance(PropertyManager.getInstance().getLocation()))
+                        MainPostFragment.newInstance(PropertyManager.getInstance().getLocation()))
                 .commit();
         // 툴바 추가
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -138,7 +140,7 @@ public class MainActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(new SearchPOIDialogFragment(), "search_main").commit();
+                        .add(SearchPOIDialogFragment.newInstance(), "search_main").commit();
             }
         });
         tbSearch = (ImageView) toolbar.findViewById(R.id.toolbar_search);
@@ -175,7 +177,6 @@ public class MainActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), PostingActivity.class);
-                intent.putExtra("area1", tbTitle.getText().toString());
                 startActivityForResult(intent, RESULT_POSTING);
             }
         });
@@ -202,18 +203,35 @@ public class MainActivity extends BaseActivity
                     String location = data.getStringExtra("name");
                     tbTitle.setText(location);
                     new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(location));
-                    onLocationChangeListener.onLocationChange(location);
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_post_fragment_container,
+                                    MainPostFragment.newInstance(location))
+                            .commit();
                     break;
                 case RESULT_EDIT_PROFILE :
                     finish();
                     startActivity(getIntent());
                     break;
                 case RESULT_POSTING :
-                    String area1 = data.getStringExtra("area1");
-                    tbTitle.setText(area1);
+                    String area1Posting = data.getStringExtra("area1");
+                    Log.e("asdf", area1Posting+"");
+                    tbTitle.setText(area1Posting);
                     new AsyncLatLonWeatherJSONList().execute(
-                            LocationData.ChangeToLatLon(area1));
-                    onLocationChangeListener.onLocationChange(area1);
+                            LocationData.ChangeToLatLon(area1Posting));
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_post_fragment_container,
+                                    MainPostFragment.newInstance(area1Posting))
+                            .commit();
+                    break;
+                case RESULT_DELETE :
+                    finish();
+                    startActivity(getIntent());
+                    break;
+                case RESULT_SETTING :
+                    if(PropertyManager.getInstance().getUseGPS()) {
+                        finish();
+                        startActivity(getIntent());
+                    }
                     break;
             }
         }
@@ -221,12 +239,15 @@ public class MainActivity extends BaseActivity
 
     // 날씨를 검색해서 지역 정보를 받아옴
     @Override
-    public void onPOISearch(POIData POIData) {
-        if (POIData != null) {
-            String location = POIData.upperAddrName;
+    public void onPOISearch(POIData poiData) {
+        if (poiData != null) {
+            String location = poiData.upperAddrName;
             tbTitle.setText(location);
-            new AsyncLatLonWeatherJSONList().execute(POIData.noorLat, POIData.noorLon);
-            onLocationChangeListener.onLocationChange(location);
+            new AsyncLatLonWeatherJSONList().execute(poiData.noorLat, poiData.noorLon);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_post_fragment_container,
+                            MainPostFragment.newInstance(location))
+                    .commit();
         }
     }
 
@@ -279,16 +300,17 @@ public class MainActivity extends BaseActivity
         imgSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, SettingActivity.class));
+                startActivityForResult(
+                        new Intent(MainActivity.this, SettingActivity.class), RESULT_SETTING);
             }
         });
-        imgAlarm = (ImageView) menu.findViewById(R.id.img_alarm);
-        imgAlarm.setOnClickListener(new View.OnClickListener() {
+        //imgAlarm = (ImageView) menu.findViewById(R.id.img_alarm);
+        /*imgAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MainActivity.this, AlarmActivity.class));
             }
-        });
+        });*/
         imgClose = (ImageView) menu.findViewById(R.id.img_close);
         imgClose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -447,11 +469,16 @@ public class MainActivity extends BaseActivity
                 imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.code, 0));
                 weatherContainer.setBackgroundResource(WeatherData.imgFromWeatherCode(result.code, 1));
                 animBackgroundWeather.setImageResource(WeatherData.imgFromWeatherCode(result.code, 2));
-                if (animBackgroundWeather.isShown()) {
-                    ((AnimationDrawable) animBackgroundWeather.getDrawable()).start();
+
+                AnimationDrawable animationBackground =
+                        (AnimationDrawable) animBackgroundWeather.getDrawable();
+                if(animationBackground != null) {
+                    animationBackground.start();
                 }
-                if (imgWeatherIcon.isShown()) {
-                    ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+                AnimationDrawable animationIcon =
+                        (AnimationDrawable) imgWeatherIcon.getDrawable();
+                if(animationIcon != null) {
+                    animationIcon.start();
                 }
             }
         }
@@ -508,7 +535,10 @@ public class MainActivity extends BaseActivity
                 String GPSlocation = LocationData.ChangeToShortName(result);
                 Log.e("GPSlocation 결과 :", GPSlocation);
                 tbTitle.setText(GPSlocation);
-                onLocationChangeListener.onLocationChange(GPSlocation);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_post_fragment_container,
+                                MainPostFragment.newInstance(GPSlocation))
+                        .commit();
             }
         }
     }
@@ -547,7 +577,7 @@ public class MainActivity extends BaseActivity
     public void handleNewLocation(Location location) {
         String lat = String.valueOf(location.getLatitude());
         String lng = String.valueOf(location.getLongitude());
-        Log.e("handleNewLocation 실행 : ", lat +" "+ lng);
+        Log.e("handleNewLocation" + " 실행 : ", lat +" "+ lng);
         new AsyncReGeoJSONList().execute(lat, lng);
         new AsyncLatLonWeatherJSONList().execute(lat, lng);
     }
@@ -557,7 +587,7 @@ public class MainActivity extends BaseActivity
         if(locationManager == null) {
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         }
-        // TODO : 환경설정에서 GPS가 꺼져있을 경우를 구현
+
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             getSupportFragmentManager().beginTransaction()
                     .add(MiddleSelectDialogFragment.newInstance(10),
@@ -569,6 +599,30 @@ public class MainActivity extends BaseActivity
             }
         }
     }
+
+    private static final int RC_FINE_LOCATION = 100;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case RC_FINE_LOCATION:
+
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (gpsManager == null) {
+                        gpsManager = new GPSManager(this, this);
+                        gpsManager.connect();
+                    }
+                    finish();
+                    startActivity(getIntent());
+                } else {
+                    PropertyManager.getInstance().setUseGps(false);
+                }
+                return;
+        }
+    }
+
 
     @Override
     public void onMiddleSelect(int select) {

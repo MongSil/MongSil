@@ -62,10 +62,10 @@
                 android:src="@drawable/icon_setting"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:layout_centerInParent="true"
-                android:layout_toLeftOf="@+id/img_alarm"
-                android:layout_toStartOf="@+id/img_alarm" />
-            <ImageView
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/img_close"
+                android:layout_toStartOf="@+id/img_close" />
+            <!--<ImageView
                 android:id="@+id/img_alarm"
                 android:src="@drawable/icon_alram"
                 android:layout_marginLeft="17dp"
@@ -73,7 +73,7 @@
                 android:layout_height="22dp"
                 android:layout_centerInParent="true"
                 android:layout_toLeftOf="@+id/img_close"
-                android:layout_toStartOf="@+id/img_close"/>
+                android:layout_toStartOf="@+id/img_close"/>-->
             <ImageView
                 android:id="@+id/img_close"
                 android:src="@drawable/icon_close"

@@ -117,22 +117,6 @@ public class BottomPicDialogFragment extends DialogFragment {
         }
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_REQUEST_STORAGE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-
-                    //사용자가 퍼미션을 OK했을 경우
-
-                } else {
-                    dismissAllowingStateLoss();
-                    //사용자가 퍼미션을 거절했을 경우
-                }
-                break;
-        }
-    }
-
     @Override
     public void onStop() {
         super.onStop();

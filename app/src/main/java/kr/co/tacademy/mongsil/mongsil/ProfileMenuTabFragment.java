@@ -57,6 +57,7 @@ public class ProfileMenuTabFragment extends Fragment {
 
         userRecycler = (RecyclerView) view.findViewById(R.id.post_recycler);
         userRecycler.setLayoutManager(layoutManager);
+        userRecycler.setAdapter(postAdapter);
 
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
@@ -169,7 +170,6 @@ public class ProfileMenuTabFragment extends Fragment {
                     }
                 }
                 postAdapter.add(result.post);
-                userRecycler.setAdapter(postAdapter);
             }
         }
     }
@@ -227,7 +227,6 @@ public class ProfileMenuTabFragment extends Fragment {
                 }
 
                 replyAdapter.add(result);
-                userRecycler.setAdapter(replyAdapter);
             }
         }
     }

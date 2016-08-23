@@ -31,7 +31,7 @@ public class NetworkDefineConstant {
     public static final String GET_SERVER_POST_DETAIL
             = "http://" + HOST_URL + PORT_NUMBER + "/post/%s";
     public static final String GET_SERVER_POST_DETAIL_REPLY
-            = "http://" + HOST_URL + PORT_NUMBER + "/post/%s" + "/reply";
+            = "http://" + HOST_URL + PORT_NUMBER + "/post/%s" + "/reply?skip=%s";
     public static final String GET_SERVER_USER_POST
             = "http://" + HOST_URL + PORT_NUMBER + "/users/%s/post?skip=%s";
     public static final String GET_SERVER_USER_REPLY

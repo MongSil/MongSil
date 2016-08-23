@@ -109,16 +109,6 @@
             android:layout_marginTop="40dp" />
 
         <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
-            android:id="@+id/map_gangwon"
-            app:textLocationName="@string/gangwon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_alignTop="@+id/map_seoul"
-            android:layout_toRightOf="@+id/map_seoul"
-            android:layout_toEndOf="@+id/map_seoul" />
-
-        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
             android:id="@+id/map_gwangju"
             app:textLocationName="@string/gwangju"
             android:layout_width="wrap_content"
@@ -135,6 +125,16 @@
             android:layout_above="@+id/map_daegu"
             android:layout_toLeftOf="@+id/map_gangwon"
             android:layout_toStartOf="@+id/map_gangwon" />
+
+        <kr.co.tacademy.mongsil.mongsil.MapWeatherButton
+            android:id="@+id/map_gangwon"
+            app:textLocationName="@string/gangwon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/map_incheon"
+            android:layout_alignBottom="@+id/map_incheon"
+            android:layout_toRightOf="@+id/map_seoul"
+            android:layout_toEndOf="@+id/map_seoul" />
 
 
     </RelativeLayout>

@@ -68,9 +68,9 @@ public class OtherUserProfileActivity extends BaseActivity {
         textMyLocation = (TextView) findViewById(R.id.text_my_location);
 
         imgSetting = (ImageView) findViewById(R.id.img_setting);
-        imgAlarm = (ImageView) findViewById(R.id.img_alarm);
+        //imgAlarm = (ImageView) findViewById(R.id.img_alarm);
         imgSetting.setVisibility(View.INVISIBLE);
-        imgAlarm.setVisibility(View.INVISIBLE);
+        //imgAlarm.setVisibility(View.INVISIBLE);
 
         imgClose = (ImageView) findViewById(R.id.img_close);
 

@@ -15,6 +15,7 @@ import com.dinuscxj.refresh.RecyclerRefreshLayout;
 /**
  * Created by Han on 2016-08-05.
  */
+@Deprecated
 public class AlarmActivity extends BaseActivity {
 
     RecyclerRefreshLayout recyclerRefreshLayout;

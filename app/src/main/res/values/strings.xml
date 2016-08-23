@@ -111,10 +111,19 @@
     <string name="none_user_info">선택하신 유저의 정보가 존재하지 않습니다.</string>
     <string name="Apache_license">Apache license 2.0</string>
     <string name="MIT_license">MIT license</string>
-    <string name="gps_setting_request">몽실몽실은 GPS 사용을 권장합니다.\nGPS를 켜시겠습니까?</string>
+    <string name="gps_setting_request">GPS 사용을 권장합니다.\nGPS를 켜시겠습니까?</string>
     <string name="google_api_connection_fail">위치 선정 네트워크 연결에 실패했습니다!</string>
     <string name="reply_remove_question">댓글을 삭제하시겠어요?</string>
     <string name="reply_modify">댓글 수정</string>
     <string name="reply_remove">댓글 삭제</string>
     <string name="img_filter_original">원본</string>
+    <string name="google_api_connection_success">현재 위치 정보는/n몽실몽실을 재부팅하시면\\n반영됩니다!</string>
+    <string name="none_share_permission">공유하시려면\\n퍼미션이 필요합니다!</string>
+    <string name="select_location">지역을 선택해주세요</string>
+    <string name="none_save_post_cause_location">지역을 선택해주세요!</string>
+    <string name="sk_weather_provide">날씨 - SK 플래닛 제공</string>
+    <string name="program_info_text">몽실몽실</string>
+    <string name="program_info_version">버전 1.0</string>
+    <string name="program_info_team">김민희, 한상우, 지상준</string>
+    <string name="program_info_email">개발자 문의 : tkddn204@gmail.com</string>
 </resources>

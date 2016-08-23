@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +15,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
@@ -29,10 +33,7 @@ import okhttp3.ResponseBody;
 import static android.util.Log.e;
 
 public class SignUpActivity extends BaseActivity
-        implements SelectLocationDialogFragment.OnSelectLocationListener,
-                GPSManager.LocationCallback{
-
-    GPSManager gpsManager;
+        implements SelectLocationDialogFragment.OnSelectLocationListener {
     RelativeLayout signUpContainer;
 
     // 이름, 지역 부분
@@ -41,21 +42,6 @@ public class SignUpActivity extends BaseActivity
 
     // 완료
     ImageView imgDone;
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        gpsManager = new GPSManager(this, this);
-        gpsManager.googleApiStart();
-    }
-
-    @Override
-    public void handleNewLocation(Location location) {
-        String lat = String.valueOf(location.getLatitude());
-        String lng = String.valueOf(location.getLongitude());
-        Log.e("handleNewLocation 실행 : ", lat +" "+ lng);
-
-    }
 
     // TODO : GPS가 켜져 있으면 지역이 자동으로 바뀌게 해야함
     @Override
@@ -150,66 +136,19 @@ public class SignUpActivity extends BaseActivity
                 }
                 if(isDone) {
                     imgDone.setEnabled(false);
-                    new AsyncSignUpRequest().execute(
-                            editName.getText().toString().trim(),
-                            location.getText().toString().trim());
+                    String fcmToken = FirebaseInstanceId.getInstance().getToken();
+                    if (!TextUtils.isEmpty(fcmToken) && !fcmToken.equals("")) {
+                        PropertyManager.getInstance().setFCMToken(fcmToken);
+                        new AsyncSignUpRequest().execute(
+                                editName.getText().toString().trim(),
+                                location.getText().toString().trim(),
+                                fcmToken);
+                    } else {
+                        Log.e("fcmToken", "토큰이 발급되지 않았습니다.");
+                    }
                 }
             }
         });
-    }
-
-    // 역지오코딩 AsyncTask
-    public class AsyncReGeoJSONList extends AsyncTask<String, String, String> {
-        @Override
-        protected String doInBackground(String... args) {
-            Response response = null;
-            try {
-                OkHttpClient toServer = new OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
-
-                Request request = new Request.Builder()
-                        .addHeader("Accept", "application/json")
-                        .addHeader("appKey", NetworkDefineConstant.SK_APP_KEY)
-                        .url(String.format(
-                                NetworkDefineConstant.SK_REVERSE_GEOCOING,
-                                args[0], args[1]))
-                        .build();
-                response = toServer.newCall(request).execute();
-                ResponseBody responseBody = response.body();
-
-                boolean flag = response.isSuccessful();
-                int responseCode = response.code();
-                Log.e("응답 코드 : ", responseCode + "");
-                if (responseCode >= 400) return null;
-                if (flag) {
-                    return ParseDataParseHandler.getJSONResGeo(
-                            new StringBuilder(responseBody.string()));
-                }
-            } catch (UnknownHostException une) {
-                e("connectionFail", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                e("connectionFail", uee.toString());
-            } catch (Exception e) {
-                e("connectionFail", e.toString());
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Log.e("역지오코딩 결과 :", result+"");
-            if (result != null) {
-                String GPSlocation = LocationData.ChangeToShortName(result);
-                Log.e("GPSlocation 결과 :", GPSlocation);
-                location.setText(GPSlocation);
-            }
-        }
     }
 
     // 가입 요청
@@ -229,6 +168,7 @@ public class SignUpActivity extends BaseActivity
                         .add("deviceId", PropertyManager.getInstance().getDeviceId())
                         .add("username", args[0])
                         .add("area", args[1])
+                        .add("fcmToken", args[2])
                         .add("date", TimeData.getNow())
                         .build();
                 //요청 세팅

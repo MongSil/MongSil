@@ -22,7 +22,8 @@ import com.google.android.gms.location.LocationServices;
 /**
  * Created by ccei on 2016-08-18.
  */
-public class GPSManager implements GoogleApiClient.ConnectionCallbacks,
+public class GPSManager implements MiddleSelectDialogFragment.OnMiddleSelectDialogListener,
+        GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
     public static final String TAG = LocationProvider.class.getSimpleName();
@@ -80,8 +81,15 @@ public class GPSManager implements GoogleApiClient.ConnectionCallbacks,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(activity,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("GPS 퍼미션 체크 중.. ", "dasf");
-            requestPermission();
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    activity, Manifest.permission.READ_CONTACTS)) {
+                activity.getSupportFragmentManager().beginTransaction()
+                        .add(MiddleSelectDialogFragment.newInstance(10),
+                                "google_api_connection_fail").commit();
+            } else {
+                Log.e("GPS 퍼미션 체크 중.. ", "dasf");
+                requestPermission();
+            }
         }
         Log.e("GPS 퍼미션 들어옴!", "ddd");
     }
@@ -90,6 +98,18 @@ public class GPSManager implements GoogleApiClient.ConnectionCallbacks,
         ActivityCompat.requestPermissions(activity,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 RC_FINE_LOCATION);
+    }
+
+    @Override
+    public void onMiddleSelect(int select) {
+        switch (select) {
+            case 100 :
+                PropertyManager.getInstance().setUseGps(false);
+                break;
+            case 101 :
+                requestPermission();
+                break;
+        }
     }
 
     @Override
@@ -104,6 +124,7 @@ public class GPSManager implements GoogleApiClient.ConnectionCallbacks,
         if(ContextCompat.checkSelfPermission(
                 activity.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_DENIED){
+
             if(googleApiClient != null) {
                 Log.i(TAG, "Location services connected.");
                 Location location =
@@ -153,7 +174,7 @@ public class GPSManager implements GoogleApiClient.ConnectionCallbacks,
 
     private void showErrorDialog() {
         activity.getSupportFragmentManager().beginTransaction()
-                .add(MiddleAloneDialogFragment.newInstance(80),
+                .add(MiddleAloneDialogFragment.newInstance(81),
                         "google_api_connection_fail").commit();
     }
 

@@ -68,6 +68,23 @@
             </intent-filter>
         </receiver>
 
+        <service
+            android:name=".FireBaseInstanceIDService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".FCMPushMessageService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <meta-data
             android:name="kr.co.tacademy.mongsil.mongsil.MongSilGlideModule"
             android:value="GlideModule" />

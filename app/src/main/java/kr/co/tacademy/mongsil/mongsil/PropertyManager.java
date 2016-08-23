@@ -27,17 +27,18 @@ public class PropertyManager {
         editor = preferences.edit();
     }
 
-    public static final String KEY_DEVICE_ID = "deviceid";
-    public static final String KEY_USERID = "userid";
-    public static final String KEY_USER_PROFILE_IMG = "userprofileimg";
-    public static final String KEY_NICKNAME = "nickname";
-    public static final String KEY_LOCATION = "location";
-    public static final String KEY_LAT_LOCATION = "latlocation";
-    public static final String KEY_LON_LOCATION = "lonlocation";
+    private static final String KEY_DEVICE_ID = "deviceid";
+    private static final String KEY_USERID = "userid";
+    private static final String KEY_USER_PROFILE_IMG = "userprofileimg";
+    private static final String KEY_NICKNAME = "nickname";
+    private static final String KEY_LOCATION = "location";
+    private static final String KEY_LAT_LOCATION = "latlocation";
+    private static final String KEY_LON_LOCATION = "lonlocation";
+    private static final String KEY_FCM_TOKEN = "fcmtoken";
 
-    public static final String KEY_ALARM = "alarm";
-    public static final String KEY_SAVE_GALLERY = "savegallery";
-    public static final String KEY_USE_GPS = "usegps";
+    private static final String KEY_ALARM = "alarm";
+    private static final String KEY_SAVE_GALLERY = "savegallery";
+    private static final String KEY_USE_GPS = "usegps";
 
     public static final String KEY_MARK_COUNT = "markcount";
 
@@ -108,6 +109,16 @@ public class PropertyManager {
 
     public void setLonLocation(String lonLocation) {
         editor.putString(KEY_LON_LOCATION, lonLocation);
+        editor.commit();
+    }
+
+    // fcm token
+    public String getFCMToken() {
+        return preferences.getString(KEY_FCM_TOKEN, "");
+    }
+
+    public void setFCMToken(String fcmToken) {
+        editor.putString(KEY_FCM_TOKEN, fcmToken);
         editor.commit();
     }
 

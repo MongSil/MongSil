@@ -62,15 +62,21 @@ public class PostRecyclerViewAdapter
     }
 
     public void add(ArrayList<Post> postItems) {
-        if(postItems.get(0).typeCode == 0 &&
+        if (postItems.get(0).typeCode == 0 &&
                 items.size() != 0) {
             postItems.remove(0);
         }
-        for(int i = 0 ; i < postItems.size() ; i++) {
+        for (int i = 0; i < postItems.size(); i++) {
             items.add(postItems.get(i));
         }
         this.notifyDataSetChanged();
     }
+
+    public void addPost(Post post) {
+        items.add(0, new Post(0, post.date));
+        items.set(1, post);
+    }
+
 
     // 날짜를 표시하는 뷰홀더
     public class DateViewHolder extends RecyclerView.ViewHolder {
@@ -113,24 +119,24 @@ public class PostRecyclerViewAdapter
             postTime = (TextView) view.findViewById(R.id.text_post_time);
         }
 
-        public void setData(final Post post, int position) {
+        public void setData(final Post post) {
             if(!post.profileImg.equals("null")) {
                 Glide.with(MongSilApplication.getMongSilContext())
                         .load(post.profileImg).into(imgPostProfile);
                 imgPostProfileIcon.setVisibility(View.GONE);
-                imgPostProfile.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(context, OtherUserProfileActivity.class);
-                        intent.putExtra("userid", String.valueOf(post.userId));
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        context.startActivity(intent);
-                    }
-                });
             } else {
                 imgPostProfile.setImageResource(R.color.little_dark_gray);
                 imgPostProfileIcon.setVisibility(View.VISIBLE);
             }
+            imgPostProfile.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(context, OtherUserProfileActivity.class);
+                    intent.putExtra("userid", String.valueOf(post.userId));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                }
+            });
             postName.setText(post.username);
             postContent.setText(post.content);
 
@@ -267,7 +273,7 @@ public class PostRecyclerViewAdapter
                 ((DateViewHolder) holder).setData(items.get(position));
                 break;
             case LAYOUT_POST:
-                ((PostViewHolder) holder).setData(items.get(position), position);
+                ((PostViewHolder) holder).setData(items.get(position));
                 break;
             case LAYOUT_MY_DATE:
                 ((MyDateViewHolder) holder).setData(items.get(position));

@@ -59,8 +59,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|top"
+            android:paddingLeft="10dp"
+            android:paddingBottom="20dp"
+            android:paddingRight="16dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="16dp"
             android:src="@drawable/icon_preview" />
     </FrameLayout>
 
@@ -100,13 +102,14 @@
 
         <ImageView
             android:id="@+id/img_posting_camera"
-            android:layout_width="22dp"
-            android:layout_height="18dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:src="@drawable/icon_camera"
+            android:scaleType="center"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_marginLeft="16dp"
+            android:layout_marginLeft="13dp"
             android:layout_marginStart="16dp" />
     </RelativeLayout>
 
@@ -132,7 +135,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="right"
-            android:layout_marginRight="16dp"
+            android:paddingRight="16dp"
             android:gravity="center"
             android:text="@string/save"
             android:textColor="@android:color/white"

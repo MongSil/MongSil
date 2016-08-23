@@ -16,7 +16,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class PostPreviewDialogFragment extends DialogFragment {
+public class PostingPreviewDialogFragment extends DialogFragment {
     private static final String LOCATION = "location";
     private static final String CONTENT = "content";
     private static final String WEATHER_POS = "weather_pos";
@@ -28,12 +28,12 @@ public class PostPreviewDialogFragment extends DialogFragment {
     private Bitmap photo;
 
 
-    public PostPreviewDialogFragment() {
+    public PostingPreviewDialogFragment() {
     }
 
-    public static PostPreviewDialogFragment newInstance(
+    public static PostingPreviewDialogFragment newInstance(
             String location, String content, int weatherPos, Bitmap photo) {
-        PostPreviewDialogFragment fragment = new PostPreviewDialogFragment();
+        PostingPreviewDialogFragment fragment = new PostingPreviewDialogFragment();
         Bundle args = new Bundle();
         args.putString(LOCATION, location);
         args.putString(CONTENT, content);
@@ -75,7 +75,7 @@ public class PostPreviewDialogFragment extends DialogFragment {
         imgBackground.setBackgroundResource(R.drawable.sign_up_background);
         if(photo == null) {
             imgBackground.setBackgroundResource(
-                    WeatherData.imgFromWeatherCode(String.valueOf(weatherPos), 3));
+                    WeatherData.imgFromWeatherCode(String.valueOf(weatherPos), 4));
         }
 
         postContent = (TextView) view.findViewById(R.id.text_post_content);
@@ -86,8 +86,10 @@ public class PostPreviewDialogFragment extends DialogFragment {
                 WeatherData.imgFromWeatherCode(String.valueOf(weatherPos), 0));
         imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
                 R.anim.bounce_interpolator, new LinearInterpolator()));
-        if(imgWeatherIcon.isShown()) {
-            ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        AnimationDrawable animation =
+                (AnimationDrawable) imgWeatherIcon.getDrawable();
+        if(animation != null) {
+            animation.start();
         }
 
         postLocation = (TextView) view.findViewById(R.id.text_post_location);

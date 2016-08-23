@@ -80,7 +80,7 @@ public class SettingActivity extends BaseActivity {
     private void toMainActivityFromthis() {
         Intent intent = new Intent(SettingActivity.this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        startActivity(intent);
+        setResult(RESULT_OK);
         finish();
     }
 

@@ -77,6 +77,15 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                     }
                 });
                 break;
+            case 11 : // 지역을 선택하지 않은 경우 [확인]
+                dialog.setText(getResources().getText(R.string.none_save_post_cause_location));
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                break;
             case 12 : // 글 작성 내용이 없는 경우 [확인]
                 dialog.setText(getResources().getText(R.string.none_save_post));
                 positive.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +104,16 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                     }
                 });
                 break;
-            case 80 : // 구글Api 연결에 실패한 경우
+            case 14 : // 공유하기 눌렀을 때 퍼미션이 없는 경우 [확인]
+                dialog.setText(getResources().getText(R.string.none_share_permission));
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                break;
+            case 81 : // 구글Api 연결에 실패한 경우
                 dialog.setText(getResources().getText(R.string.google_api_connection_fail));
                 positive.setOnClickListener(new View.OnClickListener() {
                     @Override

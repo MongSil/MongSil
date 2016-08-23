@@ -253,13 +253,18 @@ public class EditProfileActivity extends BaseActivity
     }
 
     private File resizingFile(final File file, String divider) {
+        // 이미지 4배 압축 및 카메라일 경우 로테이션 돌림
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 4;
-        Matrix matrix = new Matrix();
-        matrix.postRotate(90);
         Bitmap orgImage = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        Bitmap resize = Bitmap.createBitmap(
-                orgImage, 0, 0, orgImage.getWidth(), orgImage.getHeight(), matrix, true);
+        Bitmap resize = BitmapUtil.SafeDecodeBitmapFile(file.getAbsolutePath());
+        Matrix matrix = new Matrix();
+        if(divider.equals("camera")) {
+            matrix.postRotate(90);
+            resize = Bitmap.createBitmap(
+                    orgImage, 0, 0, orgImage.getWidth(), orgImage.getHeight(), matrix, true);
+        }
+        // 리사이즈된 이미지 구함
         OutputStream out = null;
         try {
             out = new FileOutputStream(file);
@@ -429,7 +434,7 @@ public class EditProfileActivity extends BaseActivity
                     builder.addFormDataPart("uploadCode", uploadCode);
                     builder.addFormDataPart("username", username);
                     builder.addFormDataPart("area", area);
-                    if (objects != null) {
+                    if(objects != null) {
                         File file = objects[0].file;
                         builder.addFormDataPart("profileImg", file.getName(), RequestBody.create(IMAGE_MIME_TYPE, file));
                     }
@@ -493,7 +498,8 @@ public class EditProfileActivity extends BaseActivity
                     }
                     PropertyManager.getInstance().setUserProfileImg(result.profileImg);
                 }
-                setResult(RESULT_EDIT_PROFILE);
+                setResult(RESULT_OK);
+                finish();
             } else {
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(2),

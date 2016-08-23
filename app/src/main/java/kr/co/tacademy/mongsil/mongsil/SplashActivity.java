@@ -64,8 +64,10 @@ public class SplashActivity extends BaseActivity {
 
         // 몽실 이미지
         imgSplashMongsil = (ImageView) findViewById(R.id.img_splash_mongsil);
-        if(imgSplashMongsil.isShown()) {
-            ((AnimationDrawable) imgSplashMongsil.getDrawable()).start();
+        AnimationDrawable animation =
+                (AnimationDrawable) imgSplashMongsil.getDrawable();
+        if(animation != null) {
+            animation.start();
         }
         Animation mongsilAnimation =
                 AnimationUtils.loadAnimation(
@@ -174,7 +176,7 @@ public class SplashActivity extends BaseActivity {
             }
         }
     }
-
+    // 꿀팁 String uuid = UUID.randomUUID().toString().replace('-', 'A');
     private String getDevicesUUID() {
         UUID deviceUUID = null;
         try {

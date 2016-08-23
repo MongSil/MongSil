@@ -74,6 +74,11 @@ public class SearchPOIDialogFragment extends DialogFragment
     ArrayList<POIData> markedList;
     ArrayList<POIData> datas;
 
+    public static SearchPOIDialogFragment newInstance() {
+        SearchPOIDialogFragment fragment = new SearchPOIDialogFragment();
+        return fragment;
+    }
+
     public SearchPOIDialogFragment() {
     }
 
@@ -177,7 +182,7 @@ public class SearchPOIDialogFragment extends DialogFragment
                 // 확인한 후 같은 항목이 존재하고
                 if (poiData.name.equals(datas.get(i).name)) {
                     // 찾는 부분이 즐겨찾기 부분 사이즈보다 작으면 삭제
-                    if (i < markedList.size()+1) {
+                    if (i < markCount+2) {
                         datas.remove(i);
                         break;
                     }

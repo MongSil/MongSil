@@ -28,6 +28,7 @@ import io.socket.emitter.Emitter;
 /**
  * Created by ccei on 2016-08-19.
  */
+@Deprecated
 public class MainSocketPostFragment extends Fragment
         implements MainActivity.OnLocationChangeListener {
     public static final String AREA1 = "area1";

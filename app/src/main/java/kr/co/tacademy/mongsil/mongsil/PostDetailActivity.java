@@ -1,8 +1,13 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Environment;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -13,7 +18,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
@@ -27,6 +31,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -46,9 +53,10 @@ public class PostDetailActivity extends BaseActivity
         MiddleSelectDialogFragment.OnMiddleSelectDialogListener,
         ReplyAdapterCallback {
     private static final String POST = "post";
-    private static final String POSTID = "postid";
+    private static final String REPLY = "reply";
 
-    String postId;
+    private String postId;
+    private String userId;
 
     ScrollView scrollPostingBackground;
 
@@ -62,6 +70,7 @@ public class PostDetailActivity extends BaseActivity
     ImageView imgBackground, imgWeatherIcon;
     TextView postContent, postLocation, postTime, postName, postReplyCount;
     Post post;
+    ReplyData reply;
 
     // 댓글 필드
     ReplyData data;
@@ -73,6 +82,9 @@ public class PostDetailActivity extends BaseActivity
     ImageView imgNoneReply;
     TextView share, noneReply, replySend;
     EditText editReply;
+
+    private int loadOnResult = 0;
+    private int maxLoadSize = 1;
 
     @Override
     protected void onResume() {
@@ -115,15 +127,16 @@ public class PostDetailActivity extends BaseActivity
         replySend = (TextView) findViewById(R.id.text_reply_send);
 
         Intent intent = getIntent();
-        if(intent.hasExtra(POST)) {
+        if (intent.hasExtra(POST)) {
             // 글 목록, 나의 이야기 목록
             post = intent.getParcelableExtra(POST);
             postId = String.valueOf(post.postId);
+            userId = String.valueOf(post.userId);
             init();
-        } else if(intent.hasExtra(POSTID)){
+        } else if (intent.hasExtra(REPLY)) {
             // 내가 쓴 댓글 목록
-            postId = intent.getStringExtra(POSTID);
-            new AsyncPostDetailJSONList().execute(postId);
+            reply = intent.getParcelableExtra(REPLY);
+            new AsyncPostDetailJSONList().execute(String.valueOf(reply.postId));
         }
     }
 
@@ -149,14 +162,15 @@ public class PostDetailActivity extends BaseActivity
                 return true;
             }
         });
-        if (!post.bgImg.isEmpty()) {
-            Glide.with(this).load(post.bgImg).into(imgBackground);
-        } else {
+        Log.e("asdf", post.weatherCode+"");
+        if (post.bgImg.isEmpty() || post.bgImg.equals("null")) {
             imgBackground.setImageResource(
                     WeatherData.imgFromWeatherCode(String.valueOf(post.weatherCode), 4));
+        } else {
+            Glide.with(this).load(post.bgImg).into(imgBackground);
         }
 
-        if(PropertyManager.getInstance().getUserId().equals(String.valueOf(post.userId))) {
+        if (PropertyManager.getInstance().getUserId().equals(String.valueOf(userId))) {
             tbThreeDot.setVisibility(View.VISIBLE);
             tbThreeDot.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -171,11 +185,13 @@ public class PostDetailActivity extends BaseActivity
         // 날씨 아이콘
         imgWeatherIcon.setImageResource(
                 WeatherData.imgFromWeatherCode(
-                        String.valueOf(post.weatherCode-1), 0));
+                        String.valueOf(post.weatherCode), 0));
         imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
                 R.anim.bounce_interpolator, new LinearInterpolator()));
-        if(imgWeatherIcon.isShown()) {
-            ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        AnimationDrawable animation =
+                (AnimationDrawable) imgWeatherIcon.getDrawable();
+        if(animation != null) {
+            animation.start();
         }
 
         // 포스트 내용
@@ -194,15 +210,27 @@ public class PostDetailActivity extends BaseActivity
         // 포스트 코멘트 수
         postReplyCount.setText(String.valueOf(post.replyCount));
 
-        new AsyncPostDetailReplyJSONList().execute(String.valueOf(post.postId));
+        new AsyncPostDetailReplyJSONList().execute(String.valueOf(post.postId), "0");
         // 댓글
-        replyRecycler.setLayoutManager(
-                new LinearLayoutManager(MongSilApplication.getMongSilContext()));
+        LinearLayoutManager layoutManager =
+                new LinearLayoutManager(MongSilApplication.getMongSilContext());
+        replyRecycler.setLayoutManager(layoutManager);
+        replyRecycler.setOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                if (maxLoadSize != loadOnResult) {
+                    new AsyncPostDetailReplyJSONList().execute(postId, String.valueOf(loadOnResult));
+                } else {
+                    this.setLoadingState(false);
+                }
+            }
+        });
         replyRecycler.setAdapter(replyAdapter);
         postReplyCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!isReplyContainer) {
+                    appBar.setExpanded(false);
                     Animation upAnim = AnimationUtils.loadAnimation(
                             getApplicationContext(), R.anim.anim_slide_in_bottom);
                     upAnim.setFillAfter(true);
@@ -241,15 +269,7 @@ public class PostDetailActivity extends BaseActivity
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                //intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_TEXT, post.content);
-                //intent.putExtra(Intent.EXTRA_STREAM, post.bgImg);
-
-                Intent chooser = Intent.createChooser(intent, "공유");
-                startActivity(chooser);
+                saveShareImg();
             }
         });
 
@@ -258,22 +278,84 @@ public class PostDetailActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 if (!editReply.getText().toString().isEmpty()) {
-                    if(data == null) {
+                    if (data == null) {
                         new AsyncReplingRequest().execute(
                                 PropertyManager.getInstance().getUserId(),
-                                editReply.getText().toString()
-                        );
+                                editReply.getText().toString());
                     } else {
                         new AsyncModifyReplyRequest().execute(
                                 PropertyManager.getInstance().getUserId(),
                                 editReply.getText().toString(),
-                                String.valueOf(data.replyId)
-                        );
+                                String.valueOf(data.replyId));
                     }
                     editReply.setText("");
                 }
             }
         });
+    }
+
+    // TODO : 공유하기 추가해야함
+    private void saveShareImg() {
+        checkPermission();
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, post.content);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && post.bgImg != null) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                FileOutputStream fos;
+                String address = Environment.getExternalStorageDirectory().getAbsolutePath()
+                        + "/Android/data/mongsil/" + System.currentTimeMillis() + ".jpg";
+                try {
+                    fos = new FileOutputStream(address);
+                    Bitmap captureView = BitmapUtil.viewToBitmap(imgBackground);
+                    captureView.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                File file = new File(address);
+                Uri uri = Uri.fromFile(file);
+                intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+                intent.setType("*/*");
+                intent.putExtra(Intent.EXTRA_STREAM, uri);
+                if(!PropertyManager.getInstance().getSaveGallery()) {
+                    file.deleteOnExit();
+                }
+            }
+        }
+        startActivity(Intent.createChooser(intent, "공유하기"));
+    }
+
+    private final int PERMISSION_REQUEST_STORAGE = 101;
+
+    private void checkPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED
+                    || checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PERMISSION_REQUEST_STORAGE);
+            } else {
+                //사용자가 언제나 허락
+            }
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_STORAGE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    saveShareImg();
+                    //사용자가 퍼미션을 OK했을 경우
+                } else {
+                    //사용자가 퍼미션을 거절했을 경우
+                }
+                break;
+        }
     }
 
     // 애니메이션 인터폴레이터 적용
@@ -283,6 +365,7 @@ public class PostDetailActivity extends BaseActivity
         animation.setInterpolator(interpolator);
         return animation;
     }
+
     // 글 상세내용 가져오기
     public class AsyncPostDetailJSONList extends AsyncTask<String, Integer, Post> {
         @Override
@@ -344,7 +427,7 @@ public class PostDetailActivity extends BaseActivity
                 Request request = new Request.Builder()
                         .url(String.format(
                                 NetworkDefineConstant.GET_SERVER_POST_DETAIL_REPLY,
-                                args[0]))
+                                args[0], args[1]))
                         .build();
                 response = toServer.newCall(request).execute();
                 ResponseBody responseBody = response.body();
@@ -373,12 +456,16 @@ public class PostDetailActivity extends BaseActivity
         @Override
         protected void onPostExecute(ArrayList<ReplyData> result) {
             if (result != null && result.size() > 0) {
+                int maxResultSize = result.size();
+                loadOnResult += maxResultSize;
+                maxLoadSize = result.get(0).totalCount;
                 replyRecycler.setVisibility(View.VISIBLE);
                 imgNoneReply.setVisibility(View.GONE);
                 noneReply.setVisibility(View.GONE);
                 replyAdapter.add(result);
-                replyRecycler.smoothScrollToPosition(result.size()-1);
+                replyRecycler.smoothScrollToPosition(result.size() - 1);
             } else {
+                loadOnResult = 0;
                 data = null;
                 replyRecycler.setVisibility(View.GONE);
                 imgNoneReply.setVisibility(View.VISIBLE);
@@ -399,12 +486,12 @@ public class PostDetailActivity extends BaseActivity
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
                         .build();
-
                 //요청 Body 세팅==> 그전 Query Parameter세팅과 같은 개념
                 RequestBody formBody = new FormBody.Builder()
                         .add("userId", args[0])
                         .add("content", args[1])
                         .add("date", TimeData.getNow())
+                        .add("writerId", userId)
                         .build();
                 //요청 세팅
                 Request request = new Request.Builder()
@@ -416,6 +503,7 @@ public class PostDetailActivity extends BaseActivity
                 boolean flag = response.isSuccessful();
                 //응답 코드 200등등
                 int responseCode = response.code();
+                Log.e("응답코드 - ", responseCode+"");
                 if (flag) {
                     Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
                     Log.e("response응답바디", response.body().string()); //json으로 변신
@@ -441,9 +529,9 @@ public class PostDetailActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equals("success")) {
                 new AsyncPostDetailReplyJSONList().execute(
-                        postId);
+                        postId, "0");
                 Integer replyCountUp = Integer.valueOf(postReplyCount.getText().toString());
-                postReplyCount.setText(String.valueOf(replyCountUp+1));
+                postReplyCount.setText(String.valueOf(replyCountUp + 1));
             } else if (result.equals("fail")) {
                 // 실패
             }
@@ -503,9 +591,7 @@ public class PostDetailActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equals("success")) {
                 new AsyncPostDetailReplyJSONList().execute(
-                        postId);
-                Integer replyCount = Integer.valueOf(postReplyCount.getText().toString());
-                postReplyCount.setText(String.valueOf(replyCount-1));
+                        postId, "0");
             } else if (result.equals("fail")) {
                 // 실패
             }
@@ -558,11 +644,10 @@ public class PostDetailActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equals("success")) {
                 Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                intent.putExtra("post_remove", true);
-                startActivity(intent);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                setResult(RESULT_OK, intent);
                 finish();
-            } else if(result.equals("fail")) {
+            } else if (result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction().
                         add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();
             }
@@ -615,8 +700,10 @@ public class PostDetailActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equals("success")) {
                 data = null;
-                new AsyncPostDetailReplyJSONList().execute(postId);
-            } else if(result.equals("fail")) {
+                new AsyncPostDetailReplyJSONList().execute(postId, "0");
+                Integer replyCount = Integer.valueOf(postReplyCount.getText().toString());
+                postReplyCount.setText(String.valueOf(replyCount - 1));
+            } else if (result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction().
                         add(MiddleAloneDialogFragment.newInstance(1), "middle_fail").commit();
             }
@@ -654,10 +741,10 @@ public class PostDetailActivity extends BaseActivity
     @Override
     public void onMiddleSelect(int select) {
         switch (select) {
-            case 0 :
+            case 0:
                 new AsyncPostRemoveRequest().execute(postId);
                 break;
-            case 1 :
+            case 1:
                 new AsyncReplyRemoveRequest().execute(postId, String.valueOf(data.replyId));
                 break;
         }
@@ -703,7 +790,7 @@ public class PostDetailActivity extends BaseActivity
 
     private void toMainActivityFromthis() {
         Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
     }

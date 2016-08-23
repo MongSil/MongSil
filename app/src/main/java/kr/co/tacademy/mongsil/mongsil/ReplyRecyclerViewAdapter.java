@@ -42,6 +42,7 @@ public class ReplyRecyclerViewAdapter
     }
 
     public void add(ArrayList<ReplyData> replyItems) {
+        items.clear();
         for(int i = 0 ; i < replyItems.size() ; i++) {
             items.add(replyItems.get(i));
         }
@@ -124,7 +125,7 @@ public class ReplyRecyclerViewAdapter
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(view.getContext(), PostDetailActivity.class);
-                    intent.putExtra("postid", String.valueOf(data.postId));
+                    intent.putExtra("reply", data);
                     view.getContext().startActivity(intent);
                 }
             });

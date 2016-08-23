@@ -194,8 +194,10 @@ public class PostDetailSocketActivity extends BaseActivity
                         String.valueOf(post.weatherCode), 0));
         imgWeatherIcon.setAnimation(AnimationApplyInterpolater(
                 R.anim.bounce_interpolator, new LinearInterpolator()));
-        if (imgWeatherIcon.isShown() && imgWeatherIcon != null) {
-            ((AnimationDrawable) imgWeatherIcon.getDrawable()).start();
+        AnimationDrawable animation =
+                (AnimationDrawable) imgWeatherIcon.getDrawable();
+        if(animation != null) {
+            animation.start();
         }
 
         // 포스트 내용
