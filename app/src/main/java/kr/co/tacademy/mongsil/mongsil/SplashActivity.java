@@ -144,6 +144,17 @@ public class SplashActivity extends BaseActivity {
                         toMainActivityFromthis();
                     }
                 });
+                if(getIntent().hasExtra("replyContent")) {
+                    final Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                    intent.putExtra("fcmMessage", getIntent().getExtras());
+                    splashContainer.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                }
             }else if (result.equalsIgnoreCase("fail")) {
                 getSupportFragmentManager().beginTransaction().
                         add(MiddleAloneDialogFragment.newInstance(91),

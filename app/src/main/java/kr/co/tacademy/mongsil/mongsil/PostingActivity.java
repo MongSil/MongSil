@@ -444,9 +444,9 @@ public class PostingActivity extends BaseActivity
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
 
-        Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), bmOptions);
+        Bitmap bitmap = BitmapFactory.decodeFile(file.getPath(), bmOptions);
 
-        int degree = BitmapUtil.GetExifOrientation(file.getAbsolutePath());
+        int degree = BitmapUtil.GetExifOrientation(file.getPath());
 
         Bitmap finalBitmap = BitmapUtil.GetRotatedBitmap(bitmap, degree);
         saveIntent();

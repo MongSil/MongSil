@@ -127,4 +127,5 @@
     <string name="program_info_team">김민희, 한상우, 지상준</string>
     <string name="program_info_email">개발자 문의 : tkddn204@gmail.com</string>
     <string name="signup_fail_overlap_nickname">이미 존재하는 닉네임입니다.</string>
+    <string name="save_reply_fail">댓글 보내기를 실패했습니다..</string>
 </resources>

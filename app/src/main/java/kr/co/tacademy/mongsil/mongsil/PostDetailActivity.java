@@ -135,6 +135,10 @@ public class PostDetailActivity extends BaseActivity
             // 내가 쓴 댓글 목록
             reply = intent.getParcelableExtra(REPLY);
             new AsyncPostDetailJSONList().execute(String.valueOf(reply.postId));
+        } else if (intent.hasExtra("fcmMessage")) {
+            Bundle b = getIntent().getBundleExtra("fcmMessage");
+            postId = b.getString("postId");
+            new AsyncPostDetailJSONList().execute(postId);
         }
     }
 
@@ -299,6 +303,29 @@ public class PostDetailActivity extends BaseActivity
                 }
             }
         });
+        /*if(getIntent().hasExtra("fcmMessage")) {
+            appBar.setExpanded(true);
+            Animation downAnim = AnimationUtils.loadAnimation(
+                    getApplicationContext(), R.anim.anim_slide_out_bottom);
+            downAnim.setFillAfter(true);
+            downAnim.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    replyEditContainer.setVisibility(View.GONE);
+                    replyContainer.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
+            replyEditContainer.startAnimation(downAnim);
+            isReplyContainer = false;
+        }*/
     }
 
     // TODO : 공유하기 추가해야함
@@ -490,7 +517,7 @@ public class PostDetailActivity extends BaseActivity
                 noneReply.setVisibility(View.GONE);
 
                 replyAdapter.add(result);
-                if(result.size() < maxLoadSize) {
+                if(result.size() <= maxLoadSize) {
                     replyRecycler.smoothScrollToPosition(result.size() - 1);
                 }
             } else {
@@ -549,7 +576,6 @@ public class PostDetailActivity extends BaseActivity
                     response.close();
                 }
             }
-
             return "fail";
         }
 
@@ -557,12 +583,17 @@ public class PostDetailActivity extends BaseActivity
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result.equals("success")) {
-                new AsyncPostDetailReplyJSONList().execute(
-                        postId, "0");
+                new AsyncPostDetailReplyJSONList().execute(postId, "0");
                 Integer replyCountUp = Integer.valueOf(postReplyCount.getText().toString());
                 postReplyCount.setText(String.valueOf(replyCountUp + 1));
+                if(Integer.valueOf(postReplyCount.getText().toString()) == 1) {
+                    appBar.setExpanded(false);
+                }
             } else if (result.equals("fail")) {
                 // 실패
+                getSupportFragmentManager().beginTransaction()
+                        .add(MiddleAloneDialogFragment.newInstance(3), "middle_reply_fail")
+                        .commit();
             }
         }
     }
@@ -729,7 +760,7 @@ public class PostDetailActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equals("success")) {
                 data = null;
-                new AsyncPostDetailReplyJSONList().execute(postId, "0");
+                new AsyncPostDetailReplyJSONList().execute(postId, "");
                 Integer replyCount = Integer.valueOf(postReplyCount.getText().toString());
                 postReplyCount.setText(String.valueOf(replyCount - 1));
             } else if (result.equals("fail")) {

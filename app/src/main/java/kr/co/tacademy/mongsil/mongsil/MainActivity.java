@@ -127,6 +127,10 @@ public class MainActivity extends BaseActivity
                 .replace(R.id.main_post_fragment_container,
                         MainPostFragment.newInstance(PropertyManager.getInstance().getLocation()))
                 .commit();
+        if(getIntent().hasExtra("fcmMessage")) {
+            startActivity(new Intent(MainActivity.this, PostDetailActivity.class)
+                    .putExtra("fcmMessage", getIntent().getBundleExtra("fcmMessage")));
+        }
         // 툴바 추가
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

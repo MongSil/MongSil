@@ -27,31 +27,33 @@ public class FCMPushMessageService extends FirebaseMessagingService {
         if (!PropertyManager.getInstance().getAlarm()) {
             return;
         }
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
-
-        if (remoteMessage.getData().size() > 0) {
-            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
-        }
 
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
         }
-        //실제 푸쉬로 넘어온 데이터
-        Map<String, String> receiveData = remoteMessage.getData();
-        try {
-            //한글은 반드시 디코딩 해준다.
-            sendPushNotification(URLDecoder.decode(receiveData.get("fcmPushMessage"), "UTF-8"));
-        } catch (Exception e) {
 
+        if (remoteMessage.getData() != null) {
+            //실제 푸쉬로 넘어온 데이터
+            Map<String, String> receiveData = remoteMessage.getData();
+            try {
+                //한글은 반드시 디코딩 해준다.
+                sendPushNotification(
+                        URLDecoder.decode(receiveData.get("fcmMessage"), "UTF-8"),
+                        URLDecoder.decode(receiveData.get("postId"), "UTF-8"),
+                        URLDecoder.decode(receiveData.get("replyContent"), "UTF-8")
+                        );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     /**
      * Create and show a simple notification containing the received FCM message.
      */
-    private void sendPushNotification(String pushMessage) {
-        Intent intent = new Intent(this, PostDetailActivity.class);
-        intent.putExtra("fcmExtra", pushMessage);
+    private void sendPushNotification(String message, String postId, String replyContent) {
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.putExtra("postId", postId);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -61,7 +63,7 @@ public class FCMPushMessageService extends FirebaseMessagingService {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(getResources().getString(R.string.app_name))
-                .setContentText(pushMessage)
+                .setContentText(message + "\n" + replyContent)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
