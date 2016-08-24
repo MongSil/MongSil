@@ -252,6 +252,7 @@ public class SearchPOIDialogFragment extends DialogFragment
                 }
                 //markNameValues.put(UserDB.UserMark._ID, poiData.id);
                 markNameValues.put(UserDB.UserMark.USER_MARK_UPPER, poiData.upperAddrName);
+                markNameValues.put(UserDB.UserMark.USER_MARK_MIDDLE, poiData.middleAddrName);
                 markNameValues.put(UserDB.UserMark.USER_MARK_LAT, poiData.noorLat);
                 markNameValues.put(UserDB.UserMark.USER_MARK_LON, poiData.noorLon);
                 dbHandler.insert(UserDB.UserMark.TABLE_MARK_NAME, "NODATA", markNameValues);
@@ -299,6 +300,7 @@ public class SearchPOIDialogFragment extends DialogFragment
                 UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark._ID,
                 UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_LOCATION_NAME,
                 UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_UPPER,
+                UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_MIDDLE,
                 UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_LAT,
                 UserDB.UserMark.TABLE_MARK_NAME + "." + UserDB.UserMark.USER_MARK_LON
         };
@@ -318,6 +320,8 @@ public class SearchPOIDialogFragment extends DialogFragment
                                 joinResultSet.getColumnIndex(UserDB.UserMark.USER_MARK_LOCATION_NAME)),
                         joinResultSet.getString(
                                 joinResultSet.getColumnIndex(UserDB.UserMark.USER_MARK_UPPER)),
+                        joinResultSet.getString(
+                                joinResultSet.getColumnIndex(UserDB.UserMark.USER_MARK_MIDDLE)),
                         joinResultSet.getString(
                                 joinResultSet.getColumnIndex(UserDB.UserMark.USER_MARK_LAT)),
                         joinResultSet.getString(

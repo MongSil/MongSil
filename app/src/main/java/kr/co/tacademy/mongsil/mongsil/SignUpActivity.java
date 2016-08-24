@@ -149,9 +149,9 @@ public class SignUpActivity extends BaseActivity
     }
 
     // 가입 요청
-    public class AsyncSignUpRequest extends AsyncTask<String, String, String> {
+    public class AsyncSignUpRequest extends AsyncTask<String, String, String[]> {
         @Override
-        protected String doInBackground(String... args) {
+        protected String[] doInBackground(String... args) {
             Response response = null;
             try {
                 //업로드는 타임 및 리드타임을 넉넉히 준다.
@@ -193,22 +193,24 @@ public class SignUpActivity extends BaseActivity
                     response.close();
                 }
             }
-            return "fail";
+            return null;
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(String[] result) {
             super.onPostExecute(result);
-            Log.e("회원가입 결과", result + "");
-            if (result != null) {
-                if (!result.equals("null")) {
-                    PropertyManager.getInstance().setNickname(editName.getText().toString());
-                    PropertyManager.getInstance().setLocation(location.getText().toString());
-                    PropertyManager.getInstance().setUserId(result);
-                    Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                }
+            Log.e("회원가입 결과", result[0] + "");
+            if(result[0].equals("이미 사용중인 닉네임")) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(MiddleAloneDialogFragment.newInstance(93),
+                                "middle_signup_fail").commit();
+            } else if (result[1] != null) {
+                PropertyManager.getInstance().setNickname(editName.getText().toString());
+                PropertyManager.getInstance().setLocation(location.getText().toString());
+                PropertyManager.getInstance().setUserId(result[1]);
+                Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             } else {
                 // 실패
                 getSupportFragmentManager().beginTransaction()

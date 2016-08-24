@@ -42,6 +42,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:9.4.0'
     compile 'com.github.chrisbanes.photoview:library:1.2.4'
     compile 'com.github.zomato:androidphotofilters:1.0.1'
+    compile 'com.mukesh:photofilter:1.0.0'
     compile('io.socket:socket.io-client:0.6.3') {
         exclude group: 'org.json', module: 'json'
     }

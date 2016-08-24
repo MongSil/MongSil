@@ -123,8 +123,9 @@ public class BitmapUtil {
             }
 
             // Max image size
-            final int IMAGE_MAX_SIZE 	= 4096;
+            final int IMAGE_MAX_SIZE 	= 1920;
             BitmapFactory.Options bfo 	= new BitmapFactory.Options();
+            bfo.inSampleSize            = 4;
             bfo.inJustDecodeBounds 		= true;
 
             BitmapFactory.decodeFile(strFilePath, bfo);

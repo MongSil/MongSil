@@ -43,9 +43,6 @@
             android:name=".ProgramInfoActivity"
             android:parentActivityName=".SettingActivity"/>
         <activity
-            android:name=".AlarmActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity
             android:name=".MapActivity"
             android:parentActivityName=".SettingActivity"/>
         <activity
@@ -56,11 +53,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".PostingActivity"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
-        <activity android:name=".CameraGalleryActivity" />
+            android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity android:name=".OtherUserProfileActivity" />
         <activity android:name=".PhotoViewActivity" />
-        <activity android:name=".ImgFilterActivity" />
+        <activity android:name=".PhotoFilterActivity" />
 
         <receiver android:name=".CheckNetwork">
             <intent-filter>

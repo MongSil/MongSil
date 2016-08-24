@@ -1,5 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.Gravity;
@@ -16,6 +17,20 @@ import android.widget.TextView;
  */
 public class MiddleAloneDialogFragment extends DialogFragment {
     private static final String SELECTOR = "selector";
+
+    public interface OnMiddleAloneDialogListener {
+        void onMiddleAlone(int select);
+    }
+
+    OnMiddleAloneDialogListener onMiddleAloneDialogListener;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnMiddleAloneDialogListener) {
+            onMiddleAloneDialogListener = (OnMiddleAloneDialogListener) context;
+        }
+    }
 
     private int selector;
 
@@ -73,6 +88,16 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                 positive.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                break;
+            case 10 : // 글 내용이 존재하지 않는 경우 [확인]
+                dialog.setText(getResources().getText(R.string.none_save_post_cause_location));
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onMiddleAloneDialogListener.onMiddleAlone(10);
                         dismiss();
                     }
                 });
@@ -142,6 +167,15 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                 break;
             case 92 : // 연결 실패한 경우 [확인]
                 dialog.setText(getResources().getText(R.string.connection_fail));
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                break;
+            case 93 : // 회원가입 시 중복된 닉네임이 있는 경우 [확인]
+                dialog.setText(getResources().getText(R.string.signup_fail_overlap_nickname));
                 positive.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

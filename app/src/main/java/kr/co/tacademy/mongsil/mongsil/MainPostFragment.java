@@ -1,32 +1,25 @@
 package kr.co.tacademy.mongsil.mongsil;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
-import android.icu.util.RangeValueIterator;
-import android.icu.util.ValueIterator;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import io.socket.client.IO;
@@ -42,7 +35,8 @@ import static android.util.Log.e;
 /**
  * Created by ccei on 2016-07-26.
  */
-public class MainPostFragment extends Fragment {
+public class MainPostFragment extends Fragment
+        implements MainActivity.OnLocationChangeListener {
     public static final String AREA1 = "area1";
 
     private Socket socket;
@@ -75,6 +69,15 @@ public class MainPostFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        socket.connect();
+        socket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
+        socket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+        socket.on("newPostNotice", onNewPostNotice);
+    }
+
+    @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, Bundle savedInstanceState) {
         postRecyclerView =
@@ -96,9 +99,6 @@ public class MainPostFragment extends Fragment {
                         }
                     }
                 });
-        socket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
-        socket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
-        socket.on("newPostNotice", onNewPostNotice);
         return postRecyclerView;
     }
 
@@ -142,12 +142,23 @@ public class MainPostFragment extends Fragment {
                     } catch (JSONException je) {
                         je.printStackTrace();
                     }
-                    postAdapter.addPost(post);
-                    postAdapter.notifyDataSetChanged();
+
+                    if(area1.equals(post.area1)) {
+                        postAdapter.addPost(post);
+                        postAdapter.notifyDataSetChanged();
+                    }
                 }
             });
         }
     };
+
+    @Override
+    public void onLocationChange(String location) {
+        area1 = location;
+        new AsyncPostJSONList().execute(area1, "");
+        postAdapter.items.clear();
+        postAdapter.notifyDataSetChanged();
+    }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {

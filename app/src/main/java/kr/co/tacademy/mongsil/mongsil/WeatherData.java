@@ -83,7 +83,7 @@ public class WeatherData {
             } else if(request == 3) {
                 return R.drawable.circle_small_rain;
             } else if(request == 4) {
-                return R.drawable.background_grayrain;
+                return R.drawable.background_manycloud_rain;
             }
         }
         if (code.equals("SKY_A05") || code.equals("4")) {
@@ -97,7 +97,7 @@ public class WeatherData {
             } else if(request == 3) {
                 return R.drawable.circle_snow;
             } else if(request == 4) {
-                return R.drawable.background_snow;
+                return R.drawable.background_manycloud_snow;
             }
         }
         if (code.equals("SKY_A06") || code.equals("5")) {
@@ -111,7 +111,7 @@ public class WeatherData {
             } else if(request == 3) {
                 return R.drawable.circle_cloud;
             } else if(request == 4) {
-                return R.drawable.background_grayrain;
+                return R.drawable.background_manycloud_rain_snow;
             }
         }
         if (code.equals("SKY_A07") || code.equals("6")) {
@@ -167,7 +167,8 @@ public class WeatherData {
             } else if(request == 3) {
                 return R.drawable.circle_cloud;
             } else if(request == 4) {
-                return R.drawable.background_grayrain;
+                // TODO : 흐리고 비 또는 눈 해야함
+                return R.drawable.background_graysnow;
             }
         }
         if (code.equals("SKY_A11") || code.equals("10")) {
@@ -195,7 +196,7 @@ public class WeatherData {
             }  else if(request == 3) {
                 return R.drawable.circle_bolt;
             } else if(request == 4) {
-                return R.drawable.background_gray_bolt;
+                return R.drawable.background_bolt_rain;
             }
         }
         if (code.equals("SKY_A13") || code.equals("12")) {
@@ -209,7 +210,7 @@ public class WeatherData {
             } else if(request == 3) {
                 return R.drawable.circle_bolt;
             } else if(request == 4) {
-                return R.drawable.background_gray_bolt;
+                return R.drawable.background_bolt_snow;
             }
         }
         if (code.equals("SKY_A14") || code.equals("13")) {
@@ -223,7 +224,7 @@ public class WeatherData {
             } else if(request == 3) {
                 return R.drawable.circle_bolt;
             } else if(request == 4) {
-                return R.drawable.background_gray_bolt;
+                return R.drawable.background_bolt_rain_snow;
             }
         }
         return 0;

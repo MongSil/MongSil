@@ -290,12 +290,14 @@ public class ParseDataParseHandler {
         }
         return null;
     }
-    public static String postJSONUserSignUp(StringBuilder buf) {
+    public static String[] postJSONUserSignUp(StringBuilder buf) {
         JSONObject jsonObject;
 
         try {
             jsonObject = new JSONObject(buf.toString());
-            String result = jsonObject.getString("userId");
+            String[] result = new String[2];
+            result[0] = jsonObject.getString("msg");
+            result[1] = jsonObject.getString("userId");
             return result;
         } catch (JSONException je) {
             Log.e("POST:UserLogin", "JSON파싱 중 에러발생", je);

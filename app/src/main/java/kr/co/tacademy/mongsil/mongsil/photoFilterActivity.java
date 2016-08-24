@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mukesh.image_processing.ImageProcessor;
 import com.zomato.photofilters.SampleFilters;
 import com.zomato.photofilters.imageprocessors.Filter;
 import com.zomato.photofilters.imageprocessors.subfilters.ColorOverlaySubfilter;
@@ -27,14 +28,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Deprecated
-public class ImgFilterActivity extends BaseActivity {
-    /*static
-    {
-        System.loadLibrary("NativeImageProcessor");
-    }
+public class PhotoFilterActivity extends BaseActivity {
     Bitmap imgFiltering;
-    Handler handler = new Handler();
 
     // 툴바
     Toolbar toolbar;
@@ -55,7 +50,7 @@ public class ImgFilterActivity extends BaseActivity {
         imgFiltering = getIntent().getParcelableExtra("photo");
 
         // 툴바
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         tbDone = (TextView) toolbar.findViewById(R.id.text_done);
 
         // 받은 이미지
@@ -84,7 +79,7 @@ public class ImgFilterActivity extends BaseActivity {
         });
 
         Bitmap resizedImg = BitmapUtil.resize(
-                        imgFiltering, 640, false);
+                imgFiltering, 320, false);
 
         imgImport.setImageBitmap(resizedImg);
 
@@ -102,91 +97,48 @@ public class ImgFilterActivity extends BaseActivity {
 
     private void filterSave() {
         Intent intent = new Intent();
-        FileOutputStream fos = null;
-        Bitmap finalImg = null;
-        try {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 4;
-            String savePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/mongsil/"
-                    + "mongsil_" + System.currentTimeMillis() + ".jpg";
-            File file = new File(savePath);
-            fos = new FileOutputStream(file);
-            imgFiltering.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            finalImg = BitmapFactory.decodeFile(savePath, options);
-            intent.putExtra("data", finalImg);
-        } catch (FileNotFoundException fe) {
-            fe.printStackTrace();
-        } finally {
-            try {
-                if(fos != null) {
-                    fos.close();
-                }
-            } catch (IOException ie) {
-                ie.printStackTrace();
-            }
-        }
+        intent.putExtra("data", imgFiltering);
         setResult(RESULT_OK);
         finish();
     }
 
     private void imgInit() {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                Bitmap filteredImg = BitmapUtil.resize(
-                        imgFiltering, 640, false);
-                ThumbnailItem imgOriginal = new ThumbnailItem(filteredImg);
-                ThumbnailItem imgClear = new ThumbnailItem(filteredImg);
-                ThumbnailItem imgWarm = new ThumbnailItem(filteredImg);
-                ThumbnailItem imgCold = new ThumbnailItem(filteredImg);
-                ThumbnailItem imgBlurry = new ThumbnailItem(filteredImg);
-                ThumbnailItem imgBnW = new ThumbnailItem(filteredImg);
+        ImageProcessor imageProcessor = new ImageProcessor();
+        List<Bitmap> imgFilterList = new ArrayList<Bitmap>();
 
-                // 원본
-                ThumbnailsManager.clearThumbs();
-                ThumbnailsManager.addThumb(imgOriginal);
+        Bitmap filteredImg = BitmapUtil.resize(
+                imgFiltering, 320, false);
+        Bitmap imgClear = imageProcessor.sharpen(filteredImg, 10);
+        Bitmap imgWarm = imageProcessor.doColorFilter(filteredImg, 224, 205, 77);
+        Bitmap imgCold = imageProcessor.doColorFilter(filteredImg, 224, 217, 237);
+        Bitmap imgBlurry = imageProcessor.applyGaussianBlur(filteredImg);
+        Bitmap imgBnW = imageProcessor.applyBlackFilter(filteredImg);
 
-                imgClear.filter = SampleFilters.getAweStruckVibeFilter();
-                ThumbnailsManager.addThumb(imgClear);
-                imgWarm.filter = SampleFilters.getLimeStutterFilter();
-                ThumbnailsManager.addThumb(imgWarm);
-                imgCold.filter = SampleFilters.getNightWhisperFilter();
-                ThumbnailsManager.addThumb(imgCold);
-                imgBlurry.filter = madeFilter.getBnWFilter();
-                ThumbnailsManager.addThumb(imgBnW);
+        imgFilterList.add(filteredImg);
+        imgFilterList.add(imgClear);
+        imgFilterList.add(imgWarm);
+        imgFilterList.add(imgCold);
+        imgFilterList.add(imgBlurry);
+        imgFilterList.add(imgBnW);
 
-                List<ThumbnailItem> thumbnailItems =
-                        ThumbnailsManager.processThumbs(getApplicationContext());
-                String[] filterTitles = getResources().getStringArray(R.array.filter_title);
-                for(int i = 0; i < thumbnailItems.size() ; i++) {
-                    adapter.add(thumbnailItems.get(i), filterTitles[i]);
-                }
-                adapter.notifyDataSetChanged();
-            }
-        });
-    }
-
-    private static class madeFilter {
-        madeFilter() { }
-
-        private static Filter getBnWFilter() {
-            Filter filter = new Filter();
-            filter.addSubFilter(new ColorOverlaySubfilter(100, .0f, .0f, .0f));
-            return filter;
+        String[] filterTitles = getResources().getStringArray(R.array.filter_title);
+        for (int i = 0; i < imgFilterList.size(); i++) {
+            adapter.add(imgFilterList.get(i), filterTitles[i]);
         }
+        adapter.notifyDataSetChanged();
     }
 
     private class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.FilterViewHolder> {
 
-        List<ThumbnailItem> thumnailItems;
+        List<Bitmap> thumnailItems;
         ArrayList<String> filterTitleItem;
 
         FilterAdapter() {
-            thumnailItems = new ArrayList<ThumbnailItem>();
+            thumnailItems = new ArrayList<Bitmap>();
             filterTitleItem = new ArrayList<String>();
         }
 
-        private void add(ThumbnailItem thumbs, String title) {
+        private void add(Bitmap thumbs, String title) {
             thumnailItems.add(thumbs);
             filterTitleItem.add(title);
         }
@@ -214,14 +166,12 @@ public class ImgFilterActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(FilterViewHolder holder, final int position) {
-            holder.imgFilterItem.setImageBitmap(thumnailItems.get(position).image);
+            holder.imgFilterItem.setImageBitmap(thumnailItems.get(position));
             holder.imgFilterItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Filter imgFiltered = thumnailItems.get(position).filter;
-                    imgFiltering = imgFiltered.processFilter(BitmapUtil.resize(
-                            imgFiltering, 640, false));
                     imgImport.setImageBitmap(imgFiltering);
+                    imgFiltering = imgImport.getDrawingCache();
                 }
             });
             holder.filterTitle.setText(filterTitleItem.get(position));
@@ -233,14 +183,11 @@ public class ImgFilterActivity extends BaseActivity {
         }
     }
 
-
-
-
     // 툴바 메뉴 선택
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home :
+            case android.R.id.home:
                 finish();
                 return true;
         }
@@ -252,5 +199,5 @@ public class ImgFilterActivity extends BaseActivity {
         super.onBackPressed();
         finish();
     }
-*/
+
 }

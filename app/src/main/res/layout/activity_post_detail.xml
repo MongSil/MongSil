@@ -15,6 +15,7 @@
         <ImageView
             android:id="@+id/img_post_detail_background"
             android:background="@drawable/background_sunny"
+            android:src="@drawable/background_gradient"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY" />
@@ -24,7 +25,8 @@
         android:id="@+id/appbar_post_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/invisible">
+        android:background="@color/invisible"
+        app:elevation="0dp">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"

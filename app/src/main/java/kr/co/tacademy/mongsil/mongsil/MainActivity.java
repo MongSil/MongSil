@@ -204,24 +204,21 @@ public class MainActivity extends BaseActivity
                     String location = data.getStringExtra("name");
                     tbTitle.setText(location);
                     new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(location));
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.main_post_fragment_container,
-                                    MainPostFragment.newInstance(location))
-                            .commit();
+                    onLocationChangeListener.onLocationChange(location);
                     break;
                 case RESULT_EDIT_PROFILE :
                     finish();
                     startActivity(getIntent());
+                    slidingMenu.showMenu();
                     break;
                 case RESULT_POSTING :
+                    finish();
+                    startActivity(getIntent());
                     String area1Posting = data.getStringExtra("area1");
                     tbTitle.setText(area1Posting);
                     new AsyncLatLonWeatherJSONList().execute(
                             LocationData.ChangeToLatLon(area1Posting));
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.main_post_fragment_container,
-                                    MainPostFragment.newInstance(area1Posting))
-                            .commit();
+                    onLocationChangeListener.onLocationChange(area1Posting);
                     break;
                 case RESULT_SETTING :
                     if(PropertyManager.getInstance().getUseGPS()) {
@@ -240,10 +237,7 @@ public class MainActivity extends BaseActivity
             String location = poiData.upperAddrName;
             tbTitle.setText(location);
             new AsyncLatLonWeatherJSONList().execute(poiData.noorLat, poiData.noorLon);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_post_fragment_container,
-                            MainPostFragment.newInstance(location))
-                    .commit();
+            onLocationChangeListener.onLocationChange(location);
         }
     }
 
@@ -273,8 +267,12 @@ public class MainActivity extends BaseActivity
                         public void onResourceReady(Bitmap resource,
                                                     GlideAnimation<? super Bitmap> glideAnimation) {
                             imgProfile.setImageBitmap(resource);
-                            imgProfileBackground.setImageBitmap(
-                                    BlurBuilder.blur(resource, 5));
+                            try {
+                                imgProfileBackground.setImageBitmap(
+                                        BlurBuilder.blur(resource, 5));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
         } else {
@@ -531,10 +529,7 @@ public class MainActivity extends BaseActivity
                 String GPSlocation = LocationData.ChangeToShortName(result);
                 Log.e("GPSlocation 결과 :", GPSlocation);
                 tbTitle.setText(GPSlocation);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_post_fragment_container,
-                                MainPostFragment.newInstance(GPSlocation))
-                        .commit();
+                onLocationChangeListener.onLocationChange(GPSlocation);
             }
         }
     }

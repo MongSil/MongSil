@@ -257,7 +257,7 @@ public class EditProfileActivity extends BaseActivity
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 4;
         Bitmap orgImage = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        Bitmap resize = BitmapUtil.SafeDecodeBitmapFile(file.getAbsolutePath());
+        Bitmap resize = BitmapUtil.resize(BitmapUtil.SafeDecodeBitmapFile(file.getAbsolutePath()), 200, true);
         Matrix matrix = new Matrix();
         if(divider.equals("camera")) {
             matrix.postRotate(90);
@@ -288,8 +288,8 @@ public class EditProfileActivity extends BaseActivity
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(cropUri, "image");
 
-        intent.putExtra("outputX", 300);
-        intent.putExtra("outputY", 300);
+        intent.putExtra("outputX", 200);
+        intent.putExtra("outputY", 200);
         intent.putExtra("aspectX", 1);
         intent.putExtra("aspectY", 1);
         intent.putExtra("scale", true);
@@ -488,16 +488,20 @@ public class EditProfileActivity extends BaseActivity
         @Override
         protected void onPostExecute(UserData result) {
             super.onPostExecute(result);
-            // TODO : 완료할 때 result를 받지 못하는 거 수정
-            Log.e("Result value : ", "> " + result);
+            Log.e("Profile edit Result : ", "> " + result);
             if (result != null) {
                 if(upLoadFile != null) {
-                    UpLoadValueObject fileValue = upLoadFile;
-                    if (fileValue.tempFiles) {
-                        fileValue.file.deleteOnExit(); //임시파일을 삭제한다
+                    if (upLoadFile.tempFiles) {
+                        upLoadFile.file.deleteOnExit(); //임시파일을 삭제한다
                     }
-                    PropertyManager.getInstance().setUserProfileImg(result.profileImg);
                 }
+                if (!PropertyManager.getInstance().getSaveGallery()) {
+                    File f = new File(upLoadFile.file.getPath());
+                    if (f.exists()) {
+                        f.deleteOnExit();
+                    }
+                }
+                PropertyManager.getInstance().setUserProfileImg(result.profileImg);
                 setResult(RESULT_OK);
                 finish();
             } else {

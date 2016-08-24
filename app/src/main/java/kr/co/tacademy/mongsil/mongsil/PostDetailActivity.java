@@ -30,6 +30,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.ViewTarget;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -51,6 +54,7 @@ import static android.util.Log.e;
 public class PostDetailActivity extends BaseActivity
         implements BottomEditDialogFragment.OnBottomEditDialogListener,
         MiddleSelectDialogFragment.OnMiddleSelectDialogListener,
+        MiddleAloneDialogFragment.OnMiddleAloneDialogListener,
         ReplyAdapterCallback {
     private static final String POST = "post";
     private static final String REPLY = "reply";
@@ -125,7 +129,8 @@ public class PostDetailActivity extends BaseActivity
             post = intent.getParcelableExtra(POST);
             postId = String.valueOf(post.postId);
             userId = String.valueOf(post.userId);
-            init();
+            //init();
+            new AsyncPostDetailJSONList().execute(postId);
         } else if (intent.hasExtra(REPLY)) {
             // 내가 쓴 댓글 목록
             reply = intent.getParcelableExtra(REPLY);
@@ -156,10 +161,18 @@ public class PostDetailActivity extends BaseActivity
             }
         });
         if (post.bgImg.isEmpty() || post.bgImg.equals("null")) {
-            imgBackground.setImageResource(
+            imgBackground.setBackgroundResource(
                     WeatherData.imgFromWeatherCode(String.valueOf(post.weatherCode), 4));
         } else {
-            Glide.with(this).load(post.bgImg).into(imgBackground);
+            Glide.with(this)
+                    .load(post.bgImg)
+                    .into(new ViewTarget<ImageView, GlideDrawable>(imgBackground) {
+                        @Override
+                        public void onResourceReady(GlideDrawable resource, GlideAnimation anim) {
+                            // Set your resource on myView and/or start your animation here.
+                            imgBackground.setBackgroundDrawable(resource);
+                        }
+                    });
         }
 
         if (PropertyManager.getInstance().getUserId().equals(String.valueOf(userId))) {
@@ -222,7 +235,9 @@ public class PostDetailActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 if (!isReplyContainer) {
-                    appBar.setExpanded(false);
+                    if(post.replyCount > 0) {
+                        appBar.setExpanded(false);
+                    }
                     Animation upAnim = AnimationUtils.loadAnimation(
                             getApplicationContext(), R.anim.anim_slide_in_bottom);
                     upAnim.setFillAfter(true);
@@ -400,8 +415,23 @@ public class PostDetailActivity extends BaseActivity
 
         @Override
         protected void onPostExecute(Post result) {
-            post = result;
-            init();
+            if(result != null) {
+                post = result;
+                init();
+            } else {
+                getSupportFragmentManager().beginTransaction()
+                        .add(MiddleAloneDialogFragment.newInstance(10),
+                                "middle_post_detail_load_fail").commit();
+            }
+        }
+    }
+
+    @Override
+    public void onMiddleAlone(int select) {
+        switch (select) {
+            case 10 :
+                finish();
+                break;
         }
     }
 
@@ -449,13 +479,20 @@ public class PostDetailActivity extends BaseActivity
         protected void onPostExecute(ArrayList<ReplyData> result) {
             if (result != null && result.size() > 0) {
                 int maxResultSize = result.size();
-                loadOnResult += maxResultSize;
                 maxLoadSize = result.get(0).totalCount;
+                if(maxResultSize < maxLoadSize) {
+                    loadOnResult += maxResultSize;
+                }
+                Log.e(" 댓글 정보", maxResultSize +" " + loadOnResult);
+
                 replyRecycler.setVisibility(View.VISIBLE);
                 imgNoneReply.setVisibility(View.GONE);
                 noneReply.setVisibility(View.GONE);
+
                 replyAdapter.add(result);
-                replyRecycler.smoothScrollToPosition(result.size() - 1);
+                if(result.size() < maxLoadSize) {
+                    replyRecycler.smoothScrollToPosition(result.size() - 1);
+                }
             } else {
                 loadOnResult = 0;
                 data = null;
@@ -636,7 +673,7 @@ public class PostDetailActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equals("success")) {
                 Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
             } else if (result.equals("fail")) {

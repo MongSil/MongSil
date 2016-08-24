@@ -26,6 +26,8 @@ public class UserDBHelper extends SQLiteOpenHelper {
                 .append(" TEXT ,")
                 .append(UserDB.UserMark.USER_MARK_UPPER)
                 .append(" TEXT ,")
+                .append(UserDB.UserMark.USER_MARK_MIDDLE)
+                .append(" TEXT ,")
                 .append(UserDB.UserMark.USER_MARK_LAT)
                 .append(" TEXT ,")
                 .append(UserDB.UserMark.USER_MARK_LON)

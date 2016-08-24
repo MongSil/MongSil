@@ -18,12 +18,12 @@
         <ImageView
             android:id="@+id/img_posting_background"
             android:background="@drawable/background_sunny"
+            android:src="@drawable/background_gradient"
             android:scaleType="fitXY"
             android:fitsSystemWindows="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </ScrollView>
-
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
