@@ -1,5 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -8,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -34,14 +36,22 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.ViewTarget;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -88,6 +98,7 @@ public class PostDetailActivity extends BaseActivity
 
     private int loadOnResult = 0;
     private int maxLoadSize = 1;
+    Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -327,35 +338,14 @@ public class PostDetailActivity extends BaseActivity
             isReplyContainer = false;
         }*/
     }
-
-    // TODO : 공유하기 추가해야함
     private void saveShareImg() {
         checkPermission();
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
+        Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, post.content);
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && post.bgImg != null) {
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                FileOutputStream fos;
-                String address = Environment.getExternalStorageDirectory().getAbsolutePath()
-                        + "/Android/data/mongsil/" + System.currentTimeMillis() + ".jpg";
-                try {
-                    fos = new FileOutputStream(address);
-                    Bitmap captureView = BitmapUtil.viewToBitmap(imgBackground);
-                    captureView.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                File file = new File(address);
-                Uri uri = Uri.fromFile(file);
-                intent.setAction(Intent.ACTION_SEND_MULTIPLE);
-                intent.setType("*/*");
-                intent.putExtra(Intent.EXTRA_STREAM, uri);
-                if(!PropertyManager.getInstance().getSaveGallery()) {
-                    file.deleteOnExit();
-                }
+        intent.putExtra(Intent.EXTRA_TITLE, post.content);
+        if(post.bgImg != null) {
+            if (!post.bgImg.equals("null")) {
+                intent.putExtra(Intent.EXTRA_TEXT, post.bgImg + "\n" + post.content);
             }
         }
         startActivity(Intent.createChooser(intent, "공유하기"));
@@ -533,6 +523,19 @@ public class PostDetailActivity extends BaseActivity
 
     // 댓글달기
     public class AsyncReplingRequest extends AsyncTask<String, String, String> {
+
+        ProgressDialog asyncDialog = new ProgressDialog(PostDetailActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            asyncDialog.setIndeterminate(true);
+            asyncDialog.setIndeterminateDrawable(getResources().getDrawable(R.drawable.loading_progress));
+            asyncDialog.setMessage(getResources().getString(R.string.wait_message));
+            asyncDialog.show();
+        }
+
         @Override
         protected String doInBackground(String... args) {
             Response response = null;
@@ -595,11 +598,30 @@ public class PostDetailActivity extends BaseActivity
                         .add(MiddleAloneDialogFragment.newInstance(3), "middle_reply_fail")
                         .commit();
             }
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    asyncDialog.dismiss();
+                }
+            }, 1000);
         }
     }
 
     // 댓글수정
     public class AsyncModifyReplyRequest extends AsyncTask<String, String, String> {
+
+        ProgressDialog asyncDialog = new ProgressDialog(PostDetailActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            asyncDialog.setIndeterminate(true);
+            asyncDialog.setIndeterminateDrawable(getResources().getDrawable(R.drawable.loading_progress));
+            asyncDialog.setMessage(getResources().getString(R.string.wait_message));
+            asyncDialog.show();
+        }
+
         @Override
         protected String doInBackground(String... args) {
             Response response = null;
@@ -655,6 +677,13 @@ public class PostDetailActivity extends BaseActivity
             } else if (result.equals("fail")) {
                 // 실패
             }
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    asyncDialog.dismiss();
+                }
+            }, 1000);
         }
     }
 

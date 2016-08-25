@@ -4,10 +4,6 @@
         <item>나의 이야기</item>
         <item>내가 쓴 댓글</item>
     </string-array>
-    <string-array name="other_user_tab_title">
-        <item>당신의 이야기</item>
-        <item>당신이 쓴 댓글</item>
-    </string-array>
     <string-array name="filter_title">
         <item>원본</item>
         <item>선명하게</item>

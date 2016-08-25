@@ -2,7 +2,7 @@
 <!-- recyclerView 내용 : -->
 <!-- layout_post_date, layout_post_item.xml, layout_my_post_item -->
 <android.support.v7.widget.RecyclerView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/post_recycler"
     android:layout_marginTop="10dp"
     android:paddingTop="6dp"

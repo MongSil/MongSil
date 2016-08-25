@@ -135,15 +135,18 @@ public class GPSManager implements MiddleSelectDialogFragment.OnMiddleSelectDial
                     LocationServices.FusedLocationApi
                             .requestLocationUpdates(
                                     googleApiClient, locationRequest, this);
-
-                    latitude = String.valueOf(location.getLatitude());
-                    longitude = String.valueOf(location.getLongitude());
-
-                    Log.d("Location : Latitude", latitude);
-                    Log.d("Location : Longitude", longitude);
-                    Log.d("Location : Accuracy", String.valueOf(location.getAccuracy()));
                 } else {
-                    locationCallback.handleNewLocation(location);
+                    try {
+                        latitude = String.valueOf(location.getLatitude());
+                        longitude = String.valueOf(location.getLongitude());
+
+                        Log.d("Location : Latitude", latitude);
+                        Log.d("Location : Longitude", longitude);
+                        Log.d("Location : Accuracy", String.valueOf(location.getAccuracy()));
+                        locationCallback.handleNewLocation(location);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

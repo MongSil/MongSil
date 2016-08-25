@@ -8,35 +8,50 @@
     <ImageView
         android:id="@+id/img_two_cloud03_cut"
         android:src="@drawable/cloud03_cut_02"
+        android:layout_marginBottom="90dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|start"
+        android:scaleType="fitXY" />
+
+    <ImageView
+        android:id="@+id/img_two_cloud04_cut"
+        android:src="@drawable/cloud04_cut_02"
+        android:layout_marginBottom="60dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:scaleType="fitXY" />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/img_tutorial_sunny"
+            android:src="@drawable/tutorial_sunny"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top" />
+
+        <ImageView
+            android:id="@+id/img_tutorial_navi"
+            android:src="@drawable/tutorial_navi"
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+    </RelativeLayout>
     <ImageView
         android:id="@+id/img_two_cloud02_cut"
         android:src="@drawable/cloud02_cut_02"
+        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:scaleType="fitXY" />
-
-
-    <ImageView
-        android:id="@+id/img_tutorial_weather"
-        android:src="@drawable/tutorial_weather"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|top" />
-
-    <ImageView
-        android:id="@+id/img_tutorial_navi"
-        android:src="@drawable/tutorial_navi"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="45dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|top" />
 
     <ImageView
         android:src="@drawable/cloud_cut_02"
@@ -44,12 +59,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
         android:scaleType="fitXY" />
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="110dp">
+        android:layout_marginTop="120dp">
         <TextView
             android:id="@+id/text_tutorial_title"
             android:text="@string/tutorial_two_title"

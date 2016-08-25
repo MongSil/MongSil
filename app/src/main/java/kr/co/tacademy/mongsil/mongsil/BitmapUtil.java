@@ -110,7 +110,7 @@ public class BitmapUtil {
     }
 
     //
-    public synchronized static Bitmap SafeDecodeBitmapFile(String strFilePath)
+    public synchronized static Bitmap SafeDecodeBitmapFile(String strFilePath, String select)
     {
         try
         {
@@ -123,11 +123,13 @@ public class BitmapUtil {
             }
 
             // Max image size
-            final int IMAGE_MAX_SIZE 	= 1920;
+            final int IMAGE_MAX_SIZE 	= 0;
             BitmapFactory.Options bfo 	= new BitmapFactory.Options();
             bfo.inSampleSize            = 4;
             bfo.inJustDecodeBounds 		= true;
-
+            if(select.equals("camera")) {
+                bfo.inSampleSize = 8;
+            }
             BitmapFactory.decodeFile(strFilePath, bfo);
 
             if(bfo.outHeight * bfo.outWidth >= IMAGE_MAX_SIZE * IMAGE_MAX_SIZE)

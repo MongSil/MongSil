@@ -123,7 +123,7 @@ public class OtherUserProfileActivity extends BaseActivity {
             MenuViewPagerAdapter adapter =
                     new MenuViewPagerAdapter(getSupportFragmentManager());
             String[] tabTitle = MongSilApplication.getMongSilContext()
-                    .getResources().getStringArray(R.array.other_user_tab_title);
+                    .getResources().getStringArray(R.array.menu_tab_title);
             adapter.appendFragment(
                     ProfileMenuTabFragment
                             .newInstance(0, String.valueOf(data.userId)), tabTitle[0]);

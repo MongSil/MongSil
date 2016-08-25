@@ -27,7 +27,6 @@ public class PostingPreviewDialogFragment extends DialogFragment {
     private int weatherPos;
     private Bitmap photo;
 
-
     public PostingPreviewDialogFragment() {
     }
 

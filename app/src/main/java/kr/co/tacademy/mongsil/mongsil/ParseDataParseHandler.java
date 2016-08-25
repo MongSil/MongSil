@@ -291,9 +291,9 @@ public class ParseDataParseHandler {
         return null;
     }
     public static String[] postJSONUserSignUp(StringBuilder buf) {
-        JSONObject jsonObject;
-
+        JSONObject jsonObject = null;
         try {
+            Log.e("asdf", buf.toString());
             jsonObject = new JSONObject(buf.toString());
             String[] result = new String[2];
             result[0] = jsonObject.getString("msg");

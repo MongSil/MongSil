@@ -8,27 +8,43 @@
     <ImageView
         android:id="@+id/img_three_cloud03_cut"
         android:src="@drawable/cloud03_cut_03"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
+        android:layout_marginBottom="80dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|end"
         android:scaleType="fitXY" />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/img_tutorial_sunny"
+            android:src="@drawable/tutorial_sunny"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top" />
+
+        <ImageView
+            android:id="@+id/img_tutorial_write"
+            android:src="@drawable/tutorial_write"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="86dp"
+            android:layout_marginLeft="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+    </RelativeLayout>
     <ImageView
         android:id="@+id/img_three_cloud02_cut"
         android:src="@drawable/cloud02_cut_03"
+        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:scaleType="fitXY" />
-
-    <ImageView
-        android:id="@+id/img_tutorial_write"
-        android:src="@drawable/tutorial_write"
-        android:layout_marginTop="86dp"
-        android:layout_marginLeft="40dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
 
     <ImageView
         android:src="@drawable/cloud_cut_03"
@@ -41,7 +57,7 @@
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="110dp">
+        android:layout_marginTop="120dp">
         <TextView
             android:id="@+id/text_tutorial_title"
             android:text="@string/tutorial_three_title"

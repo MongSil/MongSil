@@ -53,7 +53,12 @@ public class SelectLocationDialogFragment extends DialogFragment {
     RecyclerView selectLocationRecycle;
     private int selectedPos = 0;
 
-    Bitmap backgroundImg;
+    Bitmap backgroundImg = null;
+    public static SelectLocationDialogFragment newInstance() {
+        SelectLocationDialogFragment fragment =
+                new SelectLocationDialogFragment();
+        return fragment;
+    }
 
     public static SelectLocationDialogFragment newInstance(Bitmap bitmap) {
         SelectLocationDialogFragment fragment =
@@ -97,7 +102,9 @@ public class SelectLocationDialogFragment extends DialogFragment {
 
         selectLocationBackground =
                 (ImageView) view.findViewById(R.id.img_select_location_background);
-        selectLocationBackground.setImageBitmap(BlurBuilder.blur(backgroundImg, 5));
+        if(backgroundImg != null) {
+            selectLocationBackground.setImageBitmap(BlurBuilder.blur(backgroundImg, 5));
+        }
 
         selectLocationRecycle =
                 (RecyclerView) view.findViewById(R.id.signup_location_recycler);

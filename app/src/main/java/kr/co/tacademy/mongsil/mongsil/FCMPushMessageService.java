@@ -40,6 +40,7 @@ public class FCMPushMessageService extends FirebaseMessagingService {
                 sendPushNotification(
                         URLDecoder.decode(receiveData.get("fcmMessage"), "UTF-8"),
                         URLDecoder.decode(receiveData.get("postId"), "UTF-8"),
+                        URLDecoder.decode(receiveData.get("replyWriterId"), "UTF-8"),
                         URLDecoder.decode(receiveData.get("replyContent"), "UTF-8")
                         );
             } catch (Exception e) {
@@ -51,19 +52,19 @@ public class FCMPushMessageService extends FirebaseMessagingService {
     /**
      * Create and show a simple notification containing the received FCM message.
      */
-    private void sendPushNotification(String message, String postId, String replyContent) {
+    private void sendPushNotification(String message, String postId, String replyWriterId, String replyContent) {
         Intent intent = new Intent(this, SplashActivity.class);
         intent.putExtra("postId", postId);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_CANCEL_CURRENT);
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(getResources().getString(R.string.app_name))
-                .setContentText(message + "\n" + replyContent)
+                .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);

@@ -49,8 +49,7 @@ public class PostRecyclerViewAdapter
 
     List<Post> items;
     Context context;
-
-    Post postData;
+    boolean isToday = false;
 
     PostRecyclerViewAdapter(Context context) {
         this.context = context;
@@ -73,8 +72,12 @@ public class PostRecyclerViewAdapter
     }
 
     public void addPost(Post post) {
+        if(isToday) {
+            items.set(0, post);
+        } else {
+            items.add(0, post);
+        }
         items.add(0, new Post(0, post.date));
-        items.set(1, post);
     }
 
 
@@ -90,7 +93,11 @@ public class PostRecyclerViewAdapter
         }
 
         public void setData(Post post) {
-            postDate.setText(TimeData.dateCalculate(post.date));
+            String date = TimeData.dateCalculate(post.date);
+            postDate.setText(date);
+            if(date.equals("Today")) {
+                isToday = true;
+            }
             if(post.typeCode == 2) {
                 postDate.setTextColor(0xEBEBEB);
             }

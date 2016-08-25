@@ -1,5 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.app.ProgressDialog;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -60,6 +62,7 @@ public class PostingActivity extends BaseActivity
         BottomPicDialogFragment.OnBottomPicDialogListener {
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
+    private static final int CROP_FROM_CAMERA = 2;
 
     // 툴바 필드
     TextView tbLocation, tbSave;
@@ -85,6 +88,7 @@ public class PostingActivity extends BaseActivity
 
     private UpLoadValueObject upLoadFile = null;
     private int currentPos = 0;
+    private Handler handler = new Handler();
 
     class UpLoadValueObject {
         File file; //업로드할 파일
@@ -166,6 +170,7 @@ public class PostingActivity extends BaseActivity
         selectWeatherPager =
                 (ViewPager) findViewById(R.id.viewpager_posting_select_weather);
         selectWeatherPager.setAdapter(new WeatherPagerAdapter());
+        selectWeatherPager.setPageTransformer(false, new NoPageTransformer());
         selectWeatherPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -225,6 +230,10 @@ public class PostingActivity extends BaseActivity
                     Toast.makeText(getApplicationContext(), "SD 카드가 없습니다.", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                String currentAppPackage = getPackageName();
+                imageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), currentAppPackage);
+
                 getSupportFragmentManager().beginTransaction()
                         .add(BottomPicDialogFragment.newInstance(), "bottom_pic").commit();
             }
@@ -347,6 +356,18 @@ public class PostingActivity extends BaseActivity
         }
     }
 
+    private static class NoPageTransformer implements ViewPager.PageTransformer {
+        public void transformPage(View view, float position) {
+            if (position < 0) {
+                view.setScrollX((int)((float)(view.getWidth()) * position));
+            } else if (position > 0) {
+                view.setScrollX(-(int) ((float) (view.getWidth()) * -position));
+            } else {
+                view.setScrollX(0);
+            }
+        }
+    }
+
     // 애니메이션 인터폴레이터 적용
     private Animation AnimationApplyInterpolater(
             int resourceId, final Interpolator interpolator) {
@@ -388,6 +409,39 @@ public class PostingActivity extends BaseActivity
         }
 
         switch (requestCode) {
+            case CROP_FROM_CAMERA: {
+                // 크롭된 이미지를 세팅
+                final Bundle extras = data.getExtras();
+                if (extras != null) {
+                    Bitmap photo = null;
+                    photo = extras.getParcelable("data");
+                    /*FileOutputStream out = null;
+                    try {
+                        out = new FileOutputStream(currentSelectedUri.getPath());
+                        photo.compress(Bitmap.CompressFormat.JPEG, 550, out);
+                    } catch (FileNotFoundException fe) {
+                        fe.printStackTrace();
+                    } finally {
+                        try {
+                            if(out != null) {
+                                out.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }*/
+                    Glide.with(this)
+                            .load(currentSelectedUri)
+                            .into(new ViewTarget<ImageView, GlideDrawable>(imgPostingBackground) {
+                                @Override
+                                public void onResourceReady(GlideDrawable resource, GlideAnimation anim) {
+                                    // Set your resource on myView and/or start your animation here.
+                                    imgPostingBackground.setBackgroundDrawable(resource);
+                                }
+                            });
+                }
+                break;
+            }
             case PICK_FROM_ALBUM: {
                 currentSelectedUri = data.getData();
                 if (currentSelectedUri != null) {
@@ -395,7 +449,7 @@ public class PostingActivity extends BaseActivity
                     if (findImageFileNameFromUri(currentSelectedUri)) {
                         File galleryPicture = new File(currentFileName);
                         upLoadFile = new UpLoadValueObject(
-                                resizingFile(galleryPicture), true);
+                                resizingFile(galleryPicture, "gallery"), true);
                     }
                 } else {
                     Bundle extras = data.getExtras();
@@ -406,61 +460,31 @@ public class PostingActivity extends BaseActivity
                         Log.e("임시이미지파일저장", "실패");
                     }
                 }
-                saveIntent();
+                cropIntent(currentSelectedUri);
                 break;
 
             }
             case PICK_FROM_CAMERA: {
                 //카메라캡쳐를 이용해 가져온 이미지
-                String currentAppPackage = getPackageName();
-                imageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), currentAppPackage);
                 File cameraPicture = new File(imageDir, currentFileName);
                 upLoadFile = new UpLoadValueObject(
-                        resizingFile(cameraPicture), true);
-                saveIntent();
+                        resizingFile(cameraPicture, "camera"), true);
+                cropIntent(currentSelectedUri);
                 break;
             }
         }
     }
 
-    // 이미지 4배 압축 및 로테이션 돌림
-    private File resizingFile(final File file) {
-        // 리사이즈된 이미지 구함
-        int targetW = imgPostingBackground.getWidth(); // ImageView 의 가로 사이즈 구하기
-        int targetH = imgPostingBackground.getHeight(); // ImageView 의 세로 사이즈 구하기
-
-        // Bitmap 정보를 가져온다.
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inSampleSize = 4;
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile( file.getAbsolutePath(), bmOptions);
-        int photoW = bmOptions.outWidth; // 사진의 가로 사이즈 구하기
-        int photoH = bmOptions.outHeight; // 사진의 세로 사이즈 구하기
-
-        // 사진을 줄이기 위한 비율 구하기
-        int scaleFactor = Math.min( photoW/targetW, photoH/targetH);
-
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-
-        Bitmap bitmap = BitmapFactory.decodeFile(file.getPath(), bmOptions);
-
-        int degree = BitmapUtil.GetExifOrientation(file.getPath());
-
-        Bitmap finalBitmap = BitmapUtil.GetRotatedBitmap(bitmap, degree);
-        saveIntent();
-        /*OutputStream out = null;
-        Bitmap resize = BitmapUtil.resize(safeDecodedBitmap, 1024, false);
+    private File resizingFile(final File file, String divider) {
+        // 이미지 4배 압축 및 카메라일 경우 로테이션 돌림
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+        Bitmap resize = BitmapUtil.SafeDecodeBitmapFile(file.getAbsolutePath(), divider);
+        Matrix matrix = new Matrix();
+        OutputStream out = null;
         try {
             out = new FileOutputStream(file);
-            if(resize != null) {
-                Log.e("resize 성공", " ");
-                resize.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            } else if(safeDecodedBitmap != null){
-                Log.e("safeDecoded 성공", " ");
-                safeDecodedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            }
+            resize.compress(Bitmap.CompressFormat.JPEG, 100, out);
         } catch (FileNotFoundException fe) {
             fe.printStackTrace();
         } finally {
@@ -471,22 +495,22 @@ public class PostingActivity extends BaseActivity
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
         return file;
     }
 
-    private void saveIntent(){
-        if (currentSelectedUri != null) {
-            Glide.with(this)
-                    .load(currentSelectedUri)
-                    .into(new ViewTarget<ImageView, GlideDrawable>(imgPostingBackground) {
-                        @Override
-                        public void onResourceReady(GlideDrawable resource, GlideAnimation anim) {
-                            // Set your resource on myView and/or start your animation here.
-                            imgPostingBackground.setBackgroundDrawable(resource);
-                        }
-                    });
-        }
+    private  void  cropIntent(Uri cropUri){
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        intent.setDataAndType(cropUri, "image");
+
+        intent.putExtra("outputX", 360);
+        intent.putExtra("outputY", 640);
+        intent.putExtra("aspectX", 9);
+        intent.putExtra("aspectY", 16);
+        intent.putExtra("scale", true);
+        intent.putExtra("return-data", true);
+
+        startActivityForResult(intent, CROP_FROM_CAMERA);
     }
     private boolean tempSavedBitmapFile(Bitmap tempBitmap) {
         boolean flag = false;
@@ -575,6 +599,18 @@ public class PostingActivity extends BaseActivity
 
         AsyncPostingRequest(UpLoadValueObject object) {
             this.object = object;
+        }
+
+        ProgressDialog asyncDialog = new ProgressDialog(PostingActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            asyncDialog.setIndeterminate(true);
+            asyncDialog.setIndeterminateDrawable(getResources().getDrawable(R.drawable.loading_progress));
+            asyncDialog.setMessage(getResources().getString(R.string.wait_message));
+            asyncDialog.show();
         }
 
         @Override
@@ -703,6 +739,12 @@ public class PostingActivity extends BaseActivity
                         .add(MiddleAloneDialogFragment.newInstance(2), "middle_post_fail").commit();
             }
             tbSave.setEnabled(true);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    asyncDialog.dismiss();
+                }
+            }, 1000);
         }
     }
 
@@ -719,6 +761,18 @@ public class PostingActivity extends BaseActivity
                 this.beforeBgImg = beforeBgImg;
             }
             this.object = object;
+        }
+
+        ProgressDialog asyncDialog = new ProgressDialog(PostingActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            asyncDialog.setIndeterminate(true);
+            asyncDialog.setIndeterminateDrawable(getResources().getDrawable(R.drawable.loading_progress));
+            asyncDialog.setMessage(getResources().getString(R.string.wait_message));
+            asyncDialog.show();
         }
 
         @Override
@@ -834,6 +888,12 @@ public class PostingActivity extends BaseActivity
             }
             tbSave.setEnabled(true);
             tbLocation.setEnabled(true);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    asyncDialog.dismiss();
+                }
+            }, 1000);
         }
     }
 

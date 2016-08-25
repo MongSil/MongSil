@@ -1,5 +1,6 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.app.ProgressDialog;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -76,6 +78,7 @@ public class EditProfileActivity extends BaseActivity
     RelativeLayout leaveProfileContainer;
 
     private UpLoadValueObject upLoadFile = null;
+    private Handler handler = new Handler();
 
     class UpLoadValueObject {
         File file; //업로드할 파일
@@ -159,7 +162,7 @@ public class EditProfileActivity extends BaseActivity
             public void onClick(View view) {
                 Bitmap bitmap = BitmapUtil.viewToBitmap(editProfileContainer);
                 getSupportFragmentManager().beginTransaction()
-                        .add(SelectLocationDialogFragment.newInstance(BitmapUtil.resizeBitmap(bitmap, 600)),
+                        .add(SelectLocationDialogFragment.newInstance(),
                                 "select_location").commit();
             }
         });
@@ -257,7 +260,7 @@ public class EditProfileActivity extends BaseActivity
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 4;
         Bitmap orgImage = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        Bitmap resize = BitmapUtil.resize(BitmapUtil.SafeDecodeBitmapFile(file.getAbsolutePath()), 200, true);
+        Bitmap resize = BitmapUtil.SafeDecodeBitmapFile(file.getAbsolutePath(), divider);
         Matrix matrix = new Matrix();
         if(divider.equals("camera")) {
             matrix.postRotate(90);
@@ -390,6 +393,8 @@ public class EditProfileActivity extends BaseActivity
 
     // 프로필 업로드
     private class ProfileUpdateAsyncTask extends AsyncTask<UpLoadValueObject, Void, UserData> {
+
+
         private String username;
         private String area;
         private String uploadCode;
@@ -399,6 +404,18 @@ public class EditProfileActivity extends BaseActivity
         public ProfileUpdateAsyncTask(String username, String area) {
             this.username = username;
             this.area = area;
+        }
+
+        ProgressDialog asyncDialog = new ProgressDialog(EditProfileActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            asyncDialog.setIndeterminate(true);
+            asyncDialog.setIndeterminateDrawable(getResources().getDrawable(R.drawable.loading_progress));
+            asyncDialog.setMessage(getResources().getString(R.string.wait_message));
+            asyncDialog.show();
         }
 
         @Override
@@ -510,6 +527,12 @@ public class EditProfileActivity extends BaseActivity
                                 "middle_edit_profile_fail").commit();
             }
             tbDone.setEnabled(true);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    asyncDialog.dismiss();
+                }
+            }, 1000);
         }
     }
 
@@ -558,10 +581,9 @@ public class EditProfileActivity extends BaseActivity
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result.equals("success")) {
-                Intent intent = new Intent(EditProfileActivity.this, SplashActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
+                moveTaskToBack(true);
                 finish();
+                android.os.Process.killProcess(android.os.Process.myPid());
             } else if(result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(2), "middle_dialog").commit();

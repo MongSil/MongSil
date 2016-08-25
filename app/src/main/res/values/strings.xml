@@ -128,4 +128,6 @@
     <string name="program_info_email">개발자 문의 : tkddn204@gmail.com</string>
     <string name="signup_fail_overlap_nickname">이미 존재하는 닉네임입니다.</string>
     <string name="save_reply_fail">댓글 보내기를 실패했습니다..</string>
+    <string name="none_list">비어있어요!</string>
+    <string name="wait_message">저장 중이니 잠시만 기다려주세요...</string>
 </resources>

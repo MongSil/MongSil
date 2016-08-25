@@ -199,18 +199,17 @@ public class SignUpActivity extends BaseActivity
         @Override
         protected void onPostExecute(String[] result) {
             super.onPostExecute(result);
-            Log.e("회원가입 결과", result[0] + "");
-            if(result[0].equals("이미 사용중인 닉네임")) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(MiddleAloneDialogFragment.newInstance(93),
-                                "middle_signup_fail").commit();
-            } else if (result[1] != null) {
+             if (result[1] != null) {
                 PropertyManager.getInstance().setNickname(editName.getText().toString());
                 PropertyManager.getInstance().setLocation(location.getText().toString());
                 PropertyManager.getInstance().setUserId(result[1]);
                 Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+            } else if (result[0].equals("이미 사용중인 닉네임")) {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(MiddleAloneDialogFragment.newInstance(93),
+                                    "middle_signup_fail").commit();
             } else {
                 // 실패
                 getSupportFragmentManager().beginTransaction()

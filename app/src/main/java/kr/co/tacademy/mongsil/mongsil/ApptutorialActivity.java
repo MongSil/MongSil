@@ -129,58 +129,66 @@ public class AppTutorialActivity extends BaseActivity {
         public void transformPage(View page, float position) {
             int pageWidth = page.getWidth();
 
-            /*// 첫번째
+            // 첫번째
+            View weather = page.findViewById(R.id.img_tutorial_weather);
             View cloudCutTwo = page.findViewById(R.id.img_one_cloud02_cut);
+            View cloudCutFour = page.findViewById(R.id.img_one_cloud04_cut);
             View cloudCutThree = page.findViewById(R.id.img_one_cloud03_cut);
 
             // 두번째
             View navi = page.findViewById(R.id.img_tutorial_navi);
-            View city = page.findViewById(R.id.img_tutorial_weather);
             View cloud2CutTwo = page.findViewById(R.id.img_two_cloud02_cut);
+            View cloud2CutFour = page.findViewById(R.id.img_two_cloud04_cut);
             View cloud2CutThree = page.findViewById(R.id.img_two_cloud03_cut);
 
             // 세번째
             View write = page.findViewById(R.id.img_tutorial_write);
             View cloud3CutTwo = page.findViewById(R.id.img_three_cloud02_cut);
-            View cloud3CutThree = page.findViewById(R.id.img_three_cloud03_cut);*/
+            View cloud3CutThree = page.findViewById(R.id.img_three_cloud03_cut);
 
             if(position <= -1.0f || position >= 1.0f) {
             } else if( position == 0.0f ) {
             } else {
 
-                /*// 첫번째
+                // 첫번째
+                if (weather != null) {
+                    weather.setAlpha(1.0f - Math.abs(position));
+                }
                 if (cloudCutTwo != null) {
                     cloudCutTwo.setTranslationX(-(float)(pageWidth/1.5 * position));
+                }
+                if (cloudCutFour != null) {
+                    cloudCutFour.setTranslationX(-(float)(pageWidth/0.9 * position));
                 }
                 if (cloudCutThree != null) {
                     cloudCutThree.setTranslationX(-(float)(pageWidth/0.8 * position));
                 }
 
                 // 두번째
-                if (city != null) {
-                    city.setTranslationX((float)(pageWidth/1.2 * position));
-                }
                 if (navi != null) {
-                    navi.setTranslationX((float)(pageWidth/1.2 * position));
+                    navi.setAlpha(1.0f - Math.abs(position));
                 }
                 if (cloud2CutTwo != null) {
-                    cloud2CutTwo.setTranslationX((float)(pageWidth/0.7 * position));
+                    cloud2CutTwo.setTranslationX((float)(pageWidth/0.9 * position));
 
                 }
+                if (cloud2CutFour != null) {
+                    cloud2CutFour.setTranslationX(-(float)(pageWidth/0.8 * position));
+                }
                 if (cloud2CutThree != null) {
-                    cloud2CutThree.setTranslationX(-(float)(pageWidth/1.1 * position));
+                    cloud2CutThree.setTranslationX(-(float)(pageWidth/1.2 * position));
                 }
 
                 // 세번째
                 if (write != null) {
-                    write.setTranslationX((float)(pageWidth/1.2 * position));
+                    write.setAlpha(1.0f - Math.abs(position));
                 }
                 if (cloud3CutTwo != null) {
-                    cloud3CutTwo.setTranslationX((float)(pageWidth/0.7 * position));
+                    cloud3CutTwo.setTranslationX(-(float)(pageWidth/0.7 * position));
                 }
                 if (cloud3CutThree != null) {
                     cloud3CutThree.setTranslationX((float)(pageWidth/1.6 * position));
-                }*/
+                }
 
             }
         }

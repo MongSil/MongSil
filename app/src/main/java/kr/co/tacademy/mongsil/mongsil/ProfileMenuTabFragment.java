@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
@@ -28,6 +30,7 @@ public class ProfileMenuTabFragment extends Fragment {
     public static final String TABINFO = "tabinfo";
     public static final String USERID = "userid";
 
+    //LinearLayout postContainer;
     RecyclerView userRecycler;
     PostRecyclerViewAdapter postAdapter;
     ReplyRecyclerViewAdapter replyAdapter;
@@ -54,6 +57,8 @@ public class ProfileMenuTabFragment extends Fragment {
         final String userId = initBundle.getString(USERID);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(
                 MongSilApplication.getMongSilContext());
+
+        //postContainer = (LinearLayout) view.findViewById(R.id.none_post_container);
 
         userRecycler = (RecyclerView) view.findViewById(R.id.post_recycler);
         userRecycler.setLayoutManager(layoutManager);
@@ -219,6 +224,7 @@ public class ProfileMenuTabFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<ReplyData> result) {
             if(result != null && result.size() > 0){
+                //postContainer.setVisibility(View.GONE);
                 int maxResultSize = result.size();
                 loadOnResult += maxResultSize;
                 maxLoadSize = result.get(0).totalCount;
@@ -228,6 +234,8 @@ public class ProfileMenuTabFragment extends Fragment {
                 }
 
                 replyAdapter.add(result);
+            } else if (result != null && result.size() == 0) {
+                //postContainer.setVisibility(View.VISIBLE);
             }
         }
     }
