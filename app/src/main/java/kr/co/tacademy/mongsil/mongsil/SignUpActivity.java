@@ -43,7 +43,6 @@ public class SignUpActivity extends BaseActivity
     // 완료
     ImageView imgDone;
 
-    // TODO : GPS가 켜져 있으면 지역이 자동으로 바뀌게 해야함
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

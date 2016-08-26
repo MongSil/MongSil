@@ -1,7 +1,5 @@
 package kr.co.tacademy.mongsil.mongsil;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,7 +86,7 @@ public class MainPostFragment extends Fragment
         postRecyclerView =
                 (RecyclerView) view.findViewById(R.id.post_recycler);
 
-        postAdapter = new PostRecyclerViewAdapter(MongSilApplication.getMongSilContext());
+        postAdapter = new PostRecyclerViewAdapter(getActivity(), MongSilApplication.getMongSilContext());
         postRecyclerView.setAdapter(postAdapter);
         final LinearLayoutManager layoutManager =
                 new LinearLayoutManager(MongSilApplication.getMongSilContext());

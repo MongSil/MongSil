@@ -2,10 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        config {
-            keyAlias 'Mongsil'
-            keyPassword 'mongsil'
-        }
     }
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
@@ -13,22 +9,24 @@ android {
         applicationId "kr.co.tacademy.mongsil.mongsil"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.02"
     }
-    dexOptions { // signing 하다가 막히면 이부분을 써라
+    /*dexOptions { // signing 하다가 막히면 이부분을 써라
         javaMaxHeapSize "4g"
         preDexLibraries = false
-    }
+    }*/
     buildTypes {
         release {
             minifyEnabled true // 프로가드 적용하려면 true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
             pseudoLocalesEnabled true
             versionNameSuffix '1.0'
             zipAlignEnabled true
+            debuggable true
         }
+    }
+    productFlavors {
     }
 }
 repositories {

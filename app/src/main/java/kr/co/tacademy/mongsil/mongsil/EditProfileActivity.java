@@ -610,8 +610,9 @@ public class EditProfileActivity extends BaseActivity
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result.equals("success")) {
-                finish();
+                PropertyManager.getInstance().setUserId(null);
                 moveTaskToBack(true);
+                finish();
                 android.os.Process.killProcess(android.os.Process.myPid());
             } else if(result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction()

@@ -29,7 +29,6 @@ public class WeatherData {
                    4 : 글 작성, 글 상세보기 배경 리소스
                    5 : 지도 아이콘 리소스
         */
-    // TODO : 글 작성 배경 다시 바꿔야함
     public static int imgFromWeatherCode(String code, int request) {
         if (code.equals("SKY_A01") || code.equals("0")) {
             // 맑음
@@ -186,8 +185,7 @@ public class WeatherData {
             } else if(request == 3) {
                 return R.drawable.circle_cloud;
             } else if(request == 4) {
-                // TODO : 흐리고 비 또는 눈 해야함
-                return R.drawable.background_graysnow;
+                return R.drawable.background_gray_rain_snow;
             } else if(request == 5) {
                 return R.drawable.map_icon_mongsil_gray_rain_snow;
             }
@@ -199,7 +197,7 @@ public class WeatherData {
             } else if(request == 1) {
                 return R.drawable.background_graycloud;
             } else if(request == 2) {
-                return R.drawable.anim_list_gray_cloud;
+                return R.drawable.anim_list_bolt;
             } else if(request == 3) {
                 return R.drawable.circle_bolt;
             } else if(request == 4) {
@@ -215,7 +213,7 @@ public class WeatherData {
             } else if(request == 1) {
                 return R.drawable.background_strong_rain;
             } else if(request == 2) {
-                return R.drawable.anim_list_strong_rain;
+                return R.drawable.anim_list_bolt;
             }  else if(request == 3) {
                 return R.drawable.circle_bolt;
             } else if(request == 4) {
@@ -231,7 +229,7 @@ public class WeatherData {
             } else if(request == 1) {
                 return R.drawable.background_strong_rain;
             } else if(request == 2) {
-                return R.drawable.anim_list_snow;
+                return R.drawable.anim_list_bolt;
             } else if(request == 3) {
                 return R.drawable.circle_bolt;
             } else if(request == 4) {
@@ -247,7 +245,7 @@ public class WeatherData {
             } else if(request == 1) {
                 return R.drawable.background_strong_rain;
             } else if(request == 2) {
-                return R.drawable.anim_list_strong_rain;
+                return R.drawable.anim_list_bolt;
             } else if(request == 3) {
                 return R.drawable.circle_bolt;
             } else if(request == 4) {

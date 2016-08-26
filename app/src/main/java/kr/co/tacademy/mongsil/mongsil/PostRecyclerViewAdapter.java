@@ -48,6 +48,7 @@ public class PostRecyclerViewAdapter
     private static final int LAYOUT_MY_POST = 4000;
 
     List<Post> items;
+    Activity activity;
     Context context;
     boolean isToday = false;
 
@@ -55,8 +56,12 @@ public class PostRecyclerViewAdapter
         this.context = context;
         items = new ArrayList<Post>();
     }
+    PostRecyclerViewAdapter(Activity activity, Context context) {
+        this(context);
+        this.activity = activity;
+    }
     PostRecyclerViewAdapter(Activity activity, List<Post> items) {
-        this.context = activity;
+        this.activity = activity;
         this.items = items;
     }
 
@@ -127,6 +132,7 @@ public class PostRecyclerViewAdapter
         }
 
         public void setData(final Post post) {
+
             if(!post.profileImg.equals("null")) {
                 Glide.with(MongSilApplication.getMongSilContext())
                         .load(post.profileImg).into(imgPostProfile);
@@ -158,29 +164,6 @@ public class PostRecyclerViewAdapter
                 }
             });
         }
-
-/*
-
-        private void startTransition(View view, ValueIterator.Element element) {
-            Intent i = new Intent(getActivity(), PostDetailActivity.class);
-            i.putExtra("ITEM_ID", element.getId());
-
-            Pair<View, String>[] transitionPairs = new Pair[4];
-            transitionPairs[0] = Pair.create(findViewById(R.id.toolbar), "toolbar"); // Transition the Toolbar
-            transitionPairs[1] = Pair.create(view, "content_area"); // Transition the content_area (This will be the content area on the detail screen)
-
-            // We also want to transition the status and navigation bar barckground. Otherwise they will flicker
-            transitionPairs[2] = Pair.create(findViewById(android.R.id.statusBarBackground), Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME);
-            transitionPairs[3] = Pair.create(findViewById(android.R.id.navigationBarBackground), Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME);
-            Bundle b = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this, transitionPairs).toBundle();
-
-            ActivityCompat.startActivity(MainActivity.this, i, b);
-        }
-        // if we transition the status and navigation bar we have to wait till everything is available
-        TransitionHelper.fixSharedElementTransitionForStatusAndNavigationBar(getActivity());
-        // set a custom shared element enter transition
-        TransitionHelper.setSharedElementEnterTransition(getActivity(), R.transition.detail_activity_shared_element_enter_transition);
-        */
     }
 
 

@@ -45,7 +45,7 @@ public class PropertyManager {
 
     // UUID(장치 아이디)
     public String getDeviceId() {
-        return preferences.getString(KEY_DEVICE_ID, "");
+        return preferences.getString(KEY_DEVICE_ID, null);
     }
 
     public void setDeviceId(String UUID) {

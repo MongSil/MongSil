@@ -9,7 +9,7 @@
         android:id="@+id/text_none_post"
         android:text="@string/none_my_post"
         android:textSize="16dp"
-        android:textStyle="bold"
+        android:textStyle="normal"
         android:visibility="gone"
         android:gravity="center"
         android:layout_width="match_parent"
