@@ -37,6 +37,7 @@ public class GPSManager implements MiddleSelectDialogFragment.OnMiddleSelectDial
     private LocationRequest locationRequest;
     private GoogleApiClient googleApiClient;
 
+    boolean isLocationChange = false;
     boolean resolvingError = false;
 
     private BaseActivity activity;
@@ -71,6 +72,7 @@ public class GPSManager implements MiddleSelectDialogFragment.OnMiddleSelectDial
         if(googleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
             googleApiClient.disconnect();
+            isLocationChange = false;
         }
     }
 
@@ -114,7 +116,10 @@ public class GPSManager implements MiddleSelectDialogFragment.OnMiddleSelectDial
 
     @Override
     public void onLocationChanged(Location location) {
-        locationCallback.handleNewLocation(location);
+        if(!isLocationChange) {
+            locationCallback.handleNewLocation(location);
+            isLocationChange = true;
+        }
     }
 
     @Override
@@ -146,6 +151,7 @@ public class GPSManager implements MiddleSelectDialogFragment.OnMiddleSelectDial
                         locationCallback.handleNewLocation(location);
                     } catch (Exception e) {
                         e.printStackTrace();
+                        showErrorDialog();
                     }
                 }
             }

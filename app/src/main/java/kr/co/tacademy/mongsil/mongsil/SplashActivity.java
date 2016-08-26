@@ -94,7 +94,7 @@ public class SplashActivity extends BaseActivity {
                         .readTimeout(15, TimeUnit.SECONDS)
                         .build();
 
-                if(PropertyManager.getInstance().getDeviceId().isEmpty()) {
+                if(PropertyManager.getInstance().getDeviceId() == null) {
                     PropertyManager.getInstance().setDeviceId(getDevicesUUID());
                 }
 

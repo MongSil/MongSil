@@ -8,8 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
@@ -49,10 +48,13 @@ public class ProfileMenuTabFragment extends Fragment {
         return fragment;
     }
 
+    TextView nonePost;
+
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_post, container, false);
+        nonePost = (TextView) view.findViewById(R.id.text_none_post);
         final Bundle initBundle = getArguments();
         final String userId = initBundle.getString(USERID);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(
@@ -66,6 +68,7 @@ public class ProfileMenuTabFragment extends Fragment {
         if(initBundle.getInt(TABINFO) == 0) {
             // 나의 이야기 탭
             postAdapter = new PostRecyclerViewAdapter(MongSilApplication.getMongSilContext());
+            nonePost.setText(getResources().getString(R.string.none_my_post));
             userRecycler.setAdapter(postAdapter);
             userRecycler.setOnScrollListener(
                     new EndlessRecyclerOnScrollListener(layoutManager) {
@@ -82,6 +85,7 @@ public class ProfileMenuTabFragment extends Fragment {
         } else {
             // 내가 쓴 댓글 탭
             replyAdapter = new ReplyRecyclerViewAdapter(getActivity().getSupportFragmentManager());
+            nonePost.setText(getResources().getString(R.string.none_my_reply));
             userRecycler.setAdapter(replyAdapter);
             userRecycler.setOnScrollListener(
                     new EndlessRecyclerOnScrollListener(layoutManager) {
@@ -157,10 +161,10 @@ public class ProfileMenuTabFragment extends Fragment {
         @Override
         protected void onPostExecute(PostData result) {
             if(result != null && result.post.size() > 0){
+                nonePost.setVisibility(View.GONE);
                 int maxResultSize = result.post.size();
                 loadOnResult += maxResultSize;
                 maxLoadSize = result.totalCount;
-
                 String compare = result.post.get(maxResultSize - 1).date.split(" ")[0];
                 result.post.get(maxResultSize - 1).typeCode = 2;
                 for (int i = maxResultSize - 1; i >= 0 ; i--) {
@@ -176,6 +180,8 @@ public class ProfileMenuTabFragment extends Fragment {
                     }
                 }
                 postAdapter.add(result.post);
+            } else {
+                nonePost.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -224,7 +230,7 @@ public class ProfileMenuTabFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<ReplyData> result) {
             if(result != null && result.size() > 0){
-                //postContainer.setVisibility(View.GONE);
+                nonePost.setVisibility(View.GONE);
                 int maxResultSize = result.size();
                 loadOnResult += maxResultSize;
                 maxLoadSize = result.get(0).totalCount;
@@ -234,8 +240,8 @@ public class ProfileMenuTabFragment extends Fragment {
                 }
 
                 replyAdapter.add(result);
-            } else if (result != null && result.size() == 0) {
-                //postContainer.setVisibility(View.VISIBLE);
+            } else {
+                nonePost.setVisibility(View.VISIBLE);
             }
         }
     }

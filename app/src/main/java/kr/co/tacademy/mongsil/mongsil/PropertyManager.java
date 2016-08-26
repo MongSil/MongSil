@@ -41,6 +41,7 @@ public class PropertyManager {
     private static final String KEY_USE_GPS = "usegps";
 
     public static final String KEY_MARK_COUNT = "markcount";
+    public static final String KEY_WARNING = "warning";
 
     // UUID(장치 아이디)
     public String getDeviceId() {
@@ -159,6 +160,16 @@ public class PropertyManager {
 
     public void setMarkCount(int markCount) {
         editor.putInt(KEY_MARK_COUNT, markCount);
+        editor.commit();
+    }
+
+    // 글 쓸 때 경고 메세지
+    public boolean getWarning() {
+        return preferences.getBoolean(KEY_WARNING, false);
+    }
+
+    public void setWarning(boolean warning) {
+        editor.putBoolean(KEY_WARNING, warning);
         editor.commit();
     }
 }

@@ -15,6 +15,7 @@ public class AppTutorialActivity extends BaseActivity {
     private static final int MAX_PAGES = 3;
 
     ViewPager pager;
+    ImageView imgWeather, imgNavi, imgWrite;
     ImageView imgTutorialSkip;
     LinearLayout indicator;
 
@@ -23,6 +24,10 @@ public class AppTutorialActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_tutorial);
 
+        imgWeather = (ImageView) findViewById(R.id.img_tutorial_weather);
+        imgNavi = (ImageView) findViewById(R.id.img_tutorial_navi);
+        imgWrite = (ImageView) findViewById(R.id.img_tutorial_write);
+
         pager = (ViewPager) findViewById(R.id.viewpager_tutorial);
         final tutorialPagerAdapter adapter = new tutorialPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(adapter);
@@ -30,7 +35,24 @@ public class AppTutorialActivity extends BaseActivity {
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                //Unused
+                if(position == 0) {
+                    imgWeather.setVisibility(View.VISIBLE);
+                    imgNavi.setVisibility(View.GONE);
+                    imgWrite.setVisibility(View.GONE);
+                    imgWeather.setAlpha(1.0f - Math.abs(positionOffset));
+                }
+                if(position == 1) {
+                    imgWeather.setVisibility(View.GONE);
+                    imgNavi.setVisibility(View.VISIBLE);
+                    imgWrite.setVisibility(View.GONE);
+                    imgNavi.setAlpha(1.0f - Math.abs(positionOffset));
+                }
+                if(position == 2) {
+                    imgWeather.setVisibility(View.GONE);
+                    imgNavi.setVisibility(View.GONE);
+                    imgWrite.setVisibility(View.VISIBLE);
+                    imgWrite.setAlpha(1.0f - Math.abs(positionOffset));
+                }
             }
 
             @Override
@@ -130,19 +152,16 @@ public class AppTutorialActivity extends BaseActivity {
             int pageWidth = page.getWidth();
 
             // 첫번째
-            View weather = page.findViewById(R.id.img_tutorial_weather);
             View cloudCutTwo = page.findViewById(R.id.img_one_cloud02_cut);
             View cloudCutFour = page.findViewById(R.id.img_one_cloud04_cut);
             View cloudCutThree = page.findViewById(R.id.img_one_cloud03_cut);
 
             // 두번째
-            View navi = page.findViewById(R.id.img_tutorial_navi);
             View cloud2CutTwo = page.findViewById(R.id.img_two_cloud02_cut);
             View cloud2CutFour = page.findViewById(R.id.img_two_cloud04_cut);
             View cloud2CutThree = page.findViewById(R.id.img_two_cloud03_cut);
 
             // 세번째
-            View write = page.findViewById(R.id.img_tutorial_write);
             View cloud3CutTwo = page.findViewById(R.id.img_three_cloud02_cut);
             View cloud3CutThree = page.findViewById(R.id.img_three_cloud03_cut);
 
@@ -151,9 +170,6 @@ public class AppTutorialActivity extends BaseActivity {
             } else {
 
                 // 첫번째
-                if (weather != null) {
-                    weather.setAlpha(1.0f - Math.abs(position));
-                }
                 if (cloudCutTwo != null) {
                     cloudCutTwo.setTranslationX(-(float)(pageWidth/1.5 * position));
                 }
@@ -165,9 +181,6 @@ public class AppTutorialActivity extends BaseActivity {
                 }
 
                 // 두번째
-                if (navi != null) {
-                    navi.setAlpha(1.0f - Math.abs(position));
-                }
                 if (cloud2CutTwo != null) {
                     cloud2CutTwo.setTranslationX((float)(pageWidth/0.9 * position));
 
@@ -180,9 +193,6 @@ public class AppTutorialActivity extends BaseActivity {
                 }
 
                 // 세번째
-                if (write != null) {
-                    write.setAlpha(1.0f - Math.abs(position));
-                }
                 if (cloud3CutTwo != null) {
                     cloud3CutTwo.setTranslationX(-(float)(pageWidth/0.7 * position));
                 }

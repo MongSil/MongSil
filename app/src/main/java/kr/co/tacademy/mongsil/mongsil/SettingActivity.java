@@ -41,14 +41,14 @@ public class SettingActivity extends BaseActivity {
                 PropertyManager.getInstance().setAlarm(b);
             }
         });
-        saveGallery = (Switch) findViewById(R.id.save_gallery_switch);
+        /*saveGallery = (Switch) findViewById(R.id.save_gallery_switch);
         saveGallery.setChecked(PropertyManager.getInstance().getSaveGallery());
         saveGallery.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 PropertyManager.getInstance().setSaveGallery(b);
             }
-        });
+        });*/
         programInfoContainer = (RelativeLayout) findViewById(R.id.program_info_container);
         programInfoContainer.setOnClickListener(new View.OnClickListener() {
             @Override

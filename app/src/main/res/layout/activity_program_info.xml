@@ -58,6 +58,7 @@
         android:layout_height="wrap_content" />
 
     <TextView
+        android:id="@+id/text_developer_email"
         android:text="@string/program_info_email"
         android:textSize="12sp"
         android:textStyle="italic"

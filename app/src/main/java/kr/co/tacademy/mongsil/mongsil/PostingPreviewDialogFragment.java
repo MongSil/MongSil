@@ -2,6 +2,7 @@ package kr.co.tacademy.mongsil.mongsil;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -16,28 +17,36 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.ViewTarget;
+
 public class PostingPreviewDialogFragment extends DialogFragment {
     private static final String LOCATION = "location";
     private static final String CONTENT = "content";
     private static final String WEATHER_POS = "weather_pos";
     private static final String PHOTO = "photo";
+    private static final String BGIMG = "bgimg";
 
     private String location;
     private String content;
     private int weatherPos;
     private Bitmap photo;
+    private String bgImg;
 
     public PostingPreviewDialogFragment() {
     }
 
     public static PostingPreviewDialogFragment newInstance(
-            String location, String content, int weatherPos, Bitmap photo) {
+            String location, String content, int weatherPos, Bitmap photo, String bgImg) {
         PostingPreviewDialogFragment fragment = new PostingPreviewDialogFragment();
         Bundle args = new Bundle();
         args.putString(LOCATION, location);
         args.putString(CONTENT, content);
         args.putInt(WEATHER_POS, weatherPos);
         args.putParcelable(PHOTO, photo);
+        args.putString(BGIMG, bgImg);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,6 +59,7 @@ public class PostingPreviewDialogFragment extends DialogFragment {
             content = getArguments().getString(CONTENT);
             weatherPos = getArguments().getInt(WEATHER_POS);
             photo = getArguments().getParcelable(PHOTO);
+            bgImg = getArguments().getString(BGIMG);
         }
         setStyle(STYLE_NO_TITLE, R.style.DialogTheme);
     }
@@ -71,8 +81,20 @@ public class PostingPreviewDialogFragment extends DialogFragment {
         });
 
         imgBackground = (ImageView) view.findViewById(R.id.img_preview_background);
-        imgBackground.setBackgroundResource(R.drawable.sign_up_background);
-        if(photo == null) {
+        if(photo != null) {
+            BitmapDrawable ob = new BitmapDrawable(getResources(), photo);
+            imgBackground.setBackgroundDrawable(ob);
+        } else if(bgImg != null) {
+            Glide.with(this)
+                    .load(bgImg)
+                    .into(new ViewTarget<ImageView, GlideDrawable>(imgBackground) {
+                        @Override
+                        public void onResourceReady(GlideDrawable resource, GlideAnimation anim) {
+                            // Set your resource on myView and/or start your animation here.
+                            imgBackground.setBackgroundDrawable(resource);
+                        }
+                    });
+        } else {
             imgBackground.setBackgroundResource(
                     WeatherData.imgFromWeatherCode(String.valueOf(weatherPos), 4));
         }

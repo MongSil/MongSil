@@ -10,6 +10,43 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     <ImageView
+        android:id="@+id/img_tutorial_sunny"
+        android:src="@drawable/tutorial_sunny"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top" />
+
+    <ImageView
+        android:id="@+id/img_tutorial_weather"
+        android:src="@drawable/tutorial_weather"
+        android:visibility="visible"
+        android:layout_marginTop="115dp"
+        android:layout_marginRight="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top" />
+
+    <ImageView
+        android:id="@+id/img_tutorial_navi"
+        android:src="@drawable/tutorial_navi"
+        android:visibility="gone"
+        android:layout_marginTop="120dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top" />
+
+    <ImageView
+        android:id="@+id/img_tutorial_write"
+        android:src="@drawable/tutorial_write"
+        android:visibility="gone"
+        android:layout_marginTop="120dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top" />
+
+    <ImageView
         android:id="@+id/img_tutorial_skip"
         android:layout_width="82dp"
         android:layout_height="32dp"

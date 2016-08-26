@@ -1,5 +1,7 @@
 package kr.co.tacademy.mongsil.mongsil;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,11 +11,13 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class ProgramInfoActivity extends BaseActivity {
 
 
     RelativeLayout apacheLicenseContainer, MITLicenseContainer;
+    TextView developerEmail;
     WebView webView;
 
     @Override
@@ -30,6 +34,17 @@ public class ProgramInfoActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
         }
+
+        developerEmail = (TextView) findViewById(R.id.text_developer_email);
+        developerEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 이메일 발송
+                Uri uri = Uri.parse("mailto:tkddn204@gmail.com");
+                Intent it = new Intent(Intent.ACTION_SENDTO, uri);
+                startActivity(it);
+            }
+        });
 
         webView = (WebView) findViewById(R.id.webview_license);
 

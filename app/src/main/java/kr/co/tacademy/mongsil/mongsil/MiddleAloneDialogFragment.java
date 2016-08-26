@@ -192,7 +192,44 @@ public class MiddleAloneDialogFragment extends DialogFragment {
                     }
                 });
                 break;
-
+            case 98 : // 3G 네트워크를 사용하는 경우 [확인]
+                dialog.setText(getResources().getText(R.string.network_connection_mobile));
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                break;
+            case 99 : // 사용 가능한 네트워크가 없는 경우 [확인]
+                dialog.setText(getResources().getText(R.string.network_connection_fail));
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onMiddleAloneDialogListener.onMiddleAlone(99);
+                        dismiss();
+                    }
+                });
+                break;
+            case 100 : // 글쓰기 처음 쓸 때 경고 [확인]
+                dialog.setText(getResources().getText(R.string.post_warning));
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        PropertyManager.getInstance().setWarning(true);
+                        dismiss();
+                    }
+                });
+                break;
+            case 999 : // 날씨 정보가 없는 경우 [확인]
+                dialog.setText(getResources().getText(R.string.sorry_to_user));
+                positive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dismiss();
+                    }
+                });
+                break;
         }
         return view;
     }

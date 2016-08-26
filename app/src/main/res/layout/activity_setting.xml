@@ -72,7 +72,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp" />
 
-    <!-- 카메라롤에 사진 저장 -->
+    <!--&lt;!&ndash; 카메라롤에 사진 저장 &ndash;&gt;
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="40dp">
@@ -99,7 +99,7 @@
     <View
         android:background="@color/gray"
         android:layout_width="match_parent"
-        android:layout_height="1dp" />
+        android:layout_height="1dp" />-->
 
     <!-- 프로그램 정보 -->
     <RelativeLayout

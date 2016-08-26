@@ -1,9 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'Mongsil'
+            keyPassword 'mongsil'
+        }
+    }
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
-
     defaultConfig {
         applicationId "kr.co.tacademy.mongsil.mongsil"
         minSdkVersion 15
@@ -11,10 +16,18 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    dexOptions { // signing 하다가 막히면 이부분을 써라
+        javaMaxHeapSize "4g"
+        preDexLibraries = false
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true // 프로가드 적용하려면 true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+            pseudoLocalesEnabled true
+            versionNameSuffix '1.0'
+            zipAlignEnabled true
         }
     }
 }
@@ -44,6 +57,7 @@ dependencies {
     compile 'com.github.zomato:androidphotofilters:1.0.1'
     compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
     compile 'com.mukesh:photofilter:1.0.0'
+    compile 'com.android.support:multidex:1.0.1'
     compile('io.socket:socket.io-client:0.6.3') {
         exclude group: 'org.json', module: 'json'
     }

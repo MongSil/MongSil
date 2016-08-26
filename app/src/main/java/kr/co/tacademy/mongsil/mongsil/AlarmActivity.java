@@ -44,7 +44,7 @@ public class AlarmActivity extends BaseActivity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        // TODO : 위로 올릴 때
+                        // 위로 올릴 때
                         recyclerRefreshLayout.setRefreshing(false);
                     }
                 }, 2000);
@@ -57,12 +57,12 @@ public class AlarmActivity extends BaseActivity {
         alarmRecycler.setOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
-                // TODO : 밑으로 내릴 때
+                // 밑으로 내릴 때
             }
         });
         adapter = new AlarmRecyclerViewAdapter();
         alarmRecycler.setAdapter(adapter);
-        // TODO : 서버에서 댓글 목록을 받아온다 - GCM 사용
+        // 서버에서 댓글 목록을 받아온다 - GCM 사용
     }
 
     // 툴바 메뉴 선택

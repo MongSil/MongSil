@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="30dp"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <!-- https://github.com/rahatarmanahmed/CircularProgressView -->
+    <com.github.rahatarmanahmed.cpv.CircularProgressView
+        android:id="@+id/progress_view"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        app:cpv_animAutostart="true"
+        app:cpv_color="@android:color/holo_blue_light"
+        app:cpv_indeterminate="true" />
+    <TextView
+        android:id="@+id/progress_text"
+        android:text="@string/wait_message"
+        android:textSize="12sp"
+        android:textStyle="normal"
+        android:textColor="@android:color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/progress_view"
+        android:layout_toEndOf="@+id/progress_view" />
+</RelativeLayout>

@@ -22,9 +22,6 @@ import okhttp3.ResponseBody;
 import static android.util.Log.e;
 
 public class MapActivity extends BaseActivity implements View.OnClickListener{
-    public static final int RESULT_MAP = 1;
-
-    Intent intent;
     int order = 0;
     MapWeatherButton
             mapIncheon,
@@ -97,7 +94,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         MapWeatherButton v = (MapWeatherButton) view;
-        intent = getIntent();
+        Intent intent = getIntent();
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("name", v.getLocationName());
         setResult(RESULT_OK,intent);
@@ -168,43 +165,43 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
     private void initButton(String weatherCode) {
         if (order == 1) {
             mapSeoul.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
-            mapSeoul.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapSeoul.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 5));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapGangwon.getLocationName()));
         } else if (order == 2) {
             mapGangwon.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
-            mapGangwon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapGangwon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 5));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapChungju.getLocationName()));
         } else if (order == 3) {
             mapChungju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
-            mapChungju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapChungju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 5));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapJunju.getLocationName()));
         } else if (order == 4) {
             mapJunju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
-            mapJunju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapJunju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 5));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapDaejeon.getLocationName()));
         } else if (order == 5) {
             mapDaejeon.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
-            mapDaejeon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapDaejeon.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 5));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapGwangju.getLocationName()));
         } else if (order == 6) {
             mapGwangju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
-            mapGwangju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapGwangju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 5));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapDaegu.getLocationName()));
         } else if (order == 7) {
             mapDaegu.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
-            mapDaegu.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapDaegu.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 5));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapUlsan.getLocationName()));
         } else if (order == 8) {
             mapUlsan.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
-            mapUlsan.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapUlsan.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 5));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapBusan.getLocationName()));
         } else if (order == 9) {
             mapBusan.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
-            mapBusan.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapBusan.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 5));
             new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(mapJeju.getLocationName()));
         } else if (order == 10) {
             mapJeju.setImgLocationBackground(WeatherData.imgFromWeatherCode(weatherCode, 3));
-            mapJeju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 0));
+            mapJeju.setImgLocationWeatherIcon(WeatherData.imgFromWeatherCode(weatherCode, 5));
         }
         order++;
     }
@@ -220,7 +217,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
     }
 
     private void toMainActivityFromthis() {
-        intent = new Intent(MapActivity.this, MainActivity.class);
+        Intent intent = new Intent(MapActivity.this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();

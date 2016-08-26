@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -72,6 +73,8 @@ public class PostDetailActivity extends BaseActivity
     private String postId;
     private String userId;
 
+    CoordinatorLayout postDetailContainer;
+
     // 툴바 필드
     AppBarLayout appBar;
     Toolbar toolbar;
@@ -104,6 +107,8 @@ public class PostDetailActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_detail);
+
+        postDetailContainer = (CoordinatorLayout) findViewById(R.id.post_detail_container);
 
         appBar = (AppBarLayout) findViewById(R.id.appbar_post_detail);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -153,10 +158,12 @@ public class PostDetailActivity extends BaseActivity
         }
     }
 
+    ActionBar actionBar;
+
     private void init() {
         // 툴바
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
+        actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -210,7 +217,7 @@ public class PostDetailActivity extends BaseActivity
                 R.anim.bounce_interpolator, new LinearInterpolator()));
         AnimationDrawable animation =
                 (AnimationDrawable) imgWeatherIcon.getDrawable();
-        if(animation != null) {
+        if (animation != null) {
             animation.start();
         }
 
@@ -250,7 +257,7 @@ public class PostDetailActivity extends BaseActivity
             @Override
             public void onClick(View view) {
                 if (!isReplyContainer) {
-                    if(post.replyCount > 0) {
+                    if (post.replyCount > 0) {
                         appBar.setExpanded(false);
                     }
                     Animation upAnim = AnimationUtils.loadAnimation(
@@ -291,7 +298,38 @@ public class PostDetailActivity extends BaseActivity
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveShareImg();
+                appBar.setExpanded(true);
+                Animation downAnim = AnimationUtils.loadAnimation(
+                        getApplicationContext(), R.anim.anim_slide_out_bottom);
+                downAnim.setFillAfter(true);
+                downAnim.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        replyEditContainer.setVisibility(View.GONE);
+                        replyContainer.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                    }
+                });
+                replyEditContainer.startAnimation(downAnim);
+                isReplyContainer = false;
+                if(actionBar != null) {
+                    actionBar.setHomeAsUpIndicator(0);
+                }
+                tbThreeDot.setVisibility(View.GONE);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        saveShareImg();
+                    }
+                }, 1000);
             }
         });
 
@@ -338,9 +376,92 @@ public class PostDetailActivity extends BaseActivity
             isReplyContainer = false;
         }*/
     }
+
+    public boolean isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
     private void saveShareImg() {
         checkPermission();
-        Intent intent = new Intent(Intent.ACTION_SEND);
+        String fileName = "sns_upload_image_file.jpg";
+        File snsShareDir = new File(Environment.getExternalStorageDirectory() +
+                "/MongSil/");
+        FileOutputStream fos;
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (isStoragePermissionGranted()) {
+                postDetailContainer.buildDrawingCache();
+                Bitmap captureView = postDetailContainer.getDrawingCache();
+
+                try {
+                    if (!snsShareDir.exists()) {
+                        if (!snsShareDir.mkdirs()) {
+                        }
+                    }
+                    File file = new File(snsShareDir, fileName);
+                    if (!file.exists()) {
+                        file.createNewFile();
+                    }
+                    fos = new FileOutputStream(file);
+                    captureView.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_SUBJECT, post.content);
+                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+
+                    Intent target = Intent.createChooser(intent, "공유하기");
+                    startActivity(target);
+
+                } catch (Exception e) {
+                    Log.e("onTouch", e.toString(), e);
+                }
+            }
+        } else {
+            postDetailContainer.buildDrawingCache();
+            Bitmap captureView = postDetailContainer.getDrawingCache();
+            try {
+                if (!snsShareDir.exists()) {
+                    if (!snsShareDir.mkdirs()) {
+                    }
+                }
+                File file = new File(snsShareDir, fileName);
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                fos = new FileOutputStream(file);
+                captureView.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_SUBJECT, post.content);
+                intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(snsShareDir));
+
+                Intent target = Intent.createChooser(intent, "공유하기");
+                startActivity(target);
+
+            } catch (Exception e) {
+                Log.e("onTouch", e.toString(), e);
+            }
+        }
+        if(actionBar != null) {
+            actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
+        }
+        if(PropertyManager.getInstance().getUserId().equals(String.valueOf(post.userId))) {
+            tbThreeDot.setVisibility(View.VISIBLE);
+        }
+        if (snsShareDir != null && !PropertyManager.getInstance().getSaveGallery()) {
+            snsShareDir.deleteOnExit();
+        }
+        /*Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TITLE, post.content);
         if(post.bgImg != null) {
@@ -348,7 +469,7 @@ public class PostDetailActivity extends BaseActivity
                 intent.putExtra(Intent.EXTRA_TEXT, post.bgImg + "\n" + post.content);
             }
         }
-        startActivity(Intent.createChooser(intent, "공유하기"));
+        startActivity(Intent.createChooser(intent, "공유하기"));*/
     }
 
     private final int PERMISSION_REQUEST_STORAGE = 101;
@@ -432,7 +553,7 @@ public class PostDetailActivity extends BaseActivity
 
         @Override
         protected void onPostExecute(Post result) {
-            if(result != null) {
+            if (result != null) {
                 post = result;
                 init();
             } else {
@@ -446,7 +567,7 @@ public class PostDetailActivity extends BaseActivity
     @Override
     public void onMiddleAlone(int select) {
         switch (select) {
-            case 10 :
+            case 10:
                 finish();
                 break;
         }
@@ -497,17 +618,17 @@ public class PostDetailActivity extends BaseActivity
             if (result != null && result.size() > 0) {
                 int maxResultSize = result.size();
                 maxLoadSize = result.get(0).totalCount;
-                if(maxResultSize < maxLoadSize) {
+                if (maxResultSize < maxLoadSize) {
                     loadOnResult += maxResultSize;
                 }
-                Log.e(" 댓글 정보", maxResultSize +" " + loadOnResult);
+                Log.e(" 댓글 정보", maxResultSize + " " + loadOnResult);
 
                 replyRecycler.setVisibility(View.VISIBLE);
                 imgNoneReply.setVisibility(View.GONE);
                 noneReply.setVisibility(View.GONE);
 
                 replyAdapter.add(result);
-                if(result.size() <= maxLoadSize) {
+                if (result.size() <= maxLoadSize) {
                     replyRecycler.smoothScrollToPosition(result.size() - 1);
                 }
             } else {
@@ -524,16 +645,13 @@ public class PostDetailActivity extends BaseActivity
     // 댓글달기
     public class AsyncReplingRequest extends AsyncTask<String, String, String> {
 
-        ProgressDialog asyncDialog = new ProgressDialog(PostDetailActivity.this);
+        ProgressDialogFragment progressDialogFragment = ProgressDialogFragment.newInstance(0);
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setIndeterminate(true);
-            asyncDialog.setIndeterminateDrawable(getResources().getDrawable(R.drawable.loading_progress));
-            asyncDialog.setMessage(getResources().getString(R.string.wait_message));
-            asyncDialog.show();
+            getSupportFragmentManager().beginTransaction()
+                    .add(progressDialogFragment, "progress_dialog").commit();
         }
 
         @Override
@@ -562,7 +680,7 @@ public class PostDetailActivity extends BaseActivity
                 boolean flag = response.isSuccessful();
                 //응답 코드 200등등
                 int responseCode = response.code();
-                Log.e("응답코드 - ", responseCode+"");
+                Log.e("응답코드 - ", responseCode + "");
                 if (flag) {
                     Log.e("response결과", responseCode + "---" + response.message()); //읃답에 대한 메세지(OK)
                     Log.e("response응답바디", response.body().string()); //json으로 변신
@@ -585,11 +703,17 @@ public class PostDetailActivity extends BaseActivity
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialogFragment.dismiss();
+                }
+            }, 1000);
             if (result.equals("success")) {
                 new AsyncPostDetailReplyJSONList().execute(postId, "0");
                 Integer replyCountUp = Integer.valueOf(postReplyCount.getText().toString());
                 postReplyCount.setText(String.valueOf(replyCountUp + 1));
-                if(Integer.valueOf(postReplyCount.getText().toString()) == 1) {
+                if (Integer.valueOf(postReplyCount.getText().toString()) == 1) {
                     appBar.setExpanded(false);
                 }
             } else if (result.equals("fail")) {
@@ -598,28 +722,19 @@ public class PostDetailActivity extends BaseActivity
                         .add(MiddleAloneDialogFragment.newInstance(3), "middle_reply_fail")
                         .commit();
             }
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    asyncDialog.dismiss();
-                }
-            }, 1000);
         }
     }
 
     // 댓글수정
     public class AsyncModifyReplyRequest extends AsyncTask<String, String, String> {
 
-        ProgressDialog asyncDialog = new ProgressDialog(PostDetailActivity.this);
+        ProgressDialogFragment progressDialogFragment = ProgressDialogFragment.newInstance(0);
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setIndeterminate(true);
-            asyncDialog.setIndeterminateDrawable(getResources().getDrawable(R.drawable.loading_progress));
-            asyncDialog.setMessage(getResources().getString(R.string.wait_message));
-            asyncDialog.show();
+            getSupportFragmentManager().beginTransaction()
+                    .add(progressDialogFragment, "progress_dialog").commit();
         }
 
         @Override
@@ -671,19 +786,18 @@ public class PostDetailActivity extends BaseActivity
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialogFragment.dismiss();
+                }
+            }, 1000);
             if (result.equals("success")) {
                 new AsyncPostDetailReplyJSONList().execute(
                         postId, "0");
             } else if (result.equals("fail")) {
                 // 실패
             }
-
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    asyncDialog.dismiss();
-                }
-            }, 1000);
         }
     }
 

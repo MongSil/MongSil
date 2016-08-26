@@ -60,7 +60,6 @@ public class MainActivity extends BaseActivity
     private static final int RESULT_EDIT_PROFILE = 31;
     private static final int RESULT_POSTING = 32;
     private static final int RESULT_SETTING = 33;
-    private static final int RESULT_DELETE = 39;
 
     public interface OnLocationChangeListener {
         void onLocationChange(String location);
@@ -478,6 +477,23 @@ public class MainActivity extends BaseActivity
                 if(animationIcon != null) {
                     animationIcon.start();
                 }
+            } else {
+                weatherName.setText(getResources().getString(R.string.none_weather));
+                imgWeatherIcon.setImageDrawable(
+                        getResources().getDrawable(R.drawable.anim_list_icon_mongsil_smallrain));
+                AnimationDrawable animationIcon =
+                        (AnimationDrawable) imgWeatherIcon.getDrawable();
+                if(animationIcon != null) {
+                    animationIcon.start();
+                }
+                imgWeatherIcon.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        getSupportFragmentManager().beginTransaction()
+                                .add(MiddleAloneDialogFragment.newInstance(999), "sorry_to_user")
+                                .commit();
+                    }
+                });
             }
         }
     }

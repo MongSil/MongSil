@@ -27,6 +27,7 @@ public class WeatherData {
                    2 : 메인 배경 애니메이션 리소스
                    3 : 지도 원 배경 리소스
                    4 : 글 작성, 글 상세보기 배경 리소스
+                   5 : 지도 아이콘 리소스
         */
     // TODO : 글 작성 배경 다시 바꿔야함
     public static int imgFromWeatherCode(String code, int request) {
@@ -42,6 +43,8 @@ public class WeatherData {
                 return R.drawable.circle_sunny;
             } else if(request == 4) {
                 return R.drawable.background_sunny;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_sunny;
             }
         }
         if (code.equals("SKY_A02") || code.equals("1")) {
@@ -56,6 +59,8 @@ public class WeatherData {
                 return R.drawable.circle_cloud;
             } else if(request == 4) {
                 return R.drawable.background_smallcloud;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_littlecloud;
             }
         }
         if (code.equals("SKY_A03") || code.equals("2")) {
@@ -70,6 +75,8 @@ public class WeatherData {
                 return R.drawable.circle_cloud;
             } else if(request == 4) {
                 return R.drawable.background_manycloud;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_manycloud;
             }
         }
         if (code.equals("SKY_A04") || code.equals("3")) {
@@ -84,6 +91,8 @@ public class WeatherData {
                 return R.drawable.circle_small_rain;
             } else if(request == 4) {
                 return R.drawable.background_manycloud_rain;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_manycloud_rain;
             }
         }
         if (code.equals("SKY_A05") || code.equals("4")) {
@@ -98,6 +107,8 @@ public class WeatherData {
                 return R.drawable.circle_snow;
             } else if(request == 4) {
                 return R.drawable.background_manycloud_snow;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_manycloud_snow;
             }
         }
         if (code.equals("SKY_A06") || code.equals("5")) {
@@ -112,6 +123,8 @@ public class WeatherData {
                 return R.drawable.circle_cloud;
             } else if(request == 4) {
                 return R.drawable.background_manycloud_rain_snow;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_gray_rain_snow;
             }
         }
         if (code.equals("SKY_A07") || code.equals("6")) {
@@ -126,6 +139,8 @@ public class WeatherData {
                 return R.drawable.circle_cloud;
             } else if(request == 4) {
                 return R.drawable.background_gray;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_graycloud;
             }
         }
         if (code.equals("SKY_A08") || code.equals("7")) {
@@ -140,6 +155,8 @@ public class WeatherData {
                 return R.drawable.circle_small_rain;
             } else if(request == 4) {
                 return R.drawable.background_grayrain;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_gray_rain;
             }
         }
         if (code.equals("SKY_A09") || code.equals("8")) {
@@ -154,6 +171,8 @@ public class WeatherData {
                 return R.drawable.circle_snow;
             } else if(request == 4) {
                 return R.drawable.background_graysnow;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_gray_snow;
             }
         }
         if (code.equals("SKY_A10") || code.equals("9")) {
@@ -169,6 +188,8 @@ public class WeatherData {
             } else if(request == 4) {
                 // TODO : 흐리고 비 또는 눈 해야함
                 return R.drawable.background_graysnow;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_gray_rain_snow;
             }
         }
         if (code.equals("SKY_A11") || code.equals("10")) {
@@ -183,6 +204,8 @@ public class WeatherData {
                 return R.drawable.circle_bolt;
             } else if(request == 4) {
                 return R.drawable.background_gray_bolt;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_graycloud_bolt;
             }
         }
         if (code.equals("SKY_A12") || code.equals("11")) {
@@ -197,6 +220,8 @@ public class WeatherData {
                 return R.drawable.circle_bolt;
             } else if(request == 4) {
                 return R.drawable.background_bolt_rain;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_boltrain;
             }
         }
         if (code.equals("SKY_A13") || code.equals("12")) {
@@ -211,6 +236,8 @@ public class WeatherData {
                 return R.drawable.circle_bolt;
             } else if(request == 4) {
                 return R.drawable.background_bolt_snow;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_boltsnow;
             }
         }
         if (code.equals("SKY_A14") || code.equals("13")) {
@@ -225,6 +252,8 @@ public class WeatherData {
                 return R.drawable.circle_bolt;
             } else if(request == 4) {
                 return R.drawable.background_bolt_rain_snow;
+            } else if(request == 5) {
+                return R.drawable.map_icon_mongsil_bolt_rain_snow;
             }
         }
         return 0;

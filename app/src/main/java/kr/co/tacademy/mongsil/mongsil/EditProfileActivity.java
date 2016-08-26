@@ -1,15 +1,13 @@
 package kr.co.tacademy.mongsil.mongsil;
 
-import android.app.ProgressDialog;
 import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -21,7 +19,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -79,6 +76,7 @@ public class EditProfileActivity extends BaseActivity
 
     private UpLoadValueObject upLoadFile = null;
     private Handler handler = new Handler();
+    private boolean isDeleteProfileImg = false;
 
     class UpLoadValueObject {
         File file; //업로드할 파일
@@ -128,12 +126,11 @@ public class EditProfileActivity extends BaseActivity
         imgProfileContainer =
                 (LinearLayout) findViewById(R.id.img_profile_container);
         imgProfile = (CircleImageView) findViewById(R.id.img_profile);
+        Log.e("asdf", PropertyManager.getInstance().getUserProfileImg());
         if(!PropertyManager.getInstance().getUserProfileImg().isEmpty()) {
             Glide.with(MongSilApplication.getMongSilContext())
                     .load(PropertyManager.getInstance().getUserProfileImg())
                     .into(imgProfile);
-        } else {
-            imgProfile.setImageResource(R.drawable.none_my_profile);
         }
         imgProfileContainer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,8 +139,7 @@ public class EditProfileActivity extends BaseActivity
                     Toast.makeText(getApplicationContext(), "SD 카드가 없습니다.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                String currentAppPackage = getPackageName();
-                imageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), currentAppPackage);
+                imageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "MongSil");
 
                 getSupportFragmentManager().beginTransaction()
                         .add(BottomPicDialogFragment.newInstance(), "bottom_pic").commit();
@@ -206,6 +202,19 @@ public class EditProfileActivity extends BaseActivity
         startActivityForResult(intent, PICK_FROM_ALBUM);
     }
 
+    public  boolean isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK) {
@@ -227,64 +236,49 @@ public class EditProfileActivity extends BaseActivity
                 if (currentSelectedUri != null) {
                     //실제 Image의 full path name을 얻어온다.
                     if (findImageFileNameFromUri(currentSelectedUri)) {
-                        File galleryPicture = new File(currentFileName);
-                        upLoadFile = new UpLoadValueObject(
-                                resizingFile(galleryPicture, "gallery"), true);
-                    }
-                } else {
-                    Bundle extras = data.getExtras();
-                    Bitmap returedBitmap = (Bitmap) extras.get("data");
-                    if (tempSavedBitmapFile(returedBitmap)) {
-                        Log.e("임시이미지파일저장", "저장됨");
+                        currentFileName = getRealPathFromURI(currentSelectedUri);
+                        Bitmap scaledBitmap = BitmapUtil.SafeDecodeBitmapFile(currentFileName, "profile");
+                        backGroundFileUpload = tempSavedBitmapFile(scaledBitmap, 1);
+                        upLoadFile = new UpLoadValueObject(backGroundFileUpload, true);
                     } else {
-                        Log.e("임시이미지파일저장", "실패");
+                        Bundle extras = data.getExtras();
+                        Bitmap returnedBitmap = (Bitmap) extras.get("data");
+                        if (tempSavedBitmapFile(returnedBitmap)) {
+                            Log.e("임시이미지파일저장", "저장됨");
+                        } else {
+                            Log.e("임시이미지파일저장", "실패");
+                        }
                     }
                 }
                 cropIntent(currentSelectedUri);
                 break;
-
             }
             case PICK_FROM_CAMERA: {
                 //카메라캡쳐를 이용해 가져온 이미지
-                File cameraPicture = new File(imageDir, currentFileName);
-                upLoadFile = new UpLoadValueObject(
-                        resizingFile(cameraPicture, "camera"), true);
+                if (currentSelectedUri != null) {
+                    currentFileName = getRealPathFromURI(currentSelectedUri);
+                    Bitmap scaledBitmap = BitmapUtil.SafeDecodeBitmapFile(currentFileName, "profile");
+                    backGroundFileUpload = tempSavedBitmapFile(scaledBitmap, 1);
+                    upLoadFile = new UpLoadValueObject(backGroundFileUpload, true);
+                }
                 cropIntent(currentSelectedUri);
                 break;
             }
         }
     }
 
-    private File resizingFile(final File file, String divider) {
-        // 이미지 4배 압축 및 카메라일 경우 로테이션 돌림
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 4;
-        Bitmap orgImage = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        Bitmap resize = BitmapUtil.SafeDecodeBitmapFile(file.getAbsolutePath(), divider);
-        Matrix matrix = new Matrix();
-        if(divider.equals("camera")) {
-            matrix.postRotate(90);
-            resize = Bitmap.createBitmap(
-                    orgImage, 0, 0, orgImage.getWidth(), orgImage.getHeight(), matrix, true);
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) {
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
         }
-        // 리사이즈된 이미지 구함
-        OutputStream out = null;
-        try {
-            out = new FileOutputStream(file);
-            resize.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            return file;
-        } catch (FileNotFoundException fe) {
-            fe.printStackTrace();
-        } finally {
-            try {
-                if(out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return file;
+        return result;
     }
 
     private  void  cropIntent(Uri cropUri){
@@ -300,6 +294,7 @@ public class EditProfileActivity extends BaseActivity
 
         startActivityForResult(intent, CROP_FROM_CAMERA);
     }
+
     private boolean tempSavedBitmapFile(Bitmap tempBitmap) {
         boolean flag = false;
         try {
@@ -323,6 +318,38 @@ public class EditProfileActivity extends BaseActivity
             Log.e("저장중 문제발생", i.toString(), i);
         }
         return flag;
+    }
+
+    File backGroundFileUpload;
+
+    private  File tempSavedBitmapFile(Bitmap tempBitmap,int aaa) {
+
+        File tempFile = null;
+        try {
+            currentFileName = "upload_back_" + (System.currentTimeMillis() / 1000);
+            String fileSuffix = ".jpg";
+            if(!imageDir.exists()) {
+                imageDir.mkdirs();
+            }
+            //임시파일을 실행한다.
+            Log.e("asdf", imageDir +"");
+            tempFile = File.createTempFile(
+                    currentFileName,            // prefix
+                    fileSuffix,                   // suffix
+                    imageDir                   // directory
+            );
+            Log.e("asdf", tempFile.getAbsolutePath()+"");
+            final FileOutputStream bitmapStream = new FileOutputStream(tempFile);
+            tempBitmap.compress(Bitmap.CompressFormat.JPEG, 50, bitmapStream);
+            if (bitmapStream != null) {
+                bitmapStream.close();
+            }
+
+            return tempFile;
+        } catch (IOException iii) {
+            Log.e("저장중 문제발생!!", iii.toString(), iii);
+        }
+        return null;
     }
 
     private boolean findImageFileNameFromUri(Uri tempUri) {
@@ -370,6 +397,9 @@ public class EditProfileActivity extends BaseActivity
                 doTakeAlbumAction();
                 break;
             case 2 :
+                if(PropertyManager.getInstance().getUserProfileImg() != null) {
+                    isDeleteProfileImg = true;
+                }
                 PropertyManager.getInstance().setUserProfileImg("");
                 imgProfile.setImageResource(R.drawable.none_my_profile);
                 break;
@@ -393,8 +423,6 @@ public class EditProfileActivity extends BaseActivity
 
     // 프로필 업로드
     private class ProfileUpdateAsyncTask extends AsyncTask<UpLoadValueObject, Void, UserData> {
-
-
         private String username;
         private String area;
         private String uploadCode;
@@ -406,16 +434,13 @@ public class EditProfileActivity extends BaseActivity
             this.area = area;
         }
 
-        ProgressDialog asyncDialog = new ProgressDialog(EditProfileActivity.this);
+        ProgressDialogFragment progressDialogFragment = ProgressDialogFragment.newInstance(0);
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setIndeterminate(true);
-            asyncDialog.setIndeterminateDrawable(getResources().getDrawable(R.drawable.loading_progress));
-            asyncDialog.setMessage(getResources().getString(R.string.wait_message));
-            asyncDialog.show();
+            getSupportFragmentManager().beginTransaction()
+                    .add(progressDialogFragment, "progress_dialog").commit();
         }
 
         @Override
@@ -433,7 +458,11 @@ public class EditProfileActivity extends BaseActivity
                 if(!PropertyManager.getInstance().getUserProfileImg().isEmpty()) {
                     uploadCode = "2";
                     if(upLoadFile == null) {
-                        uploadCode = "3";
+                        if(isDeleteProfileImg) {
+                            uploadCode = "3";
+                        } else {
+                            uploadCode = "0";
+                        }
                     }
                 } else {
                     uploadCode = "1";
@@ -506,6 +535,12 @@ public class EditProfileActivity extends BaseActivity
         protected void onPostExecute(UserData result) {
             super.onPostExecute(result);
             Log.e("Profile edit Result : ", "> " + result);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialogFragment.dismiss();
+                }
+            }, 1000);
             if (result != null) {
                 if(upLoadFile != null) {
                     if (upLoadFile.tempFiles) {
@@ -514,7 +549,7 @@ public class EditProfileActivity extends BaseActivity
                 }
                 if (!PropertyManager.getInstance().getSaveGallery()) {
                     File f = new File(upLoadFile.file.getPath());
-                    if (f.exists()) {
+                    if (f != null) {
                         f.deleteOnExit();
                     }
                 }
@@ -527,12 +562,6 @@ public class EditProfileActivity extends BaseActivity
                                 "middle_edit_profile_fail").commit();
             }
             tbDone.setEnabled(true);
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    asyncDialog.dismiss();
-                }
-            }, 1000);
         }
     }
 
@@ -581,8 +610,8 @@ public class EditProfileActivity extends BaseActivity
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result.equals("success")) {
-                moveTaskToBack(true);
                 finish();
+                moveTaskToBack(true);
                 android.os.Process.killProcess(android.os.Process.myPid());
             } else if(result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction()

@@ -1,7 +1,7 @@
 package kr.co.tacademy.mongsil.mongsil;
 
-import android.app.ProgressDialog;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
@@ -11,7 +11,6 @@ import android.graphics.Matrix;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -29,6 +28,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -62,7 +62,6 @@ public class PostingActivity extends BaseActivity
         BottomPicDialogFragment.OnBottomPicDialogListener {
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
-    private static final int CROP_FROM_CAMERA = 2;
 
     // 툴바 필드
     TextView tbLocation, tbSave;
@@ -89,6 +88,8 @@ public class PostingActivity extends BaseActivity
     private UpLoadValueObject upLoadFile = null;
     private int currentPos = 0;
     private Handler handler = new Handler();
+    private boolean isDeleteProfileImg = false;
+    private boolean isImageShow = false;
 
     class UpLoadValueObject {
         File file; //업로드할 파일
@@ -128,7 +129,16 @@ public class PostingActivity extends BaseActivity
         tbSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                savePost();
+                InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if(getCurrentFocus() != null) {
+                    inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                }
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        savePost();
+                    }
+                }, 500);
             }
         });
 
@@ -143,7 +153,7 @@ public class PostingActivity extends BaseActivity
                                     area1,
                                     editPosting.getText().toString(),
                                     currentPos,
-                                    null), "preview").commit();
+                                    null, null), "preview").commit();
                 } else {
                     Bitmap imgPreview = BitmapFactory.decodeFile(upLoadFile.file.getAbsolutePath());
                     getSupportFragmentManager().beginTransaction()
@@ -151,7 +161,7 @@ public class PostingActivity extends BaseActivity
                                     area1,
                                     editPosting.getText().toString(),
                                     currentPos,
-                                    imgPreview), "preview").commit();
+                                    imgPreview, null), "preview").commit();
                 }
             }
         });
@@ -230,9 +240,16 @@ public class PostingActivity extends BaseActivity
                     Toast.makeText(getApplicationContext(), "SD 카드가 없습니다.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                String currentAppPackage = getPackageName();
-                imageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), currentAppPackage);
+                if(!PropertyManager.getInstance().getWarning()) {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(MiddleAloneDialogFragment.newInstance(100),
+                                    "middle_warning").commit();
+                    return;
+                }
+                imageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "MongSil");
+                if(!imageDir.exists()) {
+                    imageDir.mkdirs();
+                }
 
                 getSupportFragmentManager().beginTransaction()
                         .add(BottomPicDialogFragment.newInstance(), "bottom_pic").commit();
@@ -304,6 +321,26 @@ public class PostingActivity extends BaseActivity
         }
         selectWeatherPager.setCurrentItem(modifingPost.weatherCode);
         editPosting.setText(modifingPost.content);
+        imgPreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (modifingPost.bgImg == null) {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(PostingPreviewDialogFragment.newInstance(
+                                    area1,
+                                    editPosting.getText().toString(),
+                                    currentPos,
+                                    null, null), "preview").commit();
+                } else {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(PostingPreviewDialogFragment.newInstance(
+                                    area1,
+                                    editPosting.getText().toString(),
+                                    currentPos,
+                                    null, modifingPost.bgImg), "preview").commit();
+                }
+            }
+        });
     }
 
     // 날씨 뷰페이저 어뎁터
@@ -359,7 +396,7 @@ public class PostingActivity extends BaseActivity
     private static class NoPageTransformer implements ViewPager.PageTransformer {
         public void transformPage(View view, float position) {
             if (position < 0) {
-                view.setScrollX((int)((float)(view.getWidth()) * position));
+                view.setScrollX((int) ((float) (view.getWidth()) * position));
             } else if (position > 0) {
                 view.setScrollX(-(int) ((float) (view.getWidth()) * -position));
             } else {
@@ -387,7 +424,6 @@ public class PostingActivity extends BaseActivity
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         //업로드할 파일의 이름
         currentFileName = "upload_" + String.valueOf(System.currentTimeMillis() / 1000) + ".jpg";
-        currentSelectedUri = Uri.fromFile(new File(imageDir, currentFileName));
         cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, currentSelectedUri);
         startActivityForResult(cameraIntent, PICK_FROM_CAMERA);
     }
@@ -407,84 +443,93 @@ public class PostingActivity extends BaseActivity
         if (resultCode != RESULT_OK) {
             return;
         }
-
         switch (requestCode) {
-            case CROP_FROM_CAMERA: {
-                // 크롭된 이미지를 세팅
-                final Bundle extras = data.getExtras();
-                if (extras != null) {
-                    Bitmap photo = null;
-                    photo = extras.getParcelable("data");
-                    /*FileOutputStream out = null;
-                    try {
-                        out = new FileOutputStream(currentSelectedUri.getPath());
-                        photo.compress(Bitmap.CompressFormat.JPEG, 550, out);
-                    } catch (FileNotFoundException fe) {
-                        fe.printStackTrace();
-                    } finally {
-                        try {
-                            if(out != null) {
-                                out.close();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
+            case PICK_FROM_ALBUM:
+                currentSelectedUri = data.getData();
+                if (currentSelectedUri != null) {
+                    //실제 Image의 full path name을 얻어온다.
+                    if (findImageFileNameFromUri(currentSelectedUri)) {
+                        currentFileName = getRealPathFromURI(currentSelectedUri);
+                        Bitmap scaledBitmap = BitmapUtil.SafeDecodeBitmapFile(currentFileName, "");
+                        backGroundFileUpload = tempSavedBitmapFile(scaledBitmap, 1);
+                        upLoadFile = new UpLoadValueObject(backGroundFileUpload, true);
+                    } else {
+                        Bundle extras = data.getExtras();
+                        Bitmap returnedBitmap = (Bitmap) extras.get("data");
+                        if (tempSavedBitmapFile(returnedBitmap)) {
+                            Log.e("임시이미지파일저장", "저장됨");
+                        } else {
+                            Log.e("임시이미지파일저장", "실패");
                         }
-                    }*/
+                    }
+                }
+                isImageShow = true;
+                if(backGroundFileUpload != null) {
                     Glide.with(this)
-                            .load(currentSelectedUri)
+                            .load(backGroundFileUpload)
                             .into(new ViewTarget<ImageView, GlideDrawable>(imgPostingBackground) {
                                 @Override
                                 public void onResourceReady(GlideDrawable resource, GlideAnimation anim) {
-                                    // Set your resource on myView and/or start your animation here.
                                     imgPostingBackground.setBackgroundDrawable(resource);
                                 }
                             });
                 }
                 break;
-            }
-            case PICK_FROM_ALBUM: {
-                currentSelectedUri = data.getData();
-                if (currentSelectedUri != null) {
-                    //실제 Image의 full path name을 얻어온다.
-                    if (findImageFileNameFromUri(currentSelectedUri)) {
-                        File galleryPicture = new File(currentFileName);
-                        upLoadFile = new UpLoadValueObject(
-                                resizingFile(galleryPicture, "gallery"), true);
-                    }
-                } else {
-                    Bundle extras = data.getExtras();
-                    Bitmap returedBitmap = (Bitmap) extras.get("data");
-                    if (tempSavedBitmapFile(returedBitmap)) {
-                        Log.e("임시이미지파일저장", "저장됨");
-                    } else {
-                        Log.e("임시이미지파일저장", "실패");
-                    }
-                }
-                cropIntent(currentSelectedUri);
-                break;
-
-            }
             case PICK_FROM_CAMERA: {
                 //카메라캡쳐를 이용해 가져온 이미지
-                File cameraPicture = new File(imageDir, currentFileName);
-                upLoadFile = new UpLoadValueObject(
-                        resizingFile(cameraPicture, "camera"), true);
-                cropIntent(currentSelectedUri);
+                currentSelectedUri = data.getData();
+                if (currentSelectedUri != null) {
+                    currentFileName = getRealPathFromURI(currentSelectedUri);
+                    Bitmap scaledBitmap = BitmapUtil.SafeDecodeBitmapFile(currentFileName, "");
+                    backGroundFileUpload = tempSavedBitmapFile(scaledBitmap, 1);
+                    upLoadFile = new UpLoadValueObject(backGroundFileUpload, true);
+                }
+                isImageShow = true;
+                Glide.with(this)
+                        .load(currentSelectedUri)
+                        .into(new ViewTarget<ImageView, GlideDrawable>(imgPostingBackground) {
+                            @Override
+                            public void onResourceReady(GlideDrawable resource, GlideAnimation anim) {
+                                imgPostingBackground.setBackgroundDrawable(resource);
+                            }
+                        });
                 break;
             }
         }
     }
 
-    private File resizingFile(final File file, String divider) {
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) {
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
+    }
+
+    private File cameraResizingFile(final File file) {
         // 이미지 4배 압축 및 카메라일 경우 로테이션 돌림
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 4;
-        Bitmap resize = BitmapUtil.SafeDecodeBitmapFile(file.getAbsolutePath(), divider);
+        Bitmap orgImage = BitmapFactory.decodeFile(file.getPath(), options);
+        Bitmap resize = null;
         Matrix matrix = new Matrix();
+        matrix.postRotate(90);
+        resize = Bitmap.createBitmap(
+                orgImage, 0, 0, orgImage.getWidth(), orgImage.getHeight(), matrix, true);
+        // 리사이즈된 이미지 구함
         OutputStream out = null;
         try {
             out = new FileOutputStream(file);
-            resize.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            if(resize != null) {
+                resize.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            }
+            return file;
         } catch (FileNotFoundException fe) {
             fe.printStackTrace();
         } finally {
@@ -499,19 +544,7 @@ public class PostingActivity extends BaseActivity
         return file;
     }
 
-    private  void  cropIntent(Uri cropUri){
-        Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(cropUri, "image");
 
-        intent.putExtra("outputX", 360);
-        intent.putExtra("outputY", 640);
-        intent.putExtra("aspectX", 9);
-        intent.putExtra("aspectY", 16);
-        intent.putExtra("scale", true);
-        intent.putExtra("return-data", true);
-
-        startActivityForResult(intent, CROP_FROM_CAMERA);
-    }
     private boolean tempSavedBitmapFile(Bitmap tempBitmap) {
         boolean flag = false;
         try {
@@ -532,9 +565,41 @@ public class PostingActivity extends BaseActivity
             currentSelectedUri = Uri.fromFile(tempFile);
             flag = true;
         } catch (IOException i) {
-            Log.e("저장중 문제발생", i.toString(), i);
+            Log.e("저장중 문제발생", i.toString());
         }
         return flag;
+    }
+
+    File backGroundFileUpload;
+
+    private  File tempSavedBitmapFile(Bitmap tempBitmap,int aaa) {
+
+        File tempFile = null;
+        try {
+            currentFileName = "upload_back_" + (System.currentTimeMillis() / 1000);
+            String fileSuffix = ".jpg";
+            if(!imageDir.exists()) {
+                imageDir.mkdirs();
+            }
+            //임시파일을 실행한다.
+            Log.e("asdf", imageDir +"");
+            tempFile = File.createTempFile(
+                    currentFileName,            // prefix
+                    fileSuffix,                   // suffix
+                    imageDir                   // directory
+            );
+            Log.e("asdf", tempFile.getAbsolutePath()+"");
+            final FileOutputStream bitmapStream = new FileOutputStream(tempFile);
+            tempBitmap.compress(Bitmap.CompressFormat.JPEG, 50, bitmapStream);
+            if (bitmapStream != null) {
+                bitmapStream.close();
+            }
+
+            return tempFile;
+        } catch (IOException iii) {
+            Log.e("저장중 문제발생!!", iii.toString(), iii);
+        }
+        return null;
     }
 
     private boolean findImageFileNameFromUri(Uri tempUri) {
@@ -543,7 +608,6 @@ public class PostingActivity extends BaseActivity
         //실제 Image Uri의 절대이름
         String[] IMAGE_DB_COLUMN = {MediaStore.Images.ImageColumns.DATA};
         Cursor cursor = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             try {
                 //Primary Key값을 추출
                 String imagePK = String.valueOf(ContentUris.parseId(tempUri));
@@ -553,12 +617,15 @@ public class PostingActivity extends BaseActivity
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                         IMAGE_DB_COLUMN,
                         MediaStore.Images.Media._ID + "=?",
-                        new String[]{imagePK}, null, null);
-                if (cursor.getCount() > 0) {
-                    cursor.moveToFirst();
-                    currentFileName = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
-                    Log.e("fileName", String.valueOf(currentFileName));
-                    flag = true;
+                        new String[]{imagePK}, null);
+
+                if(cursor != null) {
+                    if (cursor.getCount() > 0) {
+                        cursor.moveToFirst();
+                        currentFileName = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+                        Log.e("fileName", String.valueOf(currentFileName));
+                        flag = true;
+                    }
                 }
             } catch (SQLiteException sqle) {
                 Log.e("findImage....", sqle.toString(), sqle);
@@ -567,7 +634,7 @@ public class PostingActivity extends BaseActivity
                     cursor.close();
                 }
             }
-        }
+
         return flag;
     }
 
@@ -582,6 +649,10 @@ public class PostingActivity extends BaseActivity
                 doTakeAlbumAction();
                 break;
             case 2:
+                if(isImageShow) {
+                    isDeleteProfileImg = true;
+                    isImageShow = false;
+                }
                 upLoadFile = null;
                 imgPostingBackground.setBackgroundResource(
                         WeatherData.imgFromWeatherCode(String.valueOf(currentPos), 4));
@@ -601,16 +672,13 @@ public class PostingActivity extends BaseActivity
             this.object = object;
         }
 
-        ProgressDialog asyncDialog = new ProgressDialog(PostingActivity.this);
+        ProgressDialogFragment progressDialogFragment = ProgressDialogFragment.newInstance(0);
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setIndeterminate(true);
-            asyncDialog.setIndeterminateDrawable(getResources().getDrawable(R.drawable.loading_progress));
-            asyncDialog.setMessage(getResources().getString(R.string.wait_message));
-            asyncDialog.show();
+            getSupportFragmentManager().beginTransaction()
+                    .add(progressDialogFragment, "progress_dialog").commit();
         }
 
         @Override
@@ -658,7 +726,6 @@ public class PostingActivity extends BaseActivity
                             .post(requestBody)
                             .build();
                 } else { // 이미지가 없을 경우 formBody
-                    // TODO : 형님께 area2가 있어야만 하는가 물어보자
                     RequestBody formBody = null;
                     if (area2 != null) {
                         if (!area2.equals("null")) {
@@ -672,16 +739,16 @@ public class PostingActivity extends BaseActivity
                                     .add("date", TimeData.getNow())
                                     .build();
                         }
-                    }else {
-                            formBody = new FormBody.Builder()
-                                    .add("uploadCode", uploadCode)
-                                    .add("area1", args[0])
-                                    .add("userId", args[1])
-                                    .add("weatherCode", args[2])
-                                    .add("content", args[3])
-                                    .add("date", TimeData.getNow())
-                                    .build();
-                        }
+                    } else {
+                        formBody = new FormBody.Builder()
+                                .add("uploadCode", uploadCode)
+                                .add("area1", args[0])
+                                .add("userId", args[1])
+                                .add("weatherCode", args[2])
+                                .add("content", args[3])
+                                .add("date", TimeData.getNow())
+                                .build();
+                    }
                     //요청 세팅
                     request = new Request.Builder()
                             .url(NetworkDefineConstant.POST_SERVER_POST)
@@ -718,19 +785,25 @@ public class PostingActivity extends BaseActivity
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialogFragment.dismiss();
+                }
+            }, 1000);
             if (result.equalsIgnoreCase("success")) {
                 Intent intent = new Intent(PostingActivity.this, MainActivity.class);
                 intent.putExtra("area1", area1);
                 setResult(RESULT_OK, intent);
                 finish();
-                if(upLoadFile != null) {
+                if (upLoadFile != null) {
                     if (upLoadFile.tempFiles) {
                         upLoadFile.file.deleteOnExit(); //임시파일을 삭제한다
                     }
                 }
                 if (!PropertyManager.getInstance().getSaveGallery()) {
                     File f = new File(upLoadFile.file.getPath());
-                    if (f.exists()) {
+                    if (f != null) {
                         f.deleteOnExit();
                     }
                 }
@@ -739,12 +812,6 @@ public class PostingActivity extends BaseActivity
                         .add(MiddleAloneDialogFragment.newInstance(2), "middle_post_fail").commit();
             }
             tbSave.setEnabled(true);
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    asyncDialog.dismiss();
-                }
-            }, 1000);
         }
     }
 
@@ -763,16 +830,13 @@ public class PostingActivity extends BaseActivity
             this.object = object;
         }
 
-        ProgressDialog asyncDialog = new ProgressDialog(PostingActivity.this);
+        ProgressDialogFragment progressDialogFragment = ProgressDialogFragment.newInstance(0);
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setIndeterminate(true);
-            asyncDialog.setIndeterminateDrawable(getResources().getDrawable(R.drawable.loading_progress));
-            asyncDialog.setMessage(getResources().getString(R.string.wait_message));
-            asyncDialog.show();
+            getSupportFragmentManager().beginTransaction()
+                    .add(progressDialogFragment, "progress_dialog").commit();
         }
 
         @Override
@@ -791,7 +855,11 @@ public class PostingActivity extends BaseActivity
                 if (beforeBgImg != null && !beforeBgImg.equals("null")) {
                     uploadCode = "2";
                     if (object == null) {
-                        uploadCode = "3";
+                        if(isImageShow) {
+                            uploadCode = "3";
+                        } else {
+                            uploadCode = "0";
+                        }
                     }
                 } else {
                     uploadCode = "1";
@@ -866,19 +934,25 @@ public class PostingActivity extends BaseActivity
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialogFragment.dismiss();
+                }
+            }, 1000);
             if (result.equalsIgnoreCase("success")) {
                 Intent intent = new Intent(PostingActivity.this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
-                if(upLoadFile != null) {
+                if (upLoadFile != null) {
                     if (upLoadFile.tempFiles) {
                         upLoadFile.file.deleteOnExit(); //임시파일을 삭제한다
                     }
                 }
                 if (!PropertyManager.getInstance().getSaveGallery()) {
                     File f = new File(upLoadFile.file.getPath());
-                    if (f.exists()) {
+                    if (f != null) {
                         f.deleteOnExit();
                     }
                 }
@@ -888,12 +962,6 @@ public class PostingActivity extends BaseActivity
             }
             tbSave.setEnabled(true);
             tbLocation.setEnabled(true);
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    asyncDialog.dismiss();
-                }
-            }, 1000);
         }
     }
 
@@ -913,8 +981,8 @@ public class PostingActivity extends BaseActivity
                 if (!area2.equals("null")) {
                     tbLocation.setText(String.valueOf(area1 + ", " + area2));
                 }
-            }else {
-                    tbLocation.setText(area1);
+            } else {
+                tbLocation.setText(area1);
             }
         }
     }

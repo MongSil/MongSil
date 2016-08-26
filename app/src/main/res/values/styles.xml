@@ -19,6 +19,11 @@
         <item name="android:windowBackground">@color/invisible</item>
     </style>
 
+    <style name="ProgressDialogTheme" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+    </style>
+
     <style name="LocationDialogTheme" parent="Theme.AppCompat.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowBackground">@color/invisible</item>

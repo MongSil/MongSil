@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -117,12 +118,14 @@ public class MainSocketPostFragment extends Fragment
             je.printStackTrace();
         }
     }
+    TextView nonePost;
     @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_post, container, false);
+        nonePost = (TextView) view.findViewById(R.id.text_none_post);
         postRecyclerView =
-                (RecyclerView) inflater.inflate(R.layout.fragment_post, container, false);
-
+                (RecyclerView) view.findViewById(R.id.post_recycler);
         final LinearLayoutManager layoutManager =
                 new LinearLayoutManager(MongSilApplication.getMongSilContext());
         postRecyclerView.setLayoutManager(layoutManager);
@@ -138,7 +141,7 @@ public class MainSocketPostFragment extends Fragment
                         }
                     }
                 });
-        return postRecyclerView;
+        return view;
     }
 
     private void LoadMore() {

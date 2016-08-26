@@ -111,6 +111,7 @@ public class BottomPicDialogFragment extends DialogFragment {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 Manifest.permission.READ_EXTERNAL_STORAGE},
                         PERMISSION_REQUEST_STORAGE);
+                dismissAllowingStateLoss();
             } else {
                 //사용자가 언제나 허락
             }

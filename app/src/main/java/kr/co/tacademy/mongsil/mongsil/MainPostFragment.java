@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,11 +78,16 @@ public class MainPostFragment extends Fragment
         socket.on("newPostNotice", onNewPostNotice);
     }
 
+    TextView nonePost;
+
     @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_post, container, false);
+        nonePost = (TextView) view.findViewById(R.id.text_none_post);
+        nonePost.setText(getResources().getString(R.string.none_main_post));
         postRecyclerView =
-                (RecyclerView) inflater.inflate(R.layout.fragment_post, container, false);
+                (RecyclerView) view.findViewById(R.id.post_recycler);
 
         postAdapter = new PostRecyclerViewAdapter(MongSilApplication.getMongSilContext());
         postRecyclerView.setAdapter(postAdapter);
@@ -99,7 +105,7 @@ public class MainPostFragment extends Fragment
                         }
                     }
                 });
-        return postRecyclerView;
+        return view;
     }
 
     private Emitter.Listener onConnectError = new Emitter.Listener() {
@@ -108,8 +114,9 @@ public class MainPostFragment extends Fragment
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    ProgressDialog dialog = new ProgressDialog(getContext());
-                    dialog.setMessage("서버와의 연결에 실패했습니다.\n잠시만 기다려주세요...");
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .add(ProgressDialogFragment.newInstance(1),
+                                    "fail_wait_progress").commit();
                 }
             }, 2000);
         }
@@ -224,6 +231,7 @@ public class MainPostFragment extends Fragment
         @Override
         protected void onPostExecute(PostData result) {
             if (result != null && result.post.size() > 0) {
+                nonePost.setVisibility(View.GONE);
                 int maxResultSize = result.post.size();
                 loadOnResult += maxResultSize;
                 maxLoadSize = result.totalCount;
@@ -242,6 +250,8 @@ public class MainPostFragment extends Fragment
                 }
 
                 postAdapter.add(result.post);
+            } else {
+                nonePost.setVisibility(View.GONE);
             }
         }
     }

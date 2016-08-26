@@ -35,8 +35,8 @@
         android:orientation="horizontal"
         android:layout_gravity="center"
         android:layout_below="@id/middle_dialog_line"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:layout_width="match_parent"
         android:layout_height="41dp">
         <Button

@@ -110,7 +110,7 @@ public class BitmapUtil {
     }
 
     //
-    public synchronized static Bitmap SafeDecodeBitmapFile(String strFilePath, String select)
+    public synchronized static Bitmap SafeDecodeBitmapFile(String strFilePath, String requestCode)
     {
         try
         {
@@ -122,25 +122,14 @@ public class BitmapUtil {
                 return null;
             }
 
-            // Max image size
-            final int IMAGE_MAX_SIZE 	= 0;
             BitmapFactory.Options bfo 	= new BitmapFactory.Options();
-            bfo.inSampleSize            = 4;
-            bfo.inJustDecodeBounds 		= true;
-            if(select.equals("camera")) {
-                bfo.inSampleSize = 8;
+            if(getBitmapOfWidth(strFilePath) <= getBitmapOfHeight(strFilePath)) {
+                bfo.outHeight = 1920;
+                bfo.outWidth = 1080;
             }
-            BitmapFactory.decodeFile(strFilePath, bfo);
-
-            if(bfo.outHeight * bfo.outWidth >= IMAGE_MAX_SIZE * IMAGE_MAX_SIZE)
-            {
-                bfo.inSampleSize = (int)Math.pow(2, (int)Math.round(Math.log(IMAGE_MAX_SIZE
-                        / (double) Math.max(bfo.outHeight, bfo.outWidth)) / Math.log(0.5)));
+            if(requestCode.equals("profile")) {
+                bfo.inSampleSize = 4;
             }
-            bfo.inJustDecodeBounds = false;
-            bfo.inPurgeable = true;
-            bfo.inDither = true;
-
             final Bitmap bitmap = BitmapFactory.decodeFile(strFilePath, bfo);
 
             int degree = GetExifOrientation(strFilePath);
@@ -155,6 +144,27 @@ public class BitmapUtil {
         }
     }
 
+    public static int getBitmapOfHeight( String fileName ){
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(fileName, options);
+            return options.outHeight;
+        } catch(Exception e) {
+            return 0;
+        }
+    }
+
+    public static int getBitmapOfWidth( String fileName ){
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(fileName, options);
+            return options.outHeight;
+        } catch(Exception e) {
+            return 0;
+        }
+    }
     /**
      * Bitmap을 ratio에 맞춰서 max값 만큼 resize한다.
      *
