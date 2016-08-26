@@ -18,3 +18,4 @@
 -dontwarn com.jeremyfeinstein.**
 -dontwarn jp.wasabeef.**
 -dontwarn okio.**
+-keep public class * implements com.bumptech.glide.module.GlideModule

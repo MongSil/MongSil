@@ -23,7 +23,7 @@ android {
             pseudoLocalesEnabled true
             versionNameSuffix '1.0'
             zipAlignEnabled true
-            debuggable true
+            debuggable false
         }
     }
     productFlavors {
