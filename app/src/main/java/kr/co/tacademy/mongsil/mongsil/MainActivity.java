@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -93,7 +94,7 @@ public class MainActivity extends BaseActivity
 
     // GPS
     GPSManager gpsManager;
-    boolean isCheckedGPS;
+    boolean isCheckedGPS = false;
 
     @Override
     protected void onResume() {
@@ -113,10 +114,15 @@ public class MainActivity extends BaseActivity
         else
         {
             // 성공
-            if (PropertyManager.getInstance().getUseGPS() && !isCheckedGPS) {
-                locationProviderCheck();
-                isCheckedGPS = true;
-            }
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (PropertyManager.getInstance().getUseGPS() && !isCheckedGPS) {
+                        locationProviderCheck();
+                        isCheckedGPS = true;
+                    }
+                }
+            }, 1000);
         }
     }
 
@@ -219,8 +225,13 @@ public class MainActivity extends BaseActivity
                     onLocationChangeListener.onLocationChange(location);
                     break;
                 case RESULT_EDIT_PROFILE :
-                    finish();
-                    startActivity(getIntent());
+                    if(PropertyManager.getInstance().getUserId() != null) {
+                        finish();
+                        startActivity(getIntent());
+                    } else {
+                        finish();
+                        System.exit(0);
+                    }
                     break;
                 case RESULT_POSTING :
                     finish();

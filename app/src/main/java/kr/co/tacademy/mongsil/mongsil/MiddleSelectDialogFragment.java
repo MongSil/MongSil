@@ -100,6 +100,7 @@ public class MiddleSelectDialogFragment extends DialogFragment {
                 break;
             case 10: // GPS 위치 설정창 요구하는 경우 [취소 / 확인]
                 dialog.setText(getResources().getText(R.string.gps_setting_request));
+                getDialog().setCanceledOnTouchOutside(false);
                 // if( ~~ ) {
                 negative.setOnClickListener(new View.OnClickListener() {
                     @Override

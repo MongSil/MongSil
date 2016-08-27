@@ -135,6 +135,7 @@
     <string name="none_main_post">글을 작성해보세요</string>
     <string name="none_my_reply">아직 댓글을 단  흔적이 없어요!</string>
     <string name="none_weather">알수없음</string>
-    <string name="sorry_to_user">날씨 쿼리 제한으로 오늘은\n날씨를 보여드릴 수 없어요.\n죄송합니다 ㅠㅠ</string>
+    <string name="sorry_to_user">날씨 쿼리 제한으로 오늘은\n날씨를 보여드릴 수 없어요!\n죄송합니다 ㅠㅠ</string>
     <string name="post_warning">잠깐! 이미지 등록하실 때\n세로가 긴 이미지를\n사용하시길 권장해요!</string>
+    <string name="delete_user">계정이 삭제되었어요!\n다시 돌아올 그날을 기다릴게요!</string>
 </resources>

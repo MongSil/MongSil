@@ -52,7 +52,8 @@ import okhttp3.ResponseBody;
 public class EditProfileActivity extends BaseActivity
         implements BottomPicDialogFragment.OnBottomPicDialogListener,
                 MiddleSelectDialogFragment.OnMiddleSelectDialogListener,
-                SelectLocationDialogFragment.OnSelectLocationListener {
+                SelectLocationDialogFragment.OnSelectLocationListener,
+                MiddleAloneDialogFragment.OnMiddleAloneDialogListener {
     private static final int RESULT_EDIT_PROFILE = 31;
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
@@ -421,6 +422,15 @@ public class EditProfileActivity extends BaseActivity
         }
     }
 
+    @Override
+    public void onMiddleAlone(int select) {
+        switch (select) {
+            case 1000 :
+                finish();
+                setResult(RESULT_OK);
+        }
+    }
+
     // 프로필 업로드
     private class ProfileUpdateAsyncTask extends AsyncTask<UpLoadValueObject, Void, UserData> {
         private String username;
@@ -611,9 +621,8 @@ public class EditProfileActivity extends BaseActivity
             super.onPostExecute(result);
             if (result.equals("success")) {
                 PropertyManager.getInstance().setUserId(null);
-                moveTaskToBack(true);
-                finish();
-                android.os.Process.killProcess(android.os.Process.myPid());
+                getSupportFragmentManager().beginTransaction()
+                        .add(MiddleAloneDialogFragment.newInstance(1000), "delete_user").commit();
             } else if(result.equals("fail")) {
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(2), "middle_dialog").commit();
