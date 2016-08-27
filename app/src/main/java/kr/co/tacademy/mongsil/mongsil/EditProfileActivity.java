@@ -620,7 +620,7 @@ public class EditProfileActivity extends BaseActivity
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (result.equals("success")) {
-                PropertyManager.getInstance().setUserId(null);
+                PropertyManager.getInstance().deleteUser();
                 getSupportFragmentManager().beginTransaction()
                         .add(MiddleAloneDialogFragment.newInstance(1000), "delete_user").commit();
             } else if(result.equals("fail")) {

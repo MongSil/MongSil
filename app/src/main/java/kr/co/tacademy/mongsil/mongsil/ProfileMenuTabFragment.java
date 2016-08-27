@@ -100,7 +100,6 @@ public class ProfileMenuTabFragment extends Fragment {
                     });
             initReply(userId);
         }
-
         return view;
     }
     private void PostLoadMore(String userId) {

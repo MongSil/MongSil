@@ -9,14 +9,19 @@ android {
         applicationId "kr.co.tacademy.mongsil.mongsil"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 4
+        versionCode 5
         versionName "1.03"
     }
-    /*dexOptions { // signing 하다가 막히면 이부분을 써라
+    dexOptions { // signing 하다가 막히면 이부분을 써라
         javaMaxHeapSize "4g"
         preDexLibraries = false
-    }*/
+        jumboMode = true
+    }
     buildTypes {
+        debug {
+            minifyEnabled false // 프로가드 적용하려면 true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false // 프로가드 적용하려면 true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

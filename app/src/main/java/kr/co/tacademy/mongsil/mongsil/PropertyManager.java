@@ -172,4 +172,14 @@ public class PropertyManager {
         editor.putBoolean(KEY_WARNING, warning);
         editor.commit();
     }
+
+    public void deleteUser() {
+        setDeviceId(null);
+        setUserId("");
+        setUserProfileImg("");
+        setNickname("");
+        setLocation("");
+        setFCMToken("");
+        setWarning(true);
+    }
 }

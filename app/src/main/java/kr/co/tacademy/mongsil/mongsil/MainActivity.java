@@ -131,11 +131,6 @@ public class MainActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // 글 작성 프레그먼트 선언
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_post_fragment_container,
-                        MainPostFragment.newInstance(PropertyManager.getInstance().getLocation()))
-                .commit();
         if(getIntent().hasExtra("fcmMessage")) {
             handler.postDelayed(new Runnable() {
                 @Override
@@ -200,6 +195,13 @@ public class MainActivity extends BaseActivity
             }
         });
         tbTitle.setText(PropertyManager.getInstance().getLocation());
+
+        // 글 작성 프레그먼트 선언
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_post_fragment_container,
+                        MainPostFragment.newInstance(PropertyManager.getInstance().getLocation()))
+                .commit();
+
         new AsyncLatLonWeatherJSONList().execute(
                 PropertyManager.getInstance().getLatLocation(),
                 PropertyManager.getInstance().getLonLocation());
