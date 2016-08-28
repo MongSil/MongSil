@@ -240,19 +240,19 @@ public class PostingActivity extends BaseActivity
                     Toast.makeText(getApplicationContext(), "SD 카드가 없습니다.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(!PropertyManager.getInstance().getWarning()) {
-                    getSupportFragmentManager().beginTransaction()
-                            .add(MiddleAloneDialogFragment.newInstance(100),
-                                    "middle_warning").commit();
-                    return;
-                }
                 imageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "MongSil");
                 if(!imageDir.exists()) {
                     imageDir.mkdirs();
                 }
 
-                getSupportFragmentManager().beginTransaction()
-                        .add(BottomPicDialogFragment.newInstance(), "bottom_pic").commit();
+                if(!PropertyManager.getInstance().getWarning()) {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(MiddleAloneDialogFragment.newInstance(100),
+                                    "middle_warning").commit();
+                } else {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(BottomPicDialogFragment.newInstance(), "bottom_pic").commit();
+                }
             }
         });
 

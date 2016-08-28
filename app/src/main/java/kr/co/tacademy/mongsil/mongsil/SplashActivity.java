@@ -36,6 +36,7 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         new AsyncLoginRequest().execute();
+
         splashContainer = (LinearLayout) findViewById(R.id.splash_container);
         // 타이틀
         imgSplashHere = (ImageView) findViewById(R.id.img_splash_title_text);
@@ -80,6 +81,17 @@ public class SplashActivity extends BaseActivity {
                 AnimationUtils.loadAnimation(
                         this, R.anim.anim_alpha_shadow);
         imgSplashShadow.startAnimation(shadowAnimation);
+
+        if(PropertyManager.getInstance().getDeviceId() == null) {
+            PropertyManager.getInstance().setDeviceId(getDevicesUUID());
+        }
+
+        Log.e("asdf", PropertyManager.getInstance().getNickname() + ", "
+                + PropertyManager.getInstance().getUserId() + ", "
+                + PropertyManager.getInstance().getDeviceId() + ", "
+                + PropertyManager.getInstance().getFCMToken() + ", "
+                + PropertyManager.getInstance().getLocation());
+
     }
 
     // 로그인 요청
@@ -93,10 +105,6 @@ public class SplashActivity extends BaseActivity {
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
                         .build();
-
-                if(PropertyManager.getInstance().getDeviceId() == null) {
-                    PropertyManager.getInstance().setDeviceId(getDevicesUUID());
-                }
 
                 //요청 Body 세팅==> 그전 Query Parameter세팅과 같은 개념
                 RequestBody formBody = new FormBody.Builder()
@@ -187,17 +195,10 @@ public class SplashActivity extends BaseActivity {
             }
         }
     }
-    // 꿀팁 String uuid = UUID.randomUUID().toString().replace('-', 'A');
     private String getDevicesUUID() {
-        UUID deviceUUID = null;
-        try {
-            String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-            deviceUUID = UUID.nameUUIDFromBytes(deviceId.getBytes("utf8"));
-            Log.e("생성된 UUID : ", deviceId);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return deviceUUID.toString();
+        String deviceUUID = UUID.randomUUID().toString().replace('-', 'A');
+        Log.e("생성된 UUID : ", deviceUUID);
+        return deviceUUID;
     }
 
     private void toMainActivityFromthis() {
