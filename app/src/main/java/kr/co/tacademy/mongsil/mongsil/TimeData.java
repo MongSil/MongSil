@@ -46,6 +46,7 @@ public class TimeData {
             long first = dateCompareFormat.parse(firstDate).getTime();
             long second = dateCompareFormat.parse(secondDate).getTime();
 
+            // 처음 날짜보다 두번째 날짜이 더 크면(최근이면) true
             if(first < second) {
                 return true;
             }

@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
 import io.socket.client.IO;
@@ -76,6 +78,7 @@ public class MainPostFragment extends Fragment
     }
 
     TextView nonePost;
+    LinearLayoutManager layoutManager;
 
     @Override
     public View onCreateView(final LayoutInflater inflater,
@@ -88,20 +91,20 @@ public class MainPostFragment extends Fragment
 
         postAdapter = new PostRecyclerViewAdapter(getActivity(), MongSilApplication.getMongSilContext());
         postRecyclerView.setAdapter(postAdapter);
-        final LinearLayoutManager layoutManager =
+        layoutManager =
                 new LinearLayoutManager(MongSilApplication.getMongSilContext());
         postRecyclerView.setLayoutManager(layoutManager);
-        postRecyclerView.setOnScrollListener(
-                new EndlessRecyclerOnScrollListener(layoutManager) {
-                    @Override
-                    public void onLoadMore(int current_page) {
-                        if (maxLoadSize != loadOnResult) {
-                            new AsyncPostJSONList().execute(area1, String.valueOf(loadOnResult));
-                        } else {
-                            this.setLoadingState(false);
-                        }
-                    }
-                });
+        postRecyclerView.setOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                this.setLoadingState(true);
+                if (maxLoadSize != loadOnResult && maxLoadSize > loadOnResult) {
+                    new AsyncPostJSONList().execute(area1, String.valueOf(loadOnResult));
+                } else {
+                    this.setLoadingState(false);
+                }
+            }
+        });
         return view;
     }
 
@@ -150,6 +153,10 @@ public class MainPostFragment extends Fragment
                     if(area1.equals(post.area1)) {
                         postAdapter.addPost(post);
                         postAdapter.notifyDataSetChanged();
+
+                        if (maxLoadSize != loadOnResult && maxLoadSize > loadOnResult) {
+                            loadOnResult = loadOnResult + 1;
+                        }
                     }
                 }
             });
@@ -159,9 +166,20 @@ public class MainPostFragment extends Fragment
     @Override
     public void onLocationChange(String location) {
         area1 = location;
-        new AsyncPostJSONList().execute(area1, "");
+        loadOnResult = 0;
         postAdapter.items.clear();
-        postAdapter.notifyDataSetChanged();
+        postRecyclerView.setOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int current_page) {
+                this.setLoadingState(true);
+                if (maxLoadSize != loadOnResult && maxLoadSize > loadOnResult) {
+                    new AsyncPostJSONList().execute(area1, String.valueOf(loadOnResult));
+                } else {
+                    this.setLoadingState(false);
+                }
+            }
+        });
+        new AsyncPostJSONList().execute(area1, "");
     }
 
     @Override
@@ -170,16 +188,15 @@ public class MainPostFragment extends Fragment
         if(getArguments() != null) {
             area1 = getArguments().getString(AREA1);
         }
-        new AsyncPostJSONList().execute(area1, "");
+        loadOnResult = 0;
         postAdapter.items.clear();
-        postAdapter.notifyDataSetChanged();
+        new AsyncPostJSONList().execute(area1, "");
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         socket.disconnect();
-
         socket.off(Socket.EVENT_CONNECT_ERROR, onConnectError);
         socket.off(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
         socket.off("newPostNotice", onNewPostNotice);
@@ -232,7 +249,6 @@ public class MainPostFragment extends Fragment
                 int maxResultSize = result.post.size();
                 loadOnResult += maxResultSize;
                 maxLoadSize = result.totalCount;
-
                 // Result의 Date와 오늘 날짜를 비교하는 로직
                 String compare = result.post.get(maxResultSize - 1).date.split(" ")[0];
                 for (int i = maxResultSize - 1; i >= 0; i--) {

@@ -245,7 +245,7 @@ public class PostDetailActivity extends BaseActivity
         replyRecycler.setOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int current_page) {
-                if (maxLoadSize != loadOnResult) {
+                if (maxLoadSize != loadOnResult && maxLoadSize > loadOnResult) {
                     new AsyncPostDetailReplyJSONList().execute(postId, String.valueOf(loadOnResult));
                 } else {
                     this.setLoadingState(false);

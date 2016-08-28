@@ -51,4 +51,8 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
     public void setLoadingState(boolean loading) {
         this.loading = loading;
     }
+
+    public boolean getLoadingState() {
+        return this.loading;
+    }
 }

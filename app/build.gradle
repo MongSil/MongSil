@@ -9,8 +9,8 @@ android {
         applicationId "kr.co.tacademy.mongsil.mongsil"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 6
-        versionName "1.031"
+        versionCode 9
+        versionName "1.034"
     }
     dexOptions { // signing 하다가 막히면 이부분을 써라
         javaMaxHeapSize "4g"

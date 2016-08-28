@@ -134,7 +134,7 @@ public class MainSocketPostFragment extends Fragment
                 new EndlessRecyclerOnScrollListener(layoutManager) {
                     @Override
                     public void onLoadMore(int current_page) {
-                        if (maxLoadSize != loadOnResult) {
+                        if (maxLoadSize != loadOnResult && maxLoadSize > loadOnResult) {
                             LoadMore();
                         } else {
                             this.setLoadingState(false);
