@@ -20,52 +20,52 @@
         android:label="@string/app_name"
         android:screenOrientation="portrait"
         android:theme="@style/AppTheme">
-        <activity android:name=".SplashActivity">
+        <activity android:name=".Activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AppTutorialActivity" />
-        <activity android:name=".SignUpActivity" />
+        <activity android:name=".Activities.AppTutorialActivity" />
+        <activity android:name=".Activities.SignUpActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name=".Activities.SettingActivity"
+            android:parentActivityName=".Activities.MainActivity" />
         <activity
-            android:name=".ProgramInfoActivity"
-            android:parentActivityName=".SettingActivity"/>
+            android:name=".Activities.ProgramInfoActivity"
+            android:parentActivityName=".Activities.SettingActivity"/>
         <activity
-            android:name=".MapActivity"
-            android:parentActivityName=".SettingActivity"/>
+            android:name=".Activities.MapActivity"
+            android:parentActivityName=".Activities.SettingActivity"/>
         <activity
-            android:name=".EditProfileActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name=".Activities.EditProfileActivity"
+            android:parentActivityName=".Activities.MainActivity" />
         <activity
-            android:name=".PostDetailActivity"
+            android:name=".Activities.PostDetailActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".PostingActivity"
+            android:name=".Activities.PostingActivity"
             android:windowSoftInputMode="stateVisible|adjustResize" />
-        <activity android:name=".OtherUserProfileActivity" />
-        <activity android:name=".PhotoViewActivity" />
-        <activity android:name=".PhotoFilterActivity" />
+        <activity android:name=".Activities.OtherUserProfileActivity" />
+        <activity android:name=".Activities.PhotoViewActivity" />
+        <activity android:name=".Activities.PhotoFilterActivity" />
 
-        <receiver android:name=".CheckNetwork">
+        <receiver android:name=".Utils.CheckNetwork">
             <intent-filter>
                 <action android:name="android.net.conn.BACKGROUND_DATA_SETTING_CHANGED" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name=".FireBaseInstanceIDService"
+            android:name=".Services.FireBaseInstanceIDService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -73,7 +73,7 @@
             </intent-filter>
         </service>
         <service
-            android:name=".FCMPushMessageService"
+            android:name=".Services.FCMPushMessageService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -82,7 +82,7 @@
         </service>
 
         <meta-data
-            android:name="kr.co.tacademy.mongsil.mongsil.MongSilGlideModule"
+            android:name="kr.co.tacademy.mongsil.mongsil.Utils.MongSilGlideModule"
             android:value="GlideModule" />
 
         <meta-data android:name="com.google.android.gms.version"

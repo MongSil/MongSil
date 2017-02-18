@@ -10,7 +10,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="kr.co.tacademy.mongsil.mongsil.PostingActivity">
+    tools:context="kr.co.tacademy.mongsil.mongsil.Activities.PostingActivity">
     <ScrollView
         android:id="@+id/scroll_posting"
         android:layout_gravity="center"

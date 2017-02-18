@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="kr.co.tacademy.mongsil.mongsil.MainActivity">
+    tools:context="kr.co.tacademy.mongsil.mongsil.Activities.MainActivity">
 
     <!-- 메인 화면 -->
     <RelativeLayout
