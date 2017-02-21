@@ -1,9 +1,14 @@
-package kr.co.tacademy.mongsil.mongsil.JSONParsers;
+package kr.co.tacademy.mongsil.mongsil.Constants;
 
 /**
- * Created by ccei on 2016-08-01.
+ * Created by Han on 2017-02-20.
  */
-public class NetworkDefineConstant {
+
+public class Constant {
+
+    /*
+    * 서버 관련 상수들
+     */
     public static final String SK_APP_KEY = "b97acc1a-399a-3ce5-b55a-f6bb4bf021f9";
     public static final String HOST_URL = "52.78.101.201";
     public static final String PORT_NUMBER = ":3003";

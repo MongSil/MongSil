@@ -9,7 +9,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -18,7 +18,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -40,34 +39,25 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
-import java.io.UnsupportedEncodingException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import kr.co.tacademy.mongsil.mongsil.Utils.BlurBuilder;
-import kr.co.tacademy.mongsil.mongsil.Managers.GPSManager;
-import kr.co.tacademy.mongsil.mongsil.JSONParsers.Models.LocationData;
+import kr.co.tacademy.mongsil.mongsil.Enums.DataEnum;
 import kr.co.tacademy.mongsil.mongsil.Fragments.MainPostFragment;
 import kr.co.tacademy.mongsil.mongsil.Fragments.MiddleAloneDialogFragment;
 import kr.co.tacademy.mongsil.mongsil.Fragments.MiddleSelectDialogFragment;
-import kr.co.tacademy.mongsil.mongsil.MongSilApplication;
-import kr.co.tacademy.mongsil.mongsil.JSONParsers.NetworkDefineConstant;
-import kr.co.tacademy.mongsil.mongsil.JSONParsers.Models.POIData;
-import kr.co.tacademy.mongsil.mongsil.JSONParsers.ParseDataParseHandler;
 import kr.co.tacademy.mongsil.mongsil.Fragments.ProfileMenuTabFragment;
-import kr.co.tacademy.mongsil.mongsil.Managers.PropertyManager;
-import kr.co.tacademy.mongsil.mongsil.R;
 import kr.co.tacademy.mongsil.mongsil.Fragments.SearchPOIDialogFragment;
+import kr.co.tacademy.mongsil.mongsil.JSONParsers.AsyncTaskJSONParser;
+import kr.co.tacademy.mongsil.mongsil.JSONParsers.Models.LocationData;
+import kr.co.tacademy.mongsil.mongsil.JSONParsers.Models.POIData;
 import kr.co.tacademy.mongsil.mongsil.JSONParsers.Models.TimeData;
 import kr.co.tacademy.mongsil.mongsil.JSONParsers.Models.WeatherData;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-
-import static android.util.Log.e;
+import kr.co.tacademy.mongsil.mongsil.Managers.GPSManager;
+import kr.co.tacademy.mongsil.mongsil.Managers.PropertyManager;
+import kr.co.tacademy.mongsil.mongsil.MongSilApplication;
+import kr.co.tacademy.mongsil.mongsil.R;
+import kr.co.tacademy.mongsil.mongsil.Utils.BlurBuilder;
 
 public class MainActivity extends BaseActivity
         implements SearchPOIDialogFragment.OnPOISearchListener,
@@ -111,23 +101,21 @@ public class MainActivity extends BaseActivity
     GPSManager gpsManager;
     boolean isCheckedGPS = false;
 
+    // Thread handler
+    Handler handler = new Handler();
+
     @Override
     protected void onResume() {
         super.onResume();
         int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (result != ConnectionResult.SUCCESS)
-        {//실패
-            GooglePlayServicesUtil.getErrorDialog(result, this, 0, new DialogInterface.OnCancelListener()
-            {
+        if (result != ConnectionResult.SUCCESS) {//실패
+            GooglePlayServicesUtil.getErrorDialog(result, this, 0, new DialogInterface.OnCancelListener() {
                 @Override
-                public void onCancel(DialogInterface dialog)
-                {
+                public void onCancel(DialogInterface dialog) {
                     finish();
                 }
             }).show();
-        }
-        else
-        {
+        } else {
             // 성공
             handler.postDelayed(new Runnable() {
                 @Override
@@ -141,21 +129,8 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    Handler handler = new Handler();
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        if(getIntent().hasExtra("fcmMessage")) {
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(new Intent(MainActivity.this, PostDetailActivity.class)
-                            .putExtra("fcmMessage", getIntent().getBundleExtra("fcmMessage")));
-                }
-            }, 1000);
-        }
-        // 툴바 추가
+    // 툴바 추가
+    private void createToolBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -180,16 +155,20 @@ public class MainActivity extends BaseActivity
                 startActivityForResult(intent, RESULT_MAP);
             }
         });
+    }
 
-        // 슬라이딩 메뉴(프로필메뉴)
+    // 슬라이딩 메뉴(프로필메뉴)
+    private void createSlidingMenu() {
         slidingMenu = new SlidingMenu(getApplicationContext());
         slidingMenu.setMode(SlidingMenu.LEFT);
         slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
         slidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
         slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
         slidingMenu.setMenu(loadSlidingMenu());
+    }
 
-        // 날씨
+    // 날씨
+    private void createWeatherContainer() {
         weatherContainer = (RelativeLayout) findViewById(R.id.main_weather_container);
         animBackgroundWeather = (ImageView) findViewById(R.id.anim_background_weather);
         imgWeatherIcon = (ImageView) findViewById(R.id.img_weather_icon);
@@ -199,8 +178,13 @@ public class MainActivity extends BaseActivity
         date = (TextView) findViewById(R.id.text_date);
         date.setText(TimeData.mainDateFormat);
         weatherName = (TextView) findViewById(R.id.text_weathername);
+        asyncWeatherData.execute(
+                PropertyManager.getInstance().getLatLocation(),
+                PropertyManager.getInstance().getLonLocation());
+    }
 
-        // 글쓰기 버튼
+    // 글쓰기 버튼
+    private void createPostButton() {
         btnCapturePost = (FloatingActionButton) findViewById(R.id.btn_capture_post);
         btnCapturePost.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,16 +195,36 @@ public class MainActivity extends BaseActivity
         });
         tbTitle.setText(PropertyManager.getInstance().getLocation());
 
-        // 글 작성 프레그먼트 선언
+    }
+
+    // 글 작성 프레그먼트 선언
+    private void createPostListFragment() {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_post_fragment_container,
                         MainPostFragment.newInstance(PropertyManager.getInstance().getLocation()))
                 .commit();
-
-        new AsyncLatLonWeatherJSONList().execute(
-                PropertyManager.getInstance().getLatLocation(),
-                PropertyManager.getInstance().getLonLocation());
     }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        if (getIntent().hasExtra("fcmMessage")) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(new Intent(MainActivity.this, PostDetailActivity.class)
+                            .putExtra("fcmMessage", getIntent().getBundleExtra("fcmMessage")));
+                }
+            }, 1000);
+        }
+        createToolBar();
+        createSlidingMenu();
+        createWeatherContainer();
+        createPostButton();
+        createPostListFragment();
+    }
+
 
     // 애니메이션 인터폴레이터 적용
     private Animation AnimationApplyInterpolater(
@@ -235,14 +239,14 @@ public class MainActivity extends BaseActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case RESULT_MAP :
+                case RESULT_MAP:
                     String location = data.getStringExtra("name");
                     tbTitle.setText(location);
-                    new AsyncLatLonWeatherJSONList().execute(LocationData.ChangeToLatLon(location));
+                    asyncWeatherData.execute(LocationData.ChangeToLatLon(location));
                     onLocationChangeListener.onLocationChange(location);
                     break;
-                case RESULT_EDIT_PROFILE :
-                    if(PropertyManager.getInstance().getUserId() != null) {
+                case RESULT_EDIT_PROFILE:
+                    if (PropertyManager.getInstance().getUserId() != null) {
                         finish();
                         startActivity(getIntent());
                     } else {
@@ -250,17 +254,16 @@ public class MainActivity extends BaseActivity
                         System.exit(0);
                     }
                     break;
-                case RESULT_POSTING :
+                case RESULT_POSTING:
                     finish();
                     startActivity(getIntent());
                     String area1Posting = data.getStringExtra("area1");
                     tbTitle.setText(area1Posting);
-                    new AsyncLatLonWeatherJSONList().execute(
-                            LocationData.ChangeToLatLon(area1Posting));
+                    asyncWeatherData.execute(LocationData.ChangeToLatLon(area1Posting));
                     onLocationChangeListener.onLocationChange(area1Posting);
                     break;
-                case RESULT_SETTING :
-                    if(PropertyManager.getInstance().getUseGPS()) {
+                case RESULT_SETTING:
+                    if (PropertyManager.getInstance().getUseGPS()) {
                         finish();
                         startActivity(getIntent());
                     }
@@ -275,11 +278,14 @@ public class MainActivity extends BaseActivity
         if (poiData != null) {
             String location = poiData.getUpperAddrName();
             tbTitle.setText(location);
-            new AsyncLatLonWeatherJSONList().execute(poiData.getNoorLat(), poiData.getNoorLon());
+            asyncWeatherData.execute(poiData.getNoorLat(), poiData.getNoorLon());
             onLocationChangeListener.onLocationChange(location);
         }
     }
 
+    /*
+    * 슬라이딩 메뉴
+    */
     ImageView imgProfileBackground;
     CircleImageView imgProfile;
     TextView textMyName, textMyLocation;
@@ -290,10 +296,8 @@ public class MainActivity extends BaseActivity
     // 슬라이딩메뉴 뷰
     public View loadSlidingMenu() {
         View menu = getLayoutInflater().inflate(R.layout.layout_profile_menu, null);
-
         imgProfileBackground =
                 (ImageView) menu.findViewById(R.id.img_profile_background);
-
         imgProfile =
                 (CircleImageView) menu.findViewById(R.id.img_profile);
         Log.e("프로필이미지 value : ", " " + PropertyManager.getInstance().getUserProfileImg());
@@ -451,144 +455,68 @@ public class MainActivity extends BaseActivity
     }
 
     // 위도, 경도 날씨 AsyncTask
-    public class AsyncLatLonWeatherJSONList extends AsyncTask<String, Integer, WeatherData> {
+    AsyncTaskJSONParser<WeatherData> asyncWeatherData = new AsyncTaskJSONParser<WeatherData>
+                    (DataEnum.WEATHER_DATA,
+                            new AsyncTaskJSONParser.ProcessResponse<WeatherData>() {
+                        @Override
+                        public void process(WeatherData result) {
+                            if (result != null) {
+                                weatherName.setText(result.getName());
+                                imgWeatherIcon.setImageResource(
+                                        WeatherData.imgFromWeatherCode(result.getCode(), 0));
+                                weatherContainer.setBackgroundResource(
+                                        WeatherData.imgFromWeatherCode(result.getCode(), 1));
+                                animBackgroundWeather.setImageResource(
+                                        WeatherData.imgFromWeatherCode(result.getCode(), 2));
 
-        @Override
-        protected WeatherData doInBackground(String... args) {
-            Response response = null;
-            try {
-                OkHttpClient toServer = new OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
-
-                Log.e("좌표", args[0] + " " + args[1]);
-                Request request = new Request.Builder()
-                        .addHeader("Accept", "application/json")
-                        .addHeader("appKey", NetworkDefineConstant.SK_APP_KEY)
-                        .url(String.format(
-                                NetworkDefineConstant.SK_WEATHER_LAT_LON,
-                                args[0], args[1]))
-                        .build();
-
-                response = toServer.newCall(request).execute();
-                ResponseBody responseBody = response.body();
-
-                boolean flag = response.isSuccessful();
-                int responseCode = response.code();
-                if (responseCode >= 400) return null;
-                if (flag) {
-                    return ParseDataParseHandler.getJSONWeatherList(
-                            new StringBuilder(responseBody.string()));
-                }
-            } catch (UnknownHostException une) {
-                e("connectionFail", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                e("connectionFail", uee.toString());
-            } catch (Exception e) {
-                e("connectionFail", e.toString());
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(WeatherData result) {
-            if (result != null) {
-                weatherName.setText(result.getName());
-                imgWeatherIcon.setImageResource(WeatherData.imgFromWeatherCode(result.getCode(), 0));
-                weatherContainer.setBackgroundResource(WeatherData.imgFromWeatherCode(result.getCode(), 1));
-                animBackgroundWeather.setImageResource(WeatherData.imgFromWeatherCode(result.getCode(), 2));
-
-                AnimationDrawable animationBackground =
-                        (AnimationDrawable) animBackgroundWeather.getDrawable();
-                if(animationBackground != null) {
-                    animationBackground.start();
-                }
-                AnimationDrawable animationIcon =
-                        (AnimationDrawable) imgWeatherIcon.getDrawable();
-                if(animationIcon != null) {
-                    animationIcon.start();
-                }
-            } else {
-                weatherName.setText(getResources().getString(R.string.none_weather));
-                imgWeatherIcon.setImageDrawable(
-                        getResources().getDrawable(R.drawable.anim_list_icon_mongsil_smallrain));
-                AnimationDrawable animationIcon =
-                        (AnimationDrawable) imgWeatherIcon.getDrawable();
-                if(animationIcon != null) {
-                    animationIcon.start();
-                }
-                imgWeatherIcon.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        getSupportFragmentManager().beginTransaction()
-                                .add(MiddleAloneDialogFragment.newInstance(999), "sorry_to_user")
-                                .commit();
-                    }
-                });
-            }
-        }
-    }
+                                AnimationDrawable animationBackground =
+                                        (AnimationDrawable) animBackgroundWeather.getDrawable();
+                                if (animationBackground != null) {
+                                    animationBackground.start();
+                                }
+                                AnimationDrawable animationIcon =
+                                        (AnimationDrawable) imgWeatherIcon.getDrawable();
+                                if (animationIcon != null) {
+                                    animationIcon.start();
+                                }
+                            } else {
+                                weatherName.setText(getResources().getString(R.string.none_weather));
+                                imgWeatherIcon.setImageDrawable(
+                                        getResources().getDrawable(
+                                                R.drawable.anim_list_icon_mongsil_smallrain));
+                                AnimationDrawable animationIcon =
+                                        (AnimationDrawable) imgWeatherIcon.getDrawable();
+                                if (animationIcon != null) {
+                                    animationIcon.start();
+                                }
+                                imgWeatherIcon.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        getSupportFragmentManager().beginTransaction()
+                                                .add(MiddleAloneDialogFragment.newInstance(999),
+                                                        "sorry_to_user")
+                                                .commit();
+                                    }
+                                });
+                            }
+                        }
+                    });
 
     // 역지오코딩 AsyncTask
-    public class AsyncReGeoJSONList extends AsyncTask<String, String, String> {
-
-        @Override
-        protected String doInBackground(String... args) {
-            Response response = null;
-            try {
-                OkHttpClient toServer = new OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
-
-                Request request = new Request.Builder()
-                        .addHeader("Accept", "application/json")
-                        .addHeader("appKey", NetworkDefineConstant.SK_APP_KEY)
-                        .url(String.format(
-                                NetworkDefineConstant.SK_REVERSE_GEOCOING,
-                                args[0], args[1]))
-                        .build();
-                response = toServer.newCall(request).execute();
-                ResponseBody responseBody = response.body();
-
-                boolean flag = response.isSuccessful();
-                int responseCode = response.code();
-                Log.e("응답 코드 : ", responseCode + "");
-                if (responseCode >= 400) return null;
-                if (flag) {
-                    return ParseDataParseHandler.getJSONResGeo(
-                            new StringBuilder(responseBody.string()));
-                }
-            } catch (UnknownHostException une) {
-                e("connectionFail", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                e("connectionFail", uee.toString());
-            } catch (Exception e) {
-                e("connectionFail", e.toString());
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Log.e("역지오코딩 결과 :", result+"");
-            if (result != null) {
-                String GPSlocation = LocationData.ChangeToShortName(result);
-                Log.e("GPSlocation 결과 :", GPSlocation);
-                tbTitle.setText(GPSlocation);
-                onLocationChangeListener.onLocationChange(GPSlocation);
-            }
-        }
-    }
+    AsyncTaskJSONParser<String> asyncReGeo = new AsyncTaskJSONParser<String>
+                    (DataEnum.STRING_DATA.setTypeEnum(DataEnum.TypeEnum.RE_GEO),
+                            new AsyncTaskJSONParser.ProcessResponse<String>() {
+                        @Override
+                        public void process(String result) {
+                            Log.e("역지오코딩 결과 :", result + "");
+                            if (result != null) {
+                                String GPSlocation = LocationData.ChangeToShortName(result);
+                                Log.e("GPSlocation 결과 :", GPSlocation);
+                                tbTitle.setText(GPSlocation);
+                                onLocationChangeListener.onLocationChange(GPSlocation);
+                            }
+                        }
+                    });
 
     // 툴바 메뉴 선택
     @Override
@@ -636,14 +564,15 @@ public class MainActivity extends BaseActivity
     public void handleNewLocation(Location location) {
         String lat = String.valueOf(location.getLatitude());
         String lng = String.valueOf(location.getLongitude());
-        Log.e("handleNewLocation" + " 실행 : ", lat +" "+ lng);
-        new AsyncReGeoJSONList().execute(lat, lng);
-        new AsyncLatLonWeatherJSONList().execute(lat, lng);
+        Log.e("handleNewLocation" + " 실행 : ", lat + " " + lng);
+        asyncReGeo.execute(lat, lng);
+        asyncWeatherData.execute(lat, lng);
     }
 
     LocationManager locationManager;
+
     private void locationProviderCheck() {
-        if(locationManager == null) {
+        if (locationManager == null) {
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         }
 
@@ -686,10 +615,10 @@ public class MainActivity extends BaseActivity
     @Override
     public void onMiddleSelect(int select) {
         switch (select) {
-            case 100 :
+            case 100:
                 PropertyManager.getInstance().setUseGps(false);
                 break;
-            case 101 :
+            case 101:
                 startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                 PropertyManager.getInstance().setUseGps(true);
                 break;

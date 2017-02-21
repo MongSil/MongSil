@@ -524,6 +524,7 @@ public class PostingActivity extends BaseActivity
         }
         return result;
     }
+/*
 
     private File cameraResizingFile(final File file) {
         // 이미지 4배 압축 및 카메라일 경우 로테이션 돌림
@@ -556,6 +557,7 @@ public class PostingActivity extends BaseActivity
         }
         return file;
     }
+*/
 
 
     private boolean tempSavedBitmapFile(Bitmap tempBitmap) {

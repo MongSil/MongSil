@@ -312,4 +312,17 @@ public class ParseDataParseHandler {
         }
         return null;
     }
+
+    public static String getJSONGoodOrNo(StringBuilder buf) {
+        JSONObject jsonObject;
+
+        try {
+            JSONObject object = new JSONObject(buf.toString());
+            String result = object.getString("msg");
+            return result;
+        } catch (JSONException je) {
+            Log.e("POST:UserLogin", "JSON파싱 중 에러발생", je);
+        }
+        return null;
+    }
 }

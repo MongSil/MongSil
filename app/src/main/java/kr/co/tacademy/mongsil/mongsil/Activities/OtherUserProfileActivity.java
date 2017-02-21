@@ -3,7 +3,6 @@ package kr.co.tacademy.mongsil.mongsil.Activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -20,26 +19,17 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
-import java.io.UnsupportedEncodingException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import kr.co.tacademy.mongsil.mongsil.Utils.BlurBuilder;
+import kr.co.tacademy.mongsil.mongsil.Enums.DataEnum;
 import kr.co.tacademy.mongsil.mongsil.Fragments.MiddleAloneDialogFragment;
-import kr.co.tacademy.mongsil.mongsil.MongSilApplication;
-import kr.co.tacademy.mongsil.mongsil.JSONParsers.NetworkDefineConstant;
-import kr.co.tacademy.mongsil.mongsil.JSONParsers.ParseDataParseHandler;
 import kr.co.tacademy.mongsil.mongsil.Fragments.ProfileMenuTabFragment;
-import kr.co.tacademy.mongsil.mongsil.R;
+import kr.co.tacademy.mongsil.mongsil.JSONParsers.AsyncTaskJSONParser;
 import kr.co.tacademy.mongsil.mongsil.JSONParsers.Models.UserData;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-
-import static android.util.Log.e;
+import kr.co.tacademy.mongsil.mongsil.MongSilApplication;
+import kr.co.tacademy.mongsil.mongsil.R;
+import kr.co.tacademy.mongsil.mongsil.Utils.BlurBuilder;
 
 public class OtherUserProfileActivity extends BaseActivity {
     private static final String USERID = "userid";
@@ -82,7 +72,7 @@ public class OtherUserProfileActivity extends BaseActivity {
         viewPager = (ViewPager) findViewById(R.id.viewpager_menu);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
-        new AsyncUserJSONInfo().execute(userId);
+        asyncUserData.execute(userId);
 
     }
 
@@ -215,57 +205,17 @@ public class OtherUserProfileActivity extends BaseActivity {
     }
 
     // 유저정보 얻어옴
-    public class AsyncUserJSONInfo
-            extends AsyncTask<String, String, UserData> {
-
-        @Override
-        protected UserData doInBackground(String... args) {
-            Response response = null;
-            try{
-                OkHttpClient toServer = new OkHttpClient.Builder()
-                        .connectTimeout(15, TimeUnit.SECONDS)
-                        .readTimeout(15, TimeUnit.SECONDS)
-                        .build();
-
-                Request request = new Request.Builder()
-                        .url(String.format(
-                                NetworkDefineConstant.GET_SERVER_USER_INFO,
-                                args[0]))
-                        .build();
-                response = toServer.newCall(request).execute();
-                ResponseBody responseBody = response.body();
-                boolean flag = response.isSuccessful();
-
-                int responseCode = response.code();
-                if (responseCode >= 400) return null;
-                if (flag) {
-                    return ParseDataParseHandler.getJSONUserInfo(
-                            new StringBuilder(responseBody.string()));
+    AsyncTaskJSONParser<UserData> asyncUserData = new AsyncTaskJSONParser<UserData>
+            (DataEnum.USER_DATA, new AsyncTaskJSONParser.ProcessResponse<UserData>() {
+                @Override
+                public void process(UserData result) {
+                    if (result != null) {
+                        init(result);
+                    } else {
+                        getSupportFragmentManager().beginTransaction()
+                                .add(MiddleAloneDialogFragment.newInstance(13),
+                                        "middle_user_info_fail").commit();
+                    }
                 }
-            }catch (UnknownHostException une) {
-                e("fileUpLoad", une.toString());
-            } catch (UnsupportedEncodingException uee) {
-                e("fileUpLoad", uee.toString());
-            } catch (Exception e) {
-                e("fileUpLoad", e.toString());
-            } finally {
-                if (response != null) {
-                    response.close();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(UserData data) {
-            super.onPostExecute(data);
-            if (data != null) {
-                init(data);
-            } else {
-                getSupportFragmentManager().beginTransaction()
-                        .add(MiddleAloneDialogFragment.newInstance(13),
-                                "middle_user_info_fail").commit();
-            }
-        }
-    }
+            });
 }

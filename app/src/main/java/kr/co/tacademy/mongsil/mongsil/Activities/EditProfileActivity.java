@@ -33,6 +33,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import kr.co.tacademy.mongsil.mongsil.JSONParsers.AsyncTaskJSONParser;
 import kr.co.tacademy.mongsil.mongsil.Utils.BitmapUtil;
 import kr.co.tacademy.mongsil.mongsil.Fragments.BottomPicDialogFragment;
 import kr.co.tacademy.mongsil.mongsil.Fragments.MiddleAloneDialogFragment;
@@ -87,7 +88,7 @@ public class EditProfileActivity extends BaseActivity
     private Handler handler = new Handler();
     private boolean isDeleteProfileImg = false;
 
-    class UpLoadValueObject {
+    public class UpLoadValueObject {
         File file; //업로드할 파일
         boolean tempFiles; //임시파일 유무
 
@@ -439,6 +440,7 @@ public class EditProfileActivity extends BaseActivity
         }
     }
 
+    // TODO Async보류
     // 프로필 업로드
     private class ProfileUpdateAsyncTask extends AsyncTask<UpLoadValueObject, Void, UserData> {
         private String username;
@@ -583,6 +585,7 @@ public class EditProfileActivity extends BaseActivity
         }
     }
 
+    // TODO Async보류
     // 계정 삭제
     public class AsyncUserRemoveRequest extends AsyncTask<String, String, String> {
         @Override
